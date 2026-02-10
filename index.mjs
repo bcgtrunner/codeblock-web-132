@@ -116,23 +116,4 @@ class Interpreter {
     }
 }
 
-const root = new ASTNode("assign", null, [
-    new ASTNode("variable", "x"),
-    new ASTNode("call", null, [
-        new ASTNode("variable", "add"),
-        new ASTNode("literal", 2),
-        new ASTNode("call", null, [
-            new ASTNode("variable", "mul"),
-            new ASTNode("literal", 3),
-            new ASTNode("literal", 4)
-        ])
-    ])
-]);
-
-const interp = new Interpreter(root);
-const result = interp.run();
-
-console.log(root);
-
-console.log(interp.stack)
-console.log(interp.stack.lookup("x"));
+export { ASTNode, Interpreter }
