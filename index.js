@@ -1,14 +1,11 @@
-var a = 0;
-
-init();
-
-
-Print = function () {
-    console.log("Hello, World!");
-    console.log(a);
+class Var
+{
+    type
+    value
+    constructor(a, b) {
+        this.type = a
+        this.value = b
+    }
 }
-Print();
 
-function init() {
-    a += 30;
-}
+const pi = new Var("float", 3.141592653589793)
