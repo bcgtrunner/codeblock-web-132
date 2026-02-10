@@ -70,6 +70,13 @@ class Interpreter {
 
             case "call":
                 const funcName = node.children[0].value;
+                /**
+                 * TODO:
+                 * implement user defined functions
+                 * as the first thing to do here we could inject the builtins
+                 * into the local scope, instead of magic values as they are
+                 * right now. 
+                 */
                 if (!(funcName in this.builtins))
                     throw new Error(`Unknown function ${funcName}`);
 
