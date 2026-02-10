@@ -52,7 +52,8 @@ class Interpreter {
             mul: (a, b) => a * b,
             div: (a, b) => Math.floor(a / b),
             truediv: (a, b) => a / b,
-            mod: (a, b) => a % b,
+            mod: (a, b) => ((a % b) + b) % b,
+            rem: (a, b) => a % b,
             pow: (a, b) => Math.pow(a, b),
 
             sqrt: (a) => Math.sqrt(a),
