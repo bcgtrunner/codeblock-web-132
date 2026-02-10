@@ -83,6 +83,16 @@ class Interpreter {
                 const args = node.children.slice(1).map(arg => this.eval(arg).value);
                 const result = this.builtins[funcName](...args);
                 return new Var("number", result);
+            
+                /**
+                 * TODO:
+                 * implement if-elif-else, while, for (as the last thing probably)
+                 * I think that we should start with simple if, then if-else
+                 * then if-elif-else, if wont be that difficult, but this will
+                 * allow to gradually build it up. While should be somewhat similar
+                 * to if, except in a loop. For would be a bit more complicated, cuz
+                 * its 4 statements, not 2 like while.
+                 */
 
             default:
                 throw new Error(`Unknown AST node token: ${node.token}`);
