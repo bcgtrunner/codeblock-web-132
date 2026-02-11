@@ -53,17 +53,6 @@ class Interpreter {
             pow: (a, b) => Math.pow(a, b),
             sqrt: (a) => Math.sqrt(a),
         };
-
-        this.operators = {
-            ">": (a, b) => a > b,
-            ">=": (a, b) => a >= b,
-            "<": (a, b) => a < b,
-            "<=": (a, b) => a <= b,
-            "=": (a, b) => a == b,
-            "!=": (a, b) => a != b,
-            "and": (a, b) => a && b,
-            "or": (a, b) => a || b,
-        };
     }
 
     eval(node) {
@@ -105,31 +94,6 @@ class Interpreter {
                  * its 4 statements, not 2 like while.
                  */
 
-            case "binaryExprasion":
-                const operatorName = node.children[0].value;
-
-                if (!(operatorName in this.operators))
-                    throw new Error(`Unknown operator ${operatorName}`);
-
-                const argss = node.children.slice(1).map(arg => this.eval(arg).value);
-                const res = this.operators[operatorName](...argss);
-                return new Var("boolean", res);
-
-            case "ifStatement":
-                const binaryValue = this.eval(node.children[0]).value;
-
-                if (binaryValue) {
-                    const value = this.eval(node.children[1]);
-                    return value;
-                }
-                else {
-                    const value = this.eval(node.children[2]);
-                    return value;
-                }
-                
-            case "null":
-                return;
-
             default:
                 throw new Error(`Unknown AST node token: ${node.token}`);
         }
@@ -140,32 +104,20 @@ class Interpreter {
     }
 }
 
+
+
+
 const callMul = new ASTNode("call", null, [
     new ASTNode("variable", "mul"),
     new ASTNode("literal", 3),
     new ASTNode("literal", 4)
 ]);
 
-const callIf = new ASTNode("ifStatement", null, [
-        new ASTNode("binaryExprasion", null, [
-            new ASTNode("variable", "and"),
-            new ASTNode("literal", true),
-            new ASTNode("binaryExprasion", null, [
-                new ASTNode("variable", ">"),
-                new ASTNode("literal", 3),
-                new ASTNode("literal", 2)
-            ]),
-        ]),
-        callMul,
-        new ASTNode("null")
-    ]
-)
-
 
 const callAdd = new ASTNode("call", null, [
     new ASTNode("variable", "add"),
     new ASTNode("literal", 2),
-    callIf
+    callMul
 ]);
 
 
