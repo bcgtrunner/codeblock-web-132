@@ -87,7 +87,7 @@ class Interpreter {
     eval(node) {
         switch (node.token) {
             case "literal":
-                return new Var("number", node.value);
+                return new Var("int", node.value);
 
             case "variable":
                 return this.stack.lookup(node.value);
@@ -111,7 +111,7 @@ class Interpreter {
 
                 const args = node.children.slice(1).map(arg => this.eval(arg).value);
                 const result = this.builtins[funcName](...args);
-                return new Var("number", result);
+                return new Var("int", result);
             
                 /**
                  * TODO:
@@ -122,6 +122,42 @@ class Interpreter {
                  * to if, except in a loop. For would be a bit more complicated, cuz
                  * its 4 statements, not 2 like while.
                  */
+
+            case "binaryExprasion":
+                const operatorName = node.children[0].value;
+
+                if (!(operatorName in this.operators))
+                    throw new Error(`Unknown operator ${operatorName}`);
+
+                const argss = node.children.slice(1).map(arg => this.eval(arg).value);
+                const res = this.operators[operatorName](...argss);
+                return new Var("bool", res);
+
+            case "ifStatement":
+                const binaryValue = this.eval(node.children[0]).value;
+
+                if (binaryValue) {
+                    const value = this.eval(node.children[1]);
+                    return value;
+                }
+                else {
+                    const value = this.eval(node.children[2]);
+                    return value;
+                }
+                
+            case "block":
+                const childs = node.children;
+                for (let i = 0; i < childs.length - 1; i++) {
+                    this.eval(childs[i]);
+                }
+
+                return this.eval(childs[childs.length - 1]);
+            
+            case "return":
+                return this.eval(node.children[0]);
+                
+            case "null":
+                return new Var("void", null);
 
             default:
                 throw new Error(`Unknown AST node token: ${node.token}`);
