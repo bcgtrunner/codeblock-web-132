@@ -177,8 +177,6 @@ const block = new ASTNode("block", null, [
     new ASTNode("return", null, [callAdd]),
 ]);
 
-
-
 const callIf = new ASTNode("ifStatement", null, [
         new ASTNode("binaryExprasion", null, [
             new ASTNode("variable", "and"),
