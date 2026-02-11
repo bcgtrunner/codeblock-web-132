@@ -43,15 +43,44 @@ class Interpreter {
         this.tree = tree;
         this.stack = new CallStack();
 
+        this.stack.set("pi", new Var("number", Math.PI));
+        this.stack.set("e", new Var("number", Math.E));
+
         this.builtins = {
             add: (a, b) => a + b,
             sub: (a, b) => a - b,
             mul: (a, b) => a * b,
             div: (a, b) => Math.floor(a / b),
             truediv: (a, b) => a / b,
-            mod: (a, b) => a % b,
+            mod: (a, b) => ((a % b) + b) % b,
+            rem: (a, b) => a % b,
             pow: (a, b) => Math.pow(a, b),
+
             sqrt: (a) => Math.sqrt(a),
+
+            abs: (a) => Math.abs(a),
+            min: (...args) => Math.min(...args),
+            max: (...args) => Math.max(...args),
+
+            exp: (a) => Math.exp(a),
+            log: (a) => Math.log(a),
+            log10: (a) => Math.log10(a),
+            log2: (a) => Math.log2(a),
+
+            sin: (a) => Math.sin(a),
+            cos: (a) => Math.cos(a),
+            tan: (a) => Math.tan(a),
+            asin: (a) => Math.asin(a),
+            acos: (a) => Math.acos(a),
+            atan: (a) => Math.atan(a),
+            atan2: (a, b) => Math.atan2(a, b),
+
+            floor: (a) => Math.floor(a),
+            ceil: (a) => Math.ceil(a),
+            round: (a) => Math.round(a),
+            trunc: (a) => Math.trunc(a),
+
+            sign: (a) => Math.sign(a),
         };
     }
 
@@ -104,32 +133,4 @@ class Interpreter {
     }
 }
 
-
-
-
-const callMul = new ASTNode("call", null, [
-    new ASTNode("variable", "mul"),
-    new ASTNode("literal", 3),
-    new ASTNode("literal", 4)
-]);
-
-
-const callAdd = new ASTNode("call", null, [
-    new ASTNode("variable", "add"),
-    new ASTNode("literal", 2),
-    callMul
-]);
-
-
-const root = new ASTNode("assign", null, [
-    new ASTNode("variable", "x"),
-    callAdd
-]);
-
-const interp = new Interpreter(root);
-const result = interp.run();
-
-console.log(root);
-
-console.log(interp.stack)
-console.log(interp.stack.lookup("x"));
+export { ASTNode, Interpreter }
