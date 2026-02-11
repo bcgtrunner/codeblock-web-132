@@ -69,7 +69,7 @@ class Interpreter {
     eval(node) {
         switch (node.token) {
             case "literal":
-                return new Var("int", node.value);
+                return new Var("number", node.value);
 
             case "variable":
                 return this.stack.lookup(node.value);
@@ -93,7 +93,7 @@ class Interpreter {
 
                 const args = node.children.slice(1).map(arg => this.eval(arg).value);
                 const result = this.builtins[funcName](...args);
-                return new Var("int", result);
+                return new Var("number", result);
             
                 /**
                  * TODO:
@@ -113,7 +113,7 @@ class Interpreter {
 
                 const argss = node.children.slice(1).map(arg => this.eval(arg).value);
                 const res = this.operators[operatorName](...argss);
-                return new Var("bool", res);
+                return new Var("boolean", res);
 
             case "ifStatement":
                 const binaryValue = this.eval(node.children[0]).value;
@@ -127,19 +127,8 @@ class Interpreter {
                     return value;
                 }
                 
-            case "block":
-                const childs = node.children;
-                for (let i = 0; i < childs.length - 1; i++) {
-                    this.eval(childs[i]);
-                }
-
-                return this.eval(childs[childs.length - 1]);
-            
-            case "return":
-                return this.eval(node.children[0]);
-                
             case "null":
-                return new Var("void", null);
+                return;
 
             default:
                 throw new Error(`Unknown AST node token: ${node.token}`);
@@ -153,50 +142,36 @@ class Interpreter {
 
 const callMul = new ASTNode("call", null, [
     new ASTNode("variable", "mul"),
-    new ASTNode("literal", 4),
-    new ASTNode("literal", 3)
+    new ASTNode("literal", 3),
+    new ASTNode("literal", 4)
 ]);
-
-
-const callAdd = new ASTNode("call", null, [
-    new ASTNode("variable", "add"),
-    new ASTNode("variable", "a"),
-    new ASTNode("variable", "b")
-]);
-
-
-const block = new ASTNode("block", null, [
-    new ASTNode("assign", null, [
-        new ASTNode("variable", "a"),
-        callMul
-    ]),
-    new ASTNode("assign", null, [
-        new ASTNode("variable", "b"),
-        callMul
-    ]),
-    new ASTNode("return", null, [callAdd]),
-]);
-
-
 
 const callIf = new ASTNode("ifStatement", null, [
         new ASTNode("binaryExprasion", null, [
             new ASTNode("variable", "and"),
             new ASTNode("literal", true),
             new ASTNode("binaryExprasion", null, [
-                new ASTNode("variable", "="),
+                new ASTNode("variable", ">"),
                 new ASTNode("literal", 3),
-                new ASTNode("literal", 3)
+                new ASTNode("literal", 2)
             ]),
         ]),
-        block,
+        callMul,
         new ASTNode("null")
     ]
 )
 
+
+const callAdd = new ASTNode("call", null, [
+    new ASTNode("variable", "add"),
+    new ASTNode("literal", 2),
+    callIf
+]);
+
+
 const root = new ASTNode("assign", null, [
     new ASTNode("variable", "x"),
-    callIf
+    callAdd
 ]);
 
 const interp = new Interpreter(root);
