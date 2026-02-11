@@ -24,7 +24,7 @@ const block = new ASTNode("block", null, [
 ]);
 
 const callWhile = new ASTNode("while", null, [
-        new ASTNode("binaryExprasion", null, [
+        new ASTNode("binaryExpression", null, [
             new ASTNode("variable", "<"),
             new ASTNode("variable", "a"),
             new ASTNode("literal", 100)
@@ -43,10 +43,10 @@ const block1 = new ASTNode("block", null, [
 ]);
 
 const callIf = new ASTNode("if", null, [
-        new ASTNode("binaryExprasion", null, [
+        new ASTNode("binaryExpression", null, [
             new ASTNode("variable", "and"),
             new ASTNode("literal", true),
-            new ASTNode("binaryExprasion", null, [
+            new ASTNode("binaryExpression", null, [
                 new ASTNode("variable", "="),
                 new ASTNode("literal", 3),
                 new ASTNode("literal", 3)
