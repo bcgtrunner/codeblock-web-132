@@ -34,7 +34,7 @@ class CallStack {
         for (let i = this.frames.length - 1; i >= 0; i--) {
             if (name in this.frames[i]) return this.frames[i][name];
         }
-        throw new Error(`Variable ${name} not found`);
+        return null;
     }
 }
 
@@ -82,6 +82,17 @@ class Interpreter {
 
             sign: (a) => Math.sign(a),
         };
+
+        this.operators = {
+            ">": (a, b) => a > b,
+            ">=": (a, b) => a >= b,
+            "<": (a, b) => a < b,
+            "<=": (a, b) => a <= b,
+            "=": (a, b) => a == b,
+            "!=": (a, b) => a != b,
+            "and": (a, b) => a && b,
+            "or": (a, b) => a || b,
+        };
     }
 
     eval(node) {
@@ -89,13 +100,26 @@ class Interpreter {
             case "literal":
                 return new Var("int", node.value);
 
-            case "variable":
-                return this.stack.lookup(node.value);
+            case "variable": {
+                const variable = this.stack.lookup(node.value);
+                if (variable === null) {
+                    throw new Error(`Variable ${name} not found`);
+                }
+                return variable;
+            }
 
-            case "assign":
-                const val = this.eval(node.children[1]);
-                this.stack.set(node.children[0].value, val);
-                return val;
+            case "assign": {
+                const variable_name = node.children[0].value;
+                const lhs = this.stack.lookup(variable_name)
+                const rhs = this.eval(node.children[1]);
+                if (lhs === null) {
+                    this.stack.set(variable_name, rhs);
+                } else {
+                    lhs.type = rhs.type;
+                    lhs.value = rhs.value;
+                }
+                return lhs;
+            }
 
             case "call":
                 const funcName = node.children[0].value;
@@ -104,15 +128,13 @@ class Interpreter {
                  * implement user defined functions
                  * as the first thing to do here we could inject the builtins
                  * into the local scope, instead of magic values as they are
-                 * right now. 
-                 */
+                 * right now.                 */
                 if (!(funcName in this.builtins))
                     throw new Error(`Unknown function ${funcName}`);
 
                 const args = node.children.slice(1).map(arg => this.eval(arg).value);
                 const result = this.builtins[funcName](...args);
                 return new Var("int", result);
-            
                 /**
                  * TODO:
                  * implement if-elif-else, while, for (as the last thing probably)
@@ -133,7 +155,7 @@ class Interpreter {
                 const res = this.operators[operatorName](...argss);
                 return new Var("bool", res);
 
-            case "ifStatement":
+            case "if":
                 const binaryValue = this.eval(node.children[0]).value;
 
                 if (binaryValue) {
@@ -144,20 +166,30 @@ class Interpreter {
                     const value = this.eval(node.children[2]);
                     return value;
                 }
-                
+            case "while":
+                let value1;
+                while (this.eval(node.children[0]).value) {
+                    value1 = this.eval(node.children[1]);
+                }
+                return value1;
             case "block":
+                let return_var = new Var("void", null);
+
                 const childs = node.children;
-                for (let i = 0; i < childs.length - 1; i++) {
-                    this.eval(childs[i]);
+                for (let i = 0; i < childs.length; i++) {
+                    const new_var = this.eval(childs[i]);
+                    if (childs[i].token == "return") {
+                        return_var = new_var;
+                    }
                 }
 
-                return this.eval(childs[childs.length - 1]);
-            
+                return return_var;
+
             case "return":
                 return this.eval(node.children[0]);
-                
+            
             case "null":
-                return new Var("void", null);
+                return new Var("void", null); 
 
             default:
                 throw new Error(`Unknown AST node token: ${node.token}`);
