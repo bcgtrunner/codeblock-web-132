@@ -103,7 +103,7 @@ class Interpreter {
             case "variable": {
                 const variable = this.stack.lookup(node.value);
                 if (variable === null) {
-                    throw new Error(`Variable ${name} not found`);
+                    throw new Error(`Variable ${node.value} not found`);
                 }
                 return variable;
             }
@@ -153,7 +153,7 @@ class Interpreter {
              * its 4 statements, not 2 like while.
              */
 
-            case "binaryExprasion":
+            case "binaryExpression":
                 const operatorName = node.children[0].value;
 
                 if (!(operatorName in this.operators))
@@ -181,6 +181,7 @@ class Interpreter {
                 }
                 return value1;
             case "block":
+                this.stack.pushFrame();
                 let return_var = new Var("void", null);
 
                 const childs = node.children;
@@ -190,7 +191,7 @@ class Interpreter {
                         return_var = new_var;
                     }
                 }
-
+                this.stack.popFrame();
                 return return_var;
 
             case "return":
