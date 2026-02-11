@@ -121,6 +121,15 @@ class Interpreter {
                 return lhs;
             }
 
+            /** 
+             * TODO:
+             * Static array implementation.
+             * Make types a tree instead of string.
+             * Floating point numbers.
+             * String type.
+             * Bubble sort.
+             */
+
             case "call":
                 const funcName = node.children[0].value;
                 /**
@@ -128,22 +137,21 @@ class Interpreter {
                  * implement user defined functions
                  * as the first thing to do here we could inject the builtins
                  * into the local scope, instead of magic values as they are
-                 * right now.                 */
+                 * right now.
+                 */
                 if (!(funcName in this.builtins))
                     throw new Error(`Unknown function ${funcName}`);
 
                 const args = node.children.slice(1).map(arg => this.eval(arg).value);
                 const result = this.builtins[funcName](...args);
                 return new Var("int", result);
-                /**
-                 * TODO:
-                 * implement if-elif-else, while, for (as the last thing probably)
-                 * I think that we should start with simple if, then if-else
-                 * then if-elif-else, if wont be that difficult, but this will
-                 * allow to gradually build it up. While should be somewhat similar
-                 * to if, except in a loop. For would be a bit more complicated, cuz
-                 * its 4 statements, not 2 like while.
-                 */
+                
+            /**
+             * TODO:
+             * implement if-elif for (as the last thing probably)
+             * For would be a bit more complicated, cuz
+             * its 4 statements, not 2 like while.
+             */
 
             case "binaryExprasion":
                 const operatorName = node.children[0].value;
