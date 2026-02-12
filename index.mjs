@@ -43,46 +43,105 @@ class Interpreter {
         this.tree = tree;
         this.stack = new CallStack();
 
-        // constants
         this.stack.set("pi", new Var("number", Math.PI));
         this.stack.set("e", new Var("number", Math.E));
 
-        this.builtins = {
-            "+": (a, b) => new Var("number", a.value + b.value),
-            "-": (a, b) => new Var("number", a.value - b.value),
-            "*": (a, b) => new Var("number", a.value * b.value),
-            "/": (a, b) => new Var("number", a.value / b.value),
-            "//": (a, b) => new Var("number", Math.trunc(a.value / b.value)),
-            "%": (a, b) => new Var("number", a.value % b.value),
-            "**": (a, b) => new Var("number", Math.pow(a.value, b.value)),
+        const makeBuiltin = (params, returns, impl) =>
+            new Var("function", { kind: "builtin", params, returns, impl });
 
-            ">": (a, b) => new Var("bool", a.value > b.value),
-            ">=": (a, b) => new Var("bool", a.value >= b.value),
-            "<": (a, b) => new Var("bool", a.value < b.value),
-            "<=": (a, b) => new Var("bool", a.value <= b.value),
-            "==": (a, b) => new Var("bool", a.value === b.value),
-            "!=": (a, b) => new Var("bool", a.value !== b.value),
+        this.stack.set("+", makeBuiltin(["number", "number"], "number", (a, b) =>
+            new Var("number", a.value + b.value)
+        ));
+        this.stack.set("-", makeBuiltin(["number", "number"], "number", (a, b) =>
+            new Var("number", a.value - b.value)
+        ));
+        this.stack.set("*", makeBuiltin(["number", "number"], "number", (a, b) =>
+            new Var("number", a.value * b.value)
+        ));
+        this.stack.set("/", makeBuiltin(["number", "number"], "number", (a, b) =>
+            new Var("number", a.value / b.value)
+        ));
+        this.stack.set("//", makeBuiltin(["number", "number"], "number", (a, b) =>
+            new Var("number", Math.trunc(a.value / b.value))
+        ));
+        this.stack.set("%", makeBuiltin(["number", "number"], "number", (a, b) =>
+            new Var("number", a.value % b.value)
+        ));
+        this.stack.set("**", makeBuiltin(["number", "number"], "number", (a, b) =>
+            new Var("number", Math.pow(a.value, b.value))
+        ));
 
-            "and": (a, b) => new Var("bool", a.value && b.value),
-            "or": (a, b) => new Var("bool", a.value || b.value),
-            "not": (a) => new Var("bool", !a.value),
+        this.stack.set("==", makeBuiltin(["number", "number"], "bool", (a, b) =>
+            new Var("bool", a.value === b.value)
+        ));
+        this.stack.set("!=", makeBuiltin(["number", "number"], "bool", (a, b) =>
+            new Var("bool", a.value !== b.value)
+        ));
+        this.stack.set("<", makeBuiltin(["number", "number"], "bool", (a, b) =>
+            new Var("bool", a.value < b.value)
+        ));
+        this.stack.set(">", makeBuiltin(["number", "number"], "bool", (a, b) =>
+            new Var("bool", a.value > b.value)
+        ));
+        this.stack.set("<=", makeBuiltin(["number", "number"], "bool", (a, b) =>
+            new Var("bool", a.value <= b.value)
+        ));
+        this.stack.set(">=", makeBuiltin(["number", "number"], "bool", (a, b) =>
+            new Var("bool", a.value >= b.value)
+        ));
 
-            "sqrt": (a) => new Var("number", Math.sqrt(a.value)),
-            "abs": (a) => new Var("number", Math.abs(a.value)),
-            "floor": (a) => new Var("number", Math.floor(a.value)),
-            "ceil": (a) => new Var("number", Math.ceil(a.value)),
-            "round": (a) => new Var("number", Math.round(a.value)),
-            "trunc": (a) => new Var("number", Math.trunc(a.value)),
-            "sin": (a) => new Var("number", Math.sin(a.value)),
-            "cos": (a) => new Var("number", Math.cos(a.value)),
-            "tan": (a) => new Var("number", Math.tan(a.value)),
-            "log": (a) => new Var("number", Math.log(a.value)),
-            "exp": (a) => new Var("number", Math.exp(a.value)),
-            "min": (...args) =>
-                new Var("number", Math.min(...args.map(v => v.value))),
-            "max": (...args) =>
-                new Var("number", Math.max(...args.map(v => v.value))),
-        };
+        this.stack.set("and", makeBuiltin(["bool", "bool"], "bool", (a, b) =>
+            new Var("bool", a.value && b.value)
+        ));
+        this.stack.set("or", makeBuiltin(["bool", "bool"], "bool", (a, b) =>
+            new Var("bool", a.value || b.value)
+        ));
+        this.stack.set("not", makeBuiltin(["bool"], "bool", (a) =>
+            new Var("bool", !a.value)
+        ));
+
+        this.stack.set("sqrt", makeBuiltin(["number"], "number", (a) =>
+            new Var("number", Math.sqrt(a.value))
+        ));
+        this.stack.set("abs", makeBuiltin(["number"], "number", (a) =>
+            new Var("number", Math.abs(a.value))
+        ));
+        this.stack.set("floor", makeBuiltin(["number"], "number", (a) =>
+            new Var("number", Math.floor(a.value))
+        ));
+        this.stack.set("ceil", makeBuiltin(["number"], "number", (a) =>
+            new Var("number", Math.ceil(a.value))
+        ));
+        this.stack.set("round", makeBuiltin(["number"], "number", (a) =>
+            new Var("number", Math.round(a.value))
+        ));
+        this.stack.set("trunc", makeBuiltin(["number"], "number", (a) =>
+            new Var("number", Math.trunc(a.value))
+        ));
+        this.stack.set("sin", makeBuiltin(["number"], "number", (a) =>
+            new Var("number", Math.sin(a.value))
+        ));
+        this.stack.set("cos", makeBuiltin(["number"], "number", (a) =>
+            new Var("number", Math.cos(a.value))
+        ));
+        this.stack.set("tan", makeBuiltin(["number"], "number", (a) =>
+            new Var("number", Math.tan(a.value))
+        ));
+        this.stack.set("log", makeBuiltin(["number"], "number", (a) =>
+            new Var("number", Math.log(a.value))
+        ));
+        this.stack.set("exp", makeBuiltin(["number"], "number", (a) =>
+            new Var("number", Math.exp(a.value))
+        ));
+        this.stack.set("min", makeBuiltin(["number", "number"], "number", (a, b) =>
+            new Var("number", Math.min(a.value, b.value))
+        ));
+        this.stack.set("max", makeBuiltin(["number", "number"], "number", (a, b) =>
+            new Var("number", Math.max(a.value, b.value))
+        ));
+        this.stack.set("sign", makeBuiltin(["number"], "number", (a) =>
+            new Var("number", Math.sign(a.value))
+        ));
     }
 
     eval(node) {
@@ -99,8 +158,7 @@ class Interpreter {
 
             case "variable": {
                 const variable = this.stack.lookup(node.value);
-                if (variable === null)
-                    throw new Error(`Variable ${node.value} not found`);
+                if (!variable) throw new Error(`Variable ${node.value} not found`);
                 return variable;
             }
 
@@ -109,36 +167,36 @@ class Interpreter {
                 const value = this.eval(node.children[1]);
 
                 const existing = this.stack.lookup(name);
-                if (existing === null) {
+                if (!existing) {
                     this.stack.set(name, value);
                 } else {
                     existing.type = value.type;
                     existing.value = value.value;
                 }
-
                 return value;
             }
 
             case "call": {
-                const funcName = node.children[0].value;
-
-                if (!(funcName in this.builtins))
-                    throw new Error(`Unknown function ${funcName}`);
-
-                const args = node.children
-                    .slice(1)
-                    .map(arg => this.eval(arg));
-
-                return this.builtins[funcName](...args);
+                const fnVar = this.eval(node.children[0]);
+                if (fnVar.type !== "function")
+                    throw new Error(`Attempted to call non-function`);
+                const args = node.children.slice(1).map(arg => this.eval(arg));
+                const fn = fnVar.value;
+                if (args.length !== fn.params.length)
+                    throw new Error(`Function expects ${fn.params.length} arguments`);
+                for (let i = 0; i < args.length; i++) {
+                    if (args[i].type !== fn.params[i])
+                        throw new Error(`Argument ${i} should be ${fn.params[i]}, got ${args[i].type}`);
+                }
+                const result = fn.impl(...args);
+                if (result.type !== fn.returns)
+                    throw new Error(`Function should return ${fn.returns}, got ${result.type}`);
+                return result;
             }
 
             case "if": {
                 const condition = this.eval(node.children[0]);
-                if (condition.value) {
-                    return this.eval(node.children[1]);
-                } else {
-                    return this.eval(node.children[2]);
-                }
+                return condition.value ? this.eval(node.children[1]) : this.eval(node.children[2]);
             }
 
             case "while": {
@@ -152,7 +210,6 @@ class Interpreter {
             case "block": {
                 this.stack.pushFrame();
                 let returnVar = new Var("void", null);
-
                 for (let child of node.children) {
                     const result = this.eval(child);
                     if (child.token === "return") {
@@ -160,7 +217,6 @@ class Interpreter {
                         break;
                     }
                 }
-
                 this.stack.popFrame();
                 return returnVar;
             }
