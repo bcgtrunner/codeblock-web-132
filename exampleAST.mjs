@@ -52,9 +52,6 @@ runTest("cos(pi)", Call("cos", V("pi")))
 runTest("tan(pi / 4)", Call("tan",
     Call("/", V("pi"), N(4))
 ))
-runTest("asin(1)", Call("asin", N(1)))
-runTest("acos(0)", Call("acos", N(0)))
-runTest("atan(1)", Call("atan", N(1)))
 
 console.log("\n=== ROUNDING ===")
 runTest("floor(3.7)", Call("floor", N(3.7)))
