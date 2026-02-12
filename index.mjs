@@ -153,33 +153,39 @@ class Interpreter {
              * its 4 statements, not 2 like while.
              */
 
-            case "binaryExpression":
+            case "binaryExpression": {
                 const operatorName = node.children[0].value;
 
                 if (!(operatorName in this.operators))
                     throw new Error(`Unknown operator ${operatorName}`);
 
-                const argss = node.children.slice(1).map(arg => this.eval(arg).value);
-                const res = this.operators[operatorName](...argss);
+                const args = node.children.slice(1).map(arg => this.eval(arg).value);
+                const res = this.operators[operatorName](...args);
                 return new Var("bool", res);
+            }
 
-            case "if":
+            case "if":{
                 const binaryValue = this.eval(node.children[0]).value;
 
                 if (binaryValue) {
-                    const value = this.eval(node.children[1]);
-                    return value;
+                    const returnVar = this.eval(node.children[1]);
+                    return returnVar;
                 }
                 else {
-                    const value = this.eval(node.children[2]);
-                    return value;
+                    const returnVar = this.eval(node.children[2]);
+                    return returnVar;
                 }
-            case "while":
-                let value1;
+            }
+                
+                
+            case "while": {
+                let returnVar;
                 while (this.eval(node.children[0]).value) {
-                    value1 = this.eval(node.children[1]);
+                    returnVar = this.eval(node.children[1]);
                 }
-                return value1;
+                return returnVar;
+            }
+
             case "block":
                 this.stack.pushFrame();
                 let return_var = new Var("void", null);
