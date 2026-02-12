@@ -1,71 +1,73 @@
 import { ASTNode, Interpreter } from "./index.mjs";
 
-const callMul = new ASTNode("call", null, [
-    new ASTNode("variable", "mul"),
-    new ASTNode("literal", 4),
-    new ASTNode("literal", 3)
-]);
+function N(n) { return new ASTNode("numberLiteral", n); }
+function B(b) { return new ASTNode("boolLiteral", b); }
+function V(name) { return new ASTNode("variable", name); }
+function Call(name, ...args) {
+    return new ASTNode("call", null, [V(name), ...args]);
+}
 
-
-const callAdd = new ASTNode("call", null, [
-    
-    new ASTNode("variable", "add"),
-    new ASTNode("variable", "a"),
-    new ASTNode("literal", 1)
-]);
-
+/*
+    a = a + 1
+*/
+const callAdd = Call("+", V("a"), N(1));
 
 const block = new ASTNode("block", null, [
     new ASTNode("assign", null, [
-        new ASTNode("variable", "a"),
+        V("a"),
         callAdd
     ]),
-    new ASTNode("return", null, [new ASTNode("variable", "a")]),
+    new ASTNode("return", null, [V("a")]),
 ]);
 
+/*
+    while (a < 100) { ... }
+*/
 const callWhile = new ASTNode("while", null, [
-        new ASTNode("binaryExpression", null, [
-            new ASTNode("variable", "<"),
-            new ASTNode("variable", "a"),
-            new ASTNode("literal", 100)
-        ]),
-        block,
-    ]
-)
+    Call("<", V("a"), N(100)),
+    block,
+]);
 
+/*
+    {
+        a = 3
+        while (...)
+        return a
+    }
+*/
 const block1 = new ASTNode("block", null, [
     new ASTNode("assign", null, [
-        new ASTNode("variable", "a"),
-        new ASTNode("literal", 3)
+        V("a"),
+        N(3)
     ]),
     callWhile,
-    new ASTNode("return", null, [new ASTNode("variable", "a")]),
+    new ASTNode("return", null, [V("a")]),
 ]);
 
+/*
+    if (true and (3 == 3)) { block } else null
+*/
 const callIf = new ASTNode("if", null, [
-        new ASTNode("binaryExpression", null, [
-            new ASTNode("variable", "and"),
-            new ASTNode("literal", true),
-            new ASTNode("binaryExpression", null, [
-                new ASTNode("variable", "="),
-                new ASTNode("literal", 3),
-                new ASTNode("literal", 3)
-            ]),
-        ]),
-        block,
-        new ASTNode("null")
-    ]
-)
+    Call("and",
+        B(true),
+        Call("==", N(3), N(3))
+    ),
+    block,
+    new ASTNode("null")
+]);
 
+/*
+    x = block1
+*/
 const root = new ASTNode("assign", null, [
-    new ASTNode("variable", "x"),
+    V("x"),
     block1
 ]);
 
 const interp = new Interpreter(root);
 const result = interp.run();
 
-console.log(root);
-
-console.log(interp.stack)
-console.log(interp.stack.lookup("x"));
+console.log("AST root:", root);
+console.log("Result:", result);
+console.log("Stack frames:", interp.stack.frames);
+console.log("x =", interp.stack.lookup("x"));
