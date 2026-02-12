@@ -168,17 +168,17 @@ class Interpreter {
             if (i.value < 0 || i.value >= array.value.length) {
                 throw new Error(`Array index ${i.value} out of bounds`);
             }
-            return array.value[i.value];
+            const found = array.value[i.value];
+            return new Var(found.type, found.value);
         }));
 
         this.stack.set("set_at", makeBuiltin(["array", "number", "any"], "any", (array, i, newValue) => {
             if (i.value < 0 || i.value >= array.value.length) {
                 throw new Error(`Array index ${i.value} out of bounds`);
             }
-            const targetVar = array.value[i.value];
-            targetVar.type = newValue.type;
-            targetVar.value = newValue.value;
-            return targetVar;
+            const newVar = new Var(newValue.type, newValue.value);
+            array.value[i.value] = newVar;
+            return newVar;
         }));
 
         this.stack.set("insert_at", makeBuiltin(["array", "number", "any"], "any", (array, i, newValue) => {
@@ -195,7 +195,8 @@ class Interpreter {
                 throw new Error(`Erase index ${i.value} out of bounds`);
             }
             const removedItems = array.value.splice(i.value, 1);
-            return removedItems[0];
+            const removed = removedItems[0];
+            return new Var(removed.type, removed.value);
         }));
     }
 
