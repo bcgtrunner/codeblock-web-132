@@ -81,6 +81,8 @@ class Interpreter {
             trunc: (a) => Math.trunc(a),
 
             sign: (a) => Math.sign(a),
+
+            at: (array, i) => array[i].value
         };
 
         this.operators = {
@@ -177,13 +179,21 @@ class Interpreter {
                 }
             }
                 
-                
             case "while": {
                 let returnVar;
                 while (this.eval(node.children[0]).value) {
                     returnVar = this.eval(node.children[1]);
                 }
                 return returnVar;
+            }
+            
+            case "array": {
+                let returnVar = new Var("array", []);
+                for (const child of node.children)
+                {
+                    returnVar.value.push(this.eval(child));
+                }
+                return returnVar; 
             }
 
             case "block":
@@ -203,9 +213,6 @@ class Interpreter {
             case "return":
                 return this.eval(node.children[0]);
             
-            case "null":
-                return new Var("void", null); 
-
             default:
                 throw new Error(`Unknown AST node token: ${node.token}`);
         }
