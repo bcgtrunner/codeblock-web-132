@@ -170,6 +170,33 @@ class Interpreter {
             }
             return array.value[i.value];
         }));
+
+        this.stack.set("set_at", makeBuiltin(["array", "number", "any"], "any", (array, i, newValue) => {
+            if (i.value < 0 || i.value >= array.value.length) {
+                throw new Error(`Array index ${i.value} out of bounds`);
+            }
+            const targetVar = array.value[i.value];
+            targetVar.type = newValue.type;
+            targetVar.value = newValue.value;
+            return targetVar;
+        }));
+
+        this.stack.set("insert_at", makeBuiltin(["array", "number", "any"], "any", (array, i, newValue) => {
+            if (i.value < 0 || i.value > array.value.length) {
+                throw new Error(`Insert index ${i.value} out of bounds (0 to ${array.value.length})`);
+            }
+            const varToInsert = new Var(newValue.type, newValue.value);
+            array.value.splice(i.value, 0, varToInsert);
+            return varToInsert;
+        }));
+
+        this.stack.set("erase_at", makeBuiltin(["array", "number"], "any", (array, i) => {
+            if (i.value < 0 || i.value >= array.value.length) {
+                throw new Error(`Erase index ${i.value} out of bounds`);
+            }
+            const removedItems = array.value.splice(i.value, 1);
+            return removedItems[0];
+        }));
     }
 
     eval(node) {
@@ -211,7 +238,12 @@ class Interpreter {
                 }
                 return returnVar; 
             }
-
+            /** 
+             * TODO:
+             * Make types a tree instead of string.
+             * String type.
+             * Bubble sort.
+             */
             case "call": {
                 const fnVar = this.eval(node.children[0]);
                 if (fnVar.type !== "function")
