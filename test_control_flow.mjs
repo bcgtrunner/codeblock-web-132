@@ -8,9 +8,6 @@ function Call(name, ...args) {
 }
 
 function Test1() {
-    /*
-        a = a + 1
-    */
     const callAdd = Call("+", V("a"), N(1));
 
     const block = new ASTNode("block", null, [
@@ -21,21 +18,11 @@ function Test1() {
         new ASTNode("return", null, [V("a")]),
     ]);
 
-    /*
-        while (a < 100) { ... }
-    */
     const callWhile = new ASTNode("while", null, [
         Call("<", V("a"), N(100)),
         block,
     ]);
 
-    /*
-        {
-            a = 3
-            while (...)
-            return a
-        }
-    */
     const block1 = new ASTNode("block", null, [
         new ASTNode("assign", null, [
             V("a"),
@@ -46,9 +33,6 @@ function Test1() {
         new ASTNode("return", null, [V("a")])
     ]);
 
-    /*
-        if (true and (3 == 3)) { block } else null
-    */
     const callIf = new ASTNode("if", null, [
         Call("and",
             B(true),
@@ -58,9 +42,6 @@ function Test1() {
         new ASTNode("block")
     ]);
 
-    /*
-        x = block1
-    */
     const root = new ASTNode("assign", null, [
         V("x"),
         block1
@@ -75,60 +56,67 @@ function Test1() {
     console.log("x =", interp.stack.lookup("x"));
 }
 
+function Test2() {
+    const callAddI = new ASTNode("assign", null, [
+        V("i"),
+        Call("+", V("i"), N(1))
+    ]);
 
+    const loopBlock = new ASTNode("block", null, [
+        new ASTNode("assign", null, [
+            V("a"),
+            Call("+", V("a"), Call("at", V("arr"), V("i")))
+        ]),
+        callAddI,
+        new ASTNode("return", null, [V("a")])
+    ]);
 
+    const callWhile = new ASTNode("while", null, [
+        Call("<", V("i"), N(3)),
+        loopBlock
+    ]);
 
-const callAddI = new ASTNode("assign", null, [
-    V("i"),
-    Call("+", V("i"), N(1))
-]);
+    const root = new ASTNode("block", null, [
+        new ASTNode("assign", null, [V("a"), N(0)]),
+        new ASTNode("assign", null, [V("i"), N(0)]),
+        new ASTNode("assign", null, [
+            V("arr"),
+            new ASTNode("array", null, [N(11), N(15), N(12)])
+        ]),
+        callWhile,
+        new ASTNode("return", null, [V("a")])
+    ]);
 
-/*
-    {
-        a = a + arr[i]
-        i = i + 1
-        return a
-    }
-*/
-const loopBlock = new ASTNode("block", null, [
-    new ASTNode("assign", null, [
-        V("a"),
-        Call("+", V("a"), Call("at", V("arr"), V("i")))
-    ]),
-    callAddI,
-    new ASTNode("return", null, [V("a")])
-]);
+    const interp = new Interpreter(root);
+    const result = interp.run();
+    console.log("Result:", result);
+    console.log("Stack frames:", interp.stack.frames);
+    console.log("Сумма элементов массива:", result.value); // 38
+}
 
-/*
-    while (i < 3) 
-*/
-const callWhile = new ASTNode("while", null, [
-    Call("<", V("i"), N(3)),
-    loopBlock
-]);
-
-/*
-    {
-        a = 0
-        i = 0
-        arr = [11, 15, 12]
-        while (i < 3) ...
-        return a
-    }
-*/
-const root = new ASTNode("block", null, [
-    new ASTNode("assign", null, [V("a"), N(0)]),
+function Test3() {
+    const forLoop = new ASTNode("for", null, [
     new ASTNode("assign", null, [V("i"), N(0)]),
-    new ASTNode("assign", null, [
-        V("arr"),
-        new ASTNode("array", null, [N(11), N(15), N(12)])
-    ]),
-    callWhile,
-    new ASTNode("return", null, [V("a")])
-]);
+        Call("<=", V("i"), N(10)),
+        new ASTNode("assign", null, [
+            V("i"), 
+            Call("+", V("i"), N(1))
+        ]),
+        new ASTNode("assign", null, [
+            V("a"), 
+            Call("+", V("a"), V("i"))
+        ])
+    ]);
 
-const interp = new Interpreter(root);
-const result = interp.run();
-console.log("Result:", result);
-console.log("Stack frames:", interp.stack.frames);
-console.log("Сумма элементов массива:", result.value); // 38
+    const block = new ASTNode("block", null, [
+        new ASTNode("assign", null, [V("a"), N(0)]),
+        forLoop,
+        new ASTNode("return", null, [V("a")])
+    ]);
+
+    const interp = new Interpreter(block);
+    const result = interp.run();
+    console.log("Result:", result);
+    console.log("Stack frames:", interp.stack.frames);
+    console.log("Сумма элементов массива:", result.value);
+}
