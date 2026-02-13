@@ -198,6 +198,10 @@ class Interpreter {
             const removed = removedItems[0];
             return new Var(removed.type, removed.value);
         }));
+
+        this.stack.set("len", makeBuiltin(["array"], "number", (arr) => {
+            return new Var("number", arr.value.length);
+        }))
     }
 
     eval(node) {
