@@ -327,6 +327,10 @@
                 const raw = arr.value.map(v => v.value);
                 return new Var("string", raw.join(","));
             }));
+
+            this.stack.set("typeof", makeBuiltin(["any"], "string", (something) => {
+                return new Var("string", something.type);
+            }))
         }
 
         eval(node) {
