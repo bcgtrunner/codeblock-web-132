@@ -201,7 +201,21 @@
 
             this.stack.set("len", makeBuiltin(["array"], "number", (arr) => {
                 return new Var("number", arr.value.length);
-            }))
+            }));
+
+            this.stack.set("push", makeBuiltin(["array", "any"], "number", (array, newValue) => {
+                const varToPush = new Var(newValue.type, newValue.value);
+                array.value.push(varToPush);
+                return new Var("number", array.value.length);
+            }));
+
+            this.stack.set("pop", makeBuiltin(["array"], "any", (array) => {
+                if (array.value.length === 0) {
+                    return new Var("void", null);
+                }
+                const varPopped = array.value.pop();
+                return new Var(varPopped.type, varPopped.value);
+            }));
 
             this.stack.set("strlen", makeBuiltin(["string"], "number", (str) =>
                 new Var("number", str.value.length)
@@ -375,7 +389,6 @@
                 /** 
                  * TODO:
                  * Make types a tree instead of string.
-                 * String type.
                  */
                 case "call": {
                     const fnVar = this.eval(node.children[0]);
@@ -456,11 +469,6 @@
 
                 case "return":
                     return this.eval(node.children[0]);
-
-                /**
-                 * TODO:
-                 * Add more builtin array operations (push, pop, etc.)
-                 */
 
                 default:
                     throw new Error(`Unknown AST node token: ${node.token}`);

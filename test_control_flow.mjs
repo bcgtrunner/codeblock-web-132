@@ -7,6 +7,8 @@ function Call(name, ...args) {
     return new ASTNode("call", null, [V(name), ...args]);
 }
 
+Test2();
+
 function Test1() {
     const callAdd = Call("+", V("a"), N(1));
 
@@ -83,6 +85,7 @@ function Test2() {
             V("arr"),
             new ASTNode("array", null, [N(11), N(15), N(12)])
         ]),
+        new ASTNode("push", null, [V("arr", N(100))]),
         callWhile,
         new ASTNode("return", null, [V("a")])
     ]);
