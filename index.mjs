@@ -291,6 +291,42 @@
                 }
             ));
 
+            this.stack.set("boolToNumber", makeBuiltin(["bool"], "number", (b) =>
+                new Var("number", b.value ? 1 : 0)
+            ));
+
+            this.stack.set("numberToBool", makeBuiltin(["number"], "bool", (n) =>
+                new Var("bool", n.value !== 0)
+            ));
+
+            this.stack.set("numberToString", makeBuiltin(["number"], "string", (n) =>
+                new Var("string", n.value.toString())
+            ));
+
+            this.stack.set("boolToString", makeBuiltin(["bool"], "string", (b) =>
+                new Var("string", b.value.toString())
+            ));
+
+            this.stack.set("stringToNumber", makeBuiltin(["string"], "number", (s) => {
+                const n = Number(s.value);
+                if (isNaN(n)) {
+                    return new Var("void", null);
+                }
+                return new Var("number", n);
+            }));
+
+            this.stack.set("stringToBool", makeBuiltin(["string"], "bool", (s) =>
+                new Var("bool", s.value.length > 0)
+            ));
+
+            this.stack.set("arrayToBool", makeBuiltin(["array"], "bool", (arr) =>
+                new Var("bool", arr.value.length > 0)
+            ));
+
+            this.stack.set("arrayToString", makeBuiltin(["array"], "string", (arr) => {
+                const raw = arr.value.map(v => v.value);
+                return new Var("string", raw.join(","));
+            }));
         }
 
         eval(node) {
