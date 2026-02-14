@@ -202,6 +202,95 @@
             this.stack.set("len", makeBuiltin(["array"], "number", (arr) => {
                 return new Var("number", arr.value.length);
             }))
+
+            this.stack.set("strlen", makeBuiltin(["string"], "number", (str) =>
+                new Var("number", str.value.length)
+            ));
+
+            this.stack.set("upper", makeBuiltin(["string"], "string", (str) =>
+                new Var("string", str.value.toUpperCase())
+            ));
+
+            this.stack.set("lower", makeBuiltin(["string"], "string", (str) =>
+                new Var("string", str.value.toLowerCase())
+            ));
+
+            this.stack.set("trim", makeBuiltin(["string"], "string", (str) =>
+                new Var("string", str.value.trim())
+            ));
+
+            this.stack.set("substring", makeBuiltin(
+                ["string", "number", "number"],
+                "string",
+                (str, start, end) => {
+                    return new Var(
+                        "string",
+                        str.value.substring(start.value, end.value)
+                    );
+                }
+            ));
+
+            this.stack.set("split", makeBuiltin(
+                ["string", "string"],
+                "array",
+                (str, delimiter) => {
+                    const parts = str.value.split(delimiter.value);
+                    const wrapped = parts.map(p => new Var("string", p));
+                    return new Var("array", wrapped);
+                }
+            ));
+
+            this.stack.set("join", makeBuiltin(
+                ["array", "string"],
+                "string",
+                (array, delimiter) => {
+                    const raw = array.value.map(v => {
+                        if (v.type !== "string") {
+                            throw new Error("join expects array of strings");
+                        }
+                        return v.value;
+                    });
+
+                    return new Var("string", raw.join(delimiter.value));
+                }
+            ));
+
+            this.stack.set("startsWith", makeBuiltin(
+                ["string", "string"],
+                "boolean",
+                (str, prefix) =>
+                    new Var("boolean", str.value.startsWith(prefix.value))
+            ));
+
+            this.stack.set("endsWith", makeBuiltin(
+                ["string", "string"],
+                "boolean",
+                (str, suffix) =>
+                    new Var("boolean", str.value.endsWith(suffix.value))
+            ));
+
+            this.stack.set("replace", makeBuiltin(
+                ["string", "string", "string"],
+                "string",
+                (str, search, replacement) =>
+                    new Var(
+                        "string",
+                        str.value.replace(search.value, replacement.value)
+                    )
+            ));
+
+            this.stack.set("charAt", makeBuiltin(
+                ["string", "number"],
+                "string",
+                (str, i) => {
+                    if (i.value < 0 || i.value >= str.value.length) {
+                        throw new Error(`String index ${i.value} out of bounds`);
+                    }
+
+                    return new Var("string", str.value[i.value]);
+                }
+            ));
+
         }
 
         eval(node) {
@@ -247,7 +336,6 @@
                  * TODO:
                  * Make types a tree instead of string.
                  * String type.
-                 * Bubble sort.
                  */
                 case "call": {
                     const fnVar = this.eval(node.children[0]);
@@ -331,10 +419,7 @@
 
                 /**
                  * TODO:
-                 * Make types a tree instead of string.
-                 * For loops (4 statements, not 2 like while).
-                 * Bubble sort example.
-                 * Add more builtin array operations (push, pop, length, etc.)
+                 * Add more builtin array operations (push, pop, etc.)
                  */
 
                 default:
