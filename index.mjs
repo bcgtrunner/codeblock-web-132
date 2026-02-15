@@ -278,16 +278,16 @@ class Interpreter {
 
         this.stack.set("startsWith", makeBuiltin(
             ["string", "string"],
-            "boolean",
+            "bool",
             (str, prefix) =>
-                new Var("boolean", str.value.startsWith(prefix.value))
+                new Var("bool", str.value.startsWith(prefix.value))
         ));
 
         this.stack.set("endsWith", makeBuiltin(
             ["string", "string"],
-            "boolean",
+            "bool",
             (str, suffix) =>
-                new Var("boolean", str.value.endsWith(suffix.value))
+                new Var("bool", str.value.endsWith(suffix.value))
         ));
 
         this.stack.set("replace", makeBuiltin(
@@ -365,11 +365,19 @@ class Interpreter {
 
                 case "boolLiteral":
                     return new Var("bool", Boolean(node.value));
+                
+                case "functionLiteral":
+                    return new Var("function", {
+                        kind: "user",
+                        params: node.value.params,
+                        returns: node.value.returns,
+                        impl: node.children[0]
+                    })
 
                 case "variable": {
                     const variable = this.stack.lookup(node.value);
                     if (!variable) throw new EvalError(`Variable ${node.value} not found`);
-                    return variable;
+                    return new Var(variable.type, variable.value);
                 }
 
                 case "assign": {
@@ -377,12 +385,12 @@ class Interpreter {
                     const value = this.eval(node.children[1]);
                     const existing = this.stack.lookup(name);
                     if (!existing) {
-                        this.stack.set(name, value);
+                        this.stack.set(name, new Var(value.type, value.value));
                     } else {
                         existing.type = value.type;
                         existing.value = value.value;
                     }
-                    return value;
+                    return new Var(value.type, value.value);
                 }
 
                 case "array": {
@@ -406,21 +414,48 @@ class Interpreter {
 
                     // TODO: implement user defined functions
                     // For now only builtins are supported
+                    // TODO:
+                    // separate variable declaration and assignment
+                    /**
+                     * in builtin functions params is an array of types
+                     * in user defined functions it is an array of pairs: type, name
+                     */
                     if (fn.kind !== "builtin") {
-                        throw new EvalError(`Only builtin functions are currently supported`);
+                        if (args.length !== fn.params.length)
+                            throw new EvalError(`Function expects ${fn.params.length} arguments`);
+                        for (let i = 0; i < args.length; i++) {
+                            const sign_type = fn.params[i].type;
+                            if (sign_type === "any") continue;
+                            if (args[i].type !== sign_type) {
+                                throw new EvalError(`Argument ${i} should be ${sign_type}, got ${args[i].type}`);
+                            }
+                        }
+                        this.stack.pushFrame();
+                        for (let i = 0; i < args.length; i++) {
+                            const param_name = fn.params[i].name;
+                            this.stack.set(param_name, args[i]);
+                        }
+                        const result = this.eval(fn.impl);
+                        if (result.type !== fn.returns && fn.returns !== "any") {
+                            throw new EvalError(`Function should return ${fn.returns}, got ${result.type}`);
+                        }
+                        this.stack.popFrame();
+                        return result;
+                    } else {
+                        if (args.length !== fn.params.length)
+                            throw new EvalError(`Function expects ${fn.params.length} arguments`);
+                        for (let i = 0; i < args.length; i++) {
+                            if (fn.params[i] === "any") continue;
+                            if (args[i].type !== fn.params[i])
+                                throw new EvalError(`Argument ${i} should be ${fn.params[i]}, got ${args[i].type}`);
+                        }
+    
+                        const result = fn.impl(...args);
+                        if (result.type !== fn.returns && fn.returns !== "any")
+                            throw new EvalError(`Function should return ${fn.returns}, got ${result.type}`);
+                        return result;
                     }
 
-                    if (args.length !== fn.params.length)
-                        throw new EvalError(`Function expects ${fn.params.length} arguments`);
-                    for (let i = 0; i < args.length; i++) {
-                        if (args[i].type !== fn.params[i] && fn.params[i] !== "any")
-                            throw new EvalError(`Argument ${i} should be ${fn.params[i]}, got ${args[i].type}`);
-                    }
-
-                    const result = fn.impl(...args);
-                    if (result.type !== fn.returns && fn.returns !== "any")
-                        throw new EvalError(`Function should return ${fn.returns}, got ${result.type}`);
-                    return result;
                 }
 
                 case "if": {
