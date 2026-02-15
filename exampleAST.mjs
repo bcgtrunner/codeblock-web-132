@@ -15,7 +15,7 @@ function runTest(desc, node) {
         console.log(`${desc} =>`, res && res.value)
         return res && res.value
     } catch (err) {
-        console.log(`${desc} => ERROR:`, err.message)
+        console.log(`${desc} => ERROR:`, err.message, err.path)
         return undefined
     }
 }
