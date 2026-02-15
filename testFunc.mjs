@@ -1,5 +1,5 @@
-import { ASTNode, Interpreter } from "./index.mjs";
-
+import { ASTNode, Interpreter, EvalError } from "./index.mjs";
+import { Debugger } from "./debugger.mjs";
 /* --- Small AST builder helpers to make tests concise --- */
 const V = (name) => new ASTNode("variable", name);
 const Num = (n) => new ASTNode("numberLiteral", n);
@@ -16,10 +16,25 @@ const Fn = (params = [], returns = null, body = []) =>
   new ASTNode("functionLiteral", { params, returns }, body);
 
 /* --- Runner helper --- */
-function run(tree) {
-  const interpreter = new Interpreter(tree);
-  const result = interpreter.run();
-  return result && result.value;
+async function run(tree) {
+    const interpreter = new Interpreter(tree);
+    let result;
+    try {
+        result = await interpreter.run();
+    } catch (e) {
+        if (e instanceof EvalError) {
+            console.log("Ошибка:", e.message);
+            console.log("Trace (от места ошибки до корня):");
+            e.path.forEach((node, i) => {
+                console.log(`${i}: ${node.token}${node.value !== null ? ` (${node.value})` : ''}`);
+            });
+        } else {
+            console.error(e);
+        }
+        throw e;
+    }
+
+    return result && result.value;
 }
 
 /* --- Tests --- */
@@ -192,22 +207,24 @@ const tests = [
 
 /* --- Test runner --- */
 console.log("=== TESTING USER-DEFINED FUNCTIONS ===\n");
-
-tests.forEach((t, idx) => {
-  try {
-    const val = run(t.tree);
-    if (t.expectError) {
-      console.error(`Test ${idx + 1} "${t.name}" FAILED — expected an error but got:`, val);
-    } else if (typeof t.expect !== "undefined" && val !== t.expect) {
-      console.error(`Test ${idx + 1} "${t.name}" FAILED — expected ${t.expect} but got ${val}`);
-    } else {
-      console.log(`Test ${idx + 1} "${t.name}" passed — result:`, val);
+let val;
+let idx = 0;
+for (const t of tests) {
+    try {
+        val = await run(t.tree);
+        if (t.expectError) {
+            console.error(`Test ${idx + 1} "${t.name}" FAILED — expected an error but got:`, val);
+        } else if (typeof t.expect !== "undefined" && val !== t.expect) {
+            console.error(`Test ${idx + 1} "${t.name}" FAILED — expected ${t.expect} but got ${val}`);
+        } else {
+            console.log(`Test ${idx + 1} "${t.name}" passed — result:`, val);
+        }
+    } catch (e) {
+        if (t.expectError) {
+            console.log(`Test ${idx + 1} "${t.name}" passed — expected error:`, e.message);
+        } else {
+          console.error(`Test ${idx + 1} "${t.name}" FAILED with error:`, e.message);
+        }
     }
-  } catch (e) {
-    if (t.expectError) {
-      console.log(`Test ${idx + 1} "${t.name}" passed — expected error:`, e.message);
-    } else {
-      console.error(`Test ${idx + 1} "${t.name}" FAILED with error:`, e.message);
-    }
-  }
-});
+    idx++;
+}
