@@ -7,6 +7,7 @@ class Var {
 
 class ASTNode {
     constructor(token, value = null, children = []) {
+        this.id = crypto.randomUUID();
         this.token = token;
         this.value = value;
         this.children = children;
@@ -46,7 +47,8 @@ class EvalError extends Error {
 }
 
 class Interpreter {
-    constructor(tree) {
+    constructor(tree, options = {}) {
+        this.debugger = options.debugger || null;
         this.tree = tree;
         this.stack = new CallStack();
 
@@ -354,62 +356,80 @@ class Interpreter {
         }))
     }
 
-    eval(node) {
+    async eval(node) {
+        if (this.debugger) {
+            await this.debugger.onNodeEnter(node);
+        }
+
+        let result;
+
         try {
             switch (node.token) {
+
                 case "numberLiteral":
-                    return new Var("number", Number(node.value));
+                    result = new Var("number", Number(node.value));
+                    break;
 
                 case "stringLiteral":
-                    return new Var("string", String(node.value));
+                    result = new Var("string", String(node.value));
+                    break;
 
                 case "boolLiteral":
-                    return new Var("bool", Boolean(node.value));
+                    result = new Var("bool", Boolean(node.value));
                 
                 case "functionLiteral":
-                    return new Var("function", {
+                    result = new Var("function", {
                         kind: "user",
                         params: node.value.params,
                         returns: node.value.returns,
                         impl: node.children[0]
                     })
+                    break;
 
                 case "variable": {
                     const variable = this.stack.lookup(node.value);
-                    if (!variable) throw new EvalError(`Variable ${node.value} not found`);
-                    return new Var(variable.type, variable.value);
+                    if (!variable)
+                        throw new EvalError(`Variable ${node.value} not found`);
+                    result = new Var(variable.type, variable.value);
+                    break;
                 }
 
                 case "assign": {
                     const name = node.children[0].value;
-                    const value = this.eval(node.children[1]);
+                    const value = await this.eval(node.children[1]);
+
                     const existing = this.stack.lookup(name);
+
                     if (!existing) {
                         this.stack.set(name, new Var(value.type, value.value));
                     } else {
                         existing.type = value.type;
                         existing.value = value.value;
                     }
-                    return new Var(value.type, value.value);
+
+                    result = new Var(value.type, value.value);
+                    break;
                 }
 
                 case "array": {
-                    let returnVar = new Var("array", []);
+                    let arr = new Var("array", []);
                     for (const child of node.children) {
-                        returnVar.value.push(this.eval(child));
+                        arr.value.push(await this.eval(child));
                     }
-                    return returnVar; 
+                    result = arr;
+                    break;
                 }
 
-                /** 
-                 * TODO:
-                 * Make types a tree instead of string.
-                 */
                 case "call": {
-                    const fnVar = this.eval(node.children[0]);
-                    if (fnVar.type !== "function")
+                    const fnVar = await this.eval(node.children[0]);
+
+                    if (!fnVar || fnVar.type !== "function")
                         throw new EvalError(`Attempted to call non-function`);
-                    const args = node.children.slice(1).map(arg => this.eval(arg));
+
+                    const args = [];
+                    for (let i = 1; i < node.children.length; i++) {
+                        args.push(await this.eval(node.children[i]));
+                    }
                     const fn = fnVar.value;
 
                     // TODO: implement user defined functions
@@ -435,12 +455,12 @@ class Interpreter {
                             const param_name = fn.params[i].name;
                             this.stack.set(param_name, args[i]);
                         }
-                        const result = this.eval(fn.impl);
+                        result = await this.eval(fn.impl);
                         if (result.type !== fn.returns && fn.returns !== "any") {
                             throw new EvalError(`Function should return ${fn.returns}, got ${result.type}`);
                         }
                         this.stack.popFrame();
-                        return result;
+                        
                     } else {
                         if (args.length !== fn.params.length)
                             throw new EvalError(`Function expects ${fn.params.length} arguments`);
@@ -450,83 +470,112 @@ class Interpreter {
                                 throw new EvalError(`Argument ${i} should be ${fn.params[i]}, got ${args[i].type}`);
                         }
     
-                        const result = fn.impl(...args);
+                        result = fn.impl(...args);
                         if (result.type !== fn.returns && fn.returns !== "any")
                             throw new EvalError(`Function should return ${fn.returns}, got ${result.type}`);
-                        return result;
                     }
-
+                    break;
                 }
 
                 case "if": {
-                    const condition = this.eval(node.children[0]);
-                    return condition.value ? this.eval(node.children[1]) : this.eval(node.children[2]);
+                    const condition = await this.eval(node.children[0]);
+                    result = condition.value ? await this.eval(node.children[1]) : await this.eval(node.children[2]);
+                    break;
                 }
 
                 case "for": {
-                    let result = new Var("void", null);
+                    let loopResult = new Var("void", null);
+
                     this.stack.pushFrame();
-                    this.eval(node.children[0]);
-                    let condition = this.eval(node.children[1]);
-                    if (condition.type !== "bool") {
+
+                    await this.eval(node.children[0]);
+                    let condition = await this.eval(node.children[1]);
+
+                    if (condition.type !== "bool")
                         throw new EvalError(`Bool expected, got ${condition.type}`);
-                    }
+
                     while (condition.value) {
-                        result = this.eval(node.children[3]);
-                        this.eval(node.children[2]);
-                        condition = this.eval(node.children[1]);
+                        loopResult = await this.eval(node.children[3]);
+                        await this.eval(node.children[2]);
+                        condition = await this.eval(node.children[1]);
                     }
+
                     this.stack.popFrame();
-                    return result;
+
+                    result = loopResult;
+                    break;
                 }
 
                 case "while": {
-                    let result = new Var("void", null);
+                    let loopResult = new Var("void", null);
+
                     this.stack.pushFrame();
-                    let condition = this.eval(node.children[0]);
-                    if (condition.type !== "bool") {
+
+                    let condition = await this.eval(node.children[0]);
+
+                    if (condition.type !== "bool")
                         throw new EvalError(`Bool expected, got ${condition.type}`);
-                    }
+
                     while (condition.value) {
-                        result = this.eval(node.children[1]);
-                        condition = this.eval(node.children[0]);
+                        loopResult = await this.eval(node.children[1]);
+                        condition = await this.eval(node.children[0]);
                     }
+
                     this.stack.popFrame();
-                    return result;
+
+                    result = loopResult;
+                    break;
                 }
 
                 case "block": {
                     this.stack.pushFrame();
-                    let returnVar = new Var("void", null);
+
+                    let blockResult = new Var("void", null);
+
                     for (let child of node.children) {
-                        const result = this.eval(child);
+                        const r = await this.eval(child);
                         if (child.token === "return") {
-                            returnVar = result;
+                            blockResult = r;
                             break;
                         }
                     }
+
                     this.stack.popFrame();
-                    return returnVar;
+                    result = blockResult;
+                    break;
                 }
 
                 case "return":
-                    return this.eval(node.children[0]);
+                    result = await this.eval(node.children[0]);
+                    break;
 
                 default:
                     throw new EvalError(`Unknown AST node token: ${node.token}`);
             }
+
+            if (this.debugger) {
+                await this.debugger.onNodeExit(node, result);
+            }
+
+            return result;
+
         } catch (e) {
+            if (this.debugger) {
+                this.debugger.onError(e);
+            }
+
             if (!(e instanceof EvalError)) {
                 const newErr = new EvalError(e.message || String(e));
                 e = newErr;
             }
+
             e.path.push(node);
             throw e;
         }
     }
 
-    run() {
-        return this.eval(this.tree);
+    async run() {
+        return await this.eval(this.tree);
     }
 }
 
