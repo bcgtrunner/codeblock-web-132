@@ -1,13 +1,13 @@
 import { ASTNode, Interpreter } from "./index.mjs"
 
-function N(n) { return new ASTNode("numberLiteral", n) }
+function N(n) { return new ASTNode("number", n) }
 function V(name) { return new ASTNode("variable", name) }
 
 function Call(funcName, ...args) {
     return new ASTNode("call", null, [V(funcName), ...args])
 }
 
-const interp = new Interpreter(new ASTNode("numberLiteral", 0))
+const interp = new Interpreter(new ASTNode("number", 0))
 
 function runTest(desc, node) {
     try {
@@ -72,12 +72,12 @@ runTest("5 != 3", Call("!=", N(5), N(3)))
 console.log("\n=== LOGICAL ===")
 runTest("true and false",
     Call("and",
-        new ASTNode("boolLiteral", true),
-        new ASTNode("boolLiteral", false)
+        new ASTNode("bool", true),
+        new ASTNode("bool", false)
     )
 )
 runTest("not true",
     Call("not",
-        new ASTNode("boolLiteral", true)
+        new ASTNode("bool", true)
     )
 )

@@ -1,167 +1,191 @@
 import { ASTNode, Interpreter } from "./index.mjs";
 
-const tree = new ASTNode("block", null, [
-  // ----- define the array -----
-  new ASTNode("assign", null, [
-    new ASTNode("variable", "arr"),
-    new ASTNode("array", null, [
-      new ASTNode("numberLiteral", 5),
-      new ASTNode("numberLiteral", 2),
-      new ASTNode("numberLiteral", 8),
-      new ASTNode("numberLiteral", 1),
-      new ASTNode("numberLiteral", 9)
-    ])
-  ]),
+/*
+Program equivalent to:
 
-  // ----- store length (since no built‑in `length` yet) -----
-  new ASTNode("assign", null, [
-    new ASTNode("variable", "n"),
-    new ASTNode("numberLiteral", 5)
-  ]),
+function bubbleSort(a: array) -> array {
+  for (i = 0; i < len(a) - 1; i = i + 1) {
+    for (j = 0; j < (len(a) - 1) - i; j = j + 1) {
+      if (at(a, j) > at(a, j + 1)) {
+        tmp = at(a, j);
+        set_at(a, j, at(a, j + 1));
+        set_at(a, j + 1, tmp);
+      }
+    }
+  }
+  return a;
+}
 
-  // ----- i = 0 -----
-  new ASTNode("assign", null, [
-    new ASTNode("variable", "i"),
-    new ASTNode("numberLiteral", 0)
-  ]),
+arr = [5,1,4,2,8]
+return bubbleSort(arr)
+*/
 
-  // ----- outer while: while i < n - 1 -----
-  new ASTNode("while", null, [
-    // condition: i < n - 1
-    new ASTNode("call", null, [
-      new ASTNode("variable", "<"),
-      new ASTNode("variable", "i"),
-      new ASTNode("call", null, [
-        new ASTNode("variable", "-"),
-        new ASTNode("variable", "n"),
-        new ASTNode("numberLiteral", 1)
-      ])
-    ]),
-
-    // ----- outer loop body -----
+const bubbleSortFunction = new ASTNode(
+  "function",
+  {
+    params: [{ type: "array", name: "a" }],
+    returns: "array"
+  },
+  [
     new ASTNode("block", null, [
-      // j = 0
-      new ASTNode("assign", null, [
-        new ASTNode("variable", "j"),
-        new ASTNode("numberLiteral", 0)
-      ]),
 
-      // ----- inner while: while j < n - 1 - i -----
-      new ASTNode("while", null, [
-        // condition: j < n - 1 - i
+      new ASTNode("for", null, [
+        new ASTNode("assign", null, [
+          new ASTNode("variable", "i"),
+          new ASTNode("number", 0)
+        ]),
+
         new ASTNode("call", null, [
           new ASTNode("variable", "<"),
-          new ASTNode("variable", "j"),
+          new ASTNode("variable", "i"),
           new ASTNode("call", null, [
             new ASTNode("variable", "-"),
             new ASTNode("call", null, [
-              new ASTNode("variable", "-"),
-              new ASTNode("variable", "n"),
-              new ASTNode("numberLiteral", 1)
+              new ASTNode("variable", "len"),
+              new ASTNode("variable", "a")
             ]),
-            new ASTNode("variable", "i")
+            new ASTNode("number", 1)
           ])
         ]),
 
-        // ----- inner loop body -----
-        new ASTNode("block", null, [
-          // ----- if at(arr, j) > at(arr, j+1) -----
-          new ASTNode("if", null, [
-            // condition
-            new ASTNode("call", null, [
-              new ASTNode("variable", ">"),
-              new ASTNode("call", null, [
-                new ASTNode("variable", "at"),
-                new ASTNode("variable", "arr"),
-                new ASTNode("variable", "j")
-              ]),
-              new ASTNode("call", null, [
-                new ASTNode("variable", "at"),
-                new ASTNode("variable", "arr"),
-                new ASTNode("call", null, [
-                  new ASTNode("variable", "+"),
-                  new ASTNode("variable", "j"),
-                  new ASTNode("numberLiteral", 1)
-                ])
-              ])
-            ]),
+        new ASTNode("assign", null, [
+          new ASTNode("variable", "i"),
+          new ASTNode("call", null, [
+            new ASTNode("variable", "+"),
+            new ASTNode("variable", "i"),
+            new ASTNode("number", 1)
+          ])
+        ]),
 
-            // ----- then block (swap) -----
-            new ASTNode("block", null, [
-              // temp = at(arr, j)
-              new ASTNode("assign", null, [
-                new ASTNode("variable", "temp"),
-                new ASTNode("call", null, [
-                  new ASTNode("variable", "at"),
-                  new ASTNode("variable", "arr"),
-                  new ASTNode("variable", "j")
-                ])
-              ]),
-              // set_at(arr, j, at(arr, j+1))
-              new ASTNode("call", null, [
-                new ASTNode("variable", "set_at"),
-                new ASTNode("variable", "arr"),
-                new ASTNode("variable", "j"),
-                new ASTNode("call", null, [
-                  new ASTNode("variable", "at"),
-                  new ASTNode("variable", "arr"),
-                  new ASTNode("call", null, [
-                    new ASTNode("variable", "+"),
-                    new ASTNode("variable", "j"),
-                    new ASTNode("numberLiteral", 1)
-                  ])
-                ])
-              ]),
-              // set_at(arr, j+1, temp)
-              new ASTNode("call", null, [
-                new ASTNode("variable", "set_at"),
-                new ASTNode("variable", "arr"),
-                new ASTNode("call", null, [
-                  new ASTNode("variable", "+"),
-                  new ASTNode("variable", "j"),
-                  new ASTNode("numberLiteral", 1)
-                ]),
-                new ASTNode("variable", "temp")
-              ])
-            ]),
-
-            // ----- else block (empty) -----
-            new ASTNode("block", null, [])
+        new ASTNode("for", null, [
+          new ASTNode("assign", null, [
+            new ASTNode("variable", "j"),
+            new ASTNode("number", 0)
           ]),
 
-          // ----- j = j + 1 -----
+          new ASTNode("call", null, [
+            new ASTNode("variable", "<"),
+            new ASTNode("variable", "j"),
+            new ASTNode("call", null, [
+              new ASTNode("variable", "-"),
+              new ASTNode("call", null, [
+                new ASTNode("variable", "-"),
+                new ASTNode("call", null, [
+                  new ASTNode("variable", "len"),
+                  new ASTNode("variable", "a")
+                ]),
+                new ASTNode("number", 1)
+              ]),
+              new ASTNode("variable", "i")
+            ])
+          ]),
+
           new ASTNode("assign", null, [
             new ASTNode("variable", "j"),
             new ASTNode("call", null, [
               new ASTNode("variable", "+"),
               new ASTNode("variable", "j"),
-              new ASTNode("numberLiteral", 1)
+              new ASTNode("number", 1)
+            ])
+          ]),
+
+          new ASTNode("block", null, [
+            new ASTNode("if", null, [
+              new ASTNode("call", null, [
+                new ASTNode("variable", ">"),
+                new ASTNode("call", null, [
+                  new ASTNode("variable", "at"),
+                  new ASTNode("variable", "a"),
+                  new ASTNode("variable", "j")
+                ]),
+                new ASTNode("call", null, [
+                  new ASTNode("variable", "at"),
+                  new ASTNode("variable", "a"),
+                  new ASTNode("call", null, [
+                    new ASTNode("variable", "+"),
+                    new ASTNode("variable", "j"),
+                    new ASTNode("number", 1)
+                  ])
+                ])
+              ]),
+
+              new ASTNode("block", null, [
+                new ASTNode("assign", null, [
+                  new ASTNode("variable", "tmp"),
+                  new ASTNode("call", null, [
+                    new ASTNode("variable", "at"),
+                    new ASTNode("variable", "a"),
+                    new ASTNode("variable", "j")
+                  ])
+                ]),
+
+                new ASTNode("call", null, [
+                  new ASTNode("variable", "set_at"),
+                  new ASTNode("variable", "a"),
+                  new ASTNode("variable", "j"),
+                  new ASTNode("call", null, [
+                    new ASTNode("variable", "at"),
+                    new ASTNode("variable", "a"),
+                    new ASTNode("call", null, [
+                      new ASTNode("variable", "+"),
+                      new ASTNode("variable", "j"),
+                      new ASTNode("number", 1)
+                    ])
+                  ])
+                ]),
+
+                new ASTNode("call", null, [
+                  new ASTNode("variable", "set_at"),
+                  new ASTNode("variable", "a"),
+                  new ASTNode("call", null, [
+                    new ASTNode("variable", "+"),
+                    new ASTNode("variable", "j"),
+                    new ASTNode("number", 1)
+                  ]),
+                  new ASTNode("variable", "tmp")
+                ])
+              ]),
+
+              new ASTNode("block", null, [])
             ])
           ])
-        ])   // end inner block
-      ]),    // end inner while
-
-      // ----- i = i + 1 -----
-      new ASTNode("assign", null, [
-        new ASTNode("variable", "i"),
-        new ASTNode("call", null, [
-          new ASTNode("variable", "+"),
-          new ASTNode("variable", "i"),
-          new ASTNode("numberLiteral", 1)
         ])
-      ])
-    ])      // end outer block
-  ]),       // end outer while
+      ]),
 
-  // ----- return the sorted array -----
+      new ASTNode("return", null, [
+        new ASTNode("variable", "a")
+      ])
+    ])
+  ]
+);
+
+const program = new ASTNode("block", null, [
+  new ASTNode("assign", null, [
+    new ASTNode("variable", "bubbleSort"),
+    bubbleSortFunction
+  ]),
+
+  new ASTNode("assign", null, [
+    new ASTNode("variable", "arr"),
+    new ASTNode("array", null, [
+      new ASTNode("number", 5),
+      new ASTNode("number", 1),
+      new ASTNode("number", 4),
+      new ASTNode("number", 2),
+      new ASTNode("number", 8)
+    ])
+  ]),
+
   new ASTNode("return", null, [
-    new ASTNode("variable", "arr")
+    new ASTNode("call", null, [
+      new ASTNode("variable", "bubbleSort"),
+      new ASTNode("variable", "arr")
+    ])
   ])
 ]);
 
-// ----- Run the interpreter -----
-const interpreter = new Interpreter(tree);
-const sortedArrayVar = interpreter.run();
+const interpreter = new Interpreter(program);
 
-// Print the sorted values
-console.log(sortedArrayVar.value.map(v => v.value));   // [1, 2, 5, 8, 9]
+const result = await interpreter.run();
+
+console.log("Sorted:", result.value.map(v => v.value));

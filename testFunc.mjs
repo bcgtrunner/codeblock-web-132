@@ -1,9 +1,9 @@
 import { ASTNode, Interpreter, EvalError } from "./index.mjs";
 import { Debugger } from "./debugger.mjs";
-/* --- Small AST builder helpers to make tests concise --- */
+
 const V = (name) => new ASTNode("variable", name);
-const Num = (n) => new ASTNode("numberLiteral", n);
-const Str = (s) => new ASTNode("stringLiteral", s);
+const Num = (n) => new ASTNode("number", n);
+const Str = (s) => new ASTNode("string", s);
 const Assign = (name, expr) => new ASTNode("assign", null, [V(name), expr]);
 const Call = (...children) => new ASTNode("call", null, children);
 const Block = (nodes) => new ASTNode("block", null, nodes);
@@ -13,9 +13,8 @@ const If = (cond, thenNode, elseNode) => new ASTNode("if", null, [cond, thenNode
 const While = (cond, body) => new ASTNode("while", null, [cond, body]);
 
 const Fn = (params = [], returns = null, body = []) =>
-  new ASTNode("functionLiteral", { params, returns }, body);
+  new ASTNode("function", { params, returns }, body);
 
-/* --- Runner helper --- */
 async function run(tree) {
     const interpreter = new Interpreter(tree);
     let result;
@@ -37,7 +36,6 @@ async function run(tree) {
     return result && result.value;
 }
 
-/* --- Tests --- */
 const tests = [
   {
     name: "Simple arithmetic function (double)",
@@ -205,7 +203,6 @@ const tests = [
   }
 ];
 
-/* --- Test runner --- */
 console.log("=== TESTING USER-DEFINED FUNCTIONS ===\n");
 let val;
 let idx = 0;
