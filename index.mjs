@@ -365,19 +365,19 @@ class Interpreter {
 
         try {
             switch (node.token) {
-
-                case "numberLiteral":
+                case "number":
                     result = new Var("number", Number(node.value));
                     break;
 
-                case "stringLiteral":
+                case "string":
                     result = new Var("string", String(node.value));
                     break;
 
-                case "boolLiteral":
+                case "bool":
                     result = new Var("bool", Boolean(node.value));
+                    break;
                 
-                case "functionLiteral":
+                case "function":
                     result = new Var("function", {
                         kind: "user",
                         params: node.value.params,
@@ -432,8 +432,6 @@ class Interpreter {
                     }
                     const fn = fnVar.value;
 
-                    // TODO: implement user defined functions
-                    // For now only builtins are supported
                     // TODO:
                     // separate variable declaration and assignment
                     /**

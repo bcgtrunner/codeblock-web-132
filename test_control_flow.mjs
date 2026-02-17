@@ -1,7 +1,7 @@
 import { ASTNode, Interpreter } from "./index.mjs";
 
-function N(n) { return new ASTNode("numberLiteral", n); }
-function B(b) { return new ASTNode("boolLiteral", b); }
+function N(n) { return new ASTNode("number", n); }
+function B(b) { return new ASTNode("bool", b); }
 function V(name) { return new ASTNode("variable", name); }
 function Call(name, ...args) {
     return new ASTNode("call", null, [V(name), ...args]);

@@ -4,18 +4,18 @@ import { Debugger } from "./debugger.mjs";
 const tree = new ASTNode("block", null, [
     new ASTNode("assign", null, [
         new ASTNode("variable", "x"),
-        new ASTNode("numberLiteral", 42)
+        new ASTNode("number", 42)
     ]),
     new ASTNode("assign", null, [
         new ASTNode("variable", "y"),
-        new ASTNode("numberLiteral", 42)
+        new ASTNode("number", 42)
     ]),
     new ASTNode("block", null, [
         new ASTNode("assign", null, [
             new ASTNode("variable", "y"),
             new ASTNode("call", null, [
                 new ASTNode("variable", "+"),
-                new ASTNode("numberLiteral", 10),
+                new ASTNode("number", 10),
                 new ASTNode("variable", "z")
             ])
         ])
@@ -48,8 +48,6 @@ debuggerInstance.watch("x");
 debuggerInstance.watch("y");
 
 interpreter.debugger = debuggerInstance;
-
-
 
 try {
     await interpreter.run();
