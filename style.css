@@ -1,0 +1,42 @@
+body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.environment {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+
+.environment__code-editor {
+    flex: 7.5 0 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.environment__console {
+    flex-grow: 2
+}
+
+.container {
+    border: 1px solid;
+}
+
+.console_output {
+    margin-left: 3px;
+}
+
+.console_input-wrapper {
+    margin-left: 3px;
+}
+.console_input {
+    border: none;
+    outline: none;
+}
