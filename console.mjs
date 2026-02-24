@@ -17,6 +17,7 @@ class Console
 
     execute() {
         const text = this.input.value;
+        if (text === 'run') {}
         this.output.innerHTML += `<div>> ${text}</div>`;
         this.output.innerHTML += `<div> Text entered: "${text}"</div>`;
         this.input.value = '';
