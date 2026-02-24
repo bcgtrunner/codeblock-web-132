@@ -1,3 +1,9 @@
+header {
+    background-color: blueviolet;
+    height: 50px;
+    flex-shrink: 0;
+}
+
 body {
     display: flex;
     flex-direction: column;
@@ -9,9 +15,26 @@ html, body {
     margin: 0;
 }
 
+img {
+    width:40px;
+    height:40px;
+    margin-top: 6px;
+    margin-left: 5px;
+}
+
+.logo {
+    margin-top: 20px;
+    margin-left: 5px;
+}
+
 .environment {
     flex: 1;
     display: flex;
+    min-height: 0;
+}
+
+.environment > section {
+    height: 100%;
     min-height: 0;
 }
 
@@ -20,6 +43,142 @@ html, body {
     position: relative;
     overflow: hidden;
 }
+
+.environment__block-palette {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.environment__console {
+    flex-grow: 2
+} 
+.container {
+    border: 2px solid black;
+    
+    /* margin-top: 7vh; */
+}
+
+.block,
+.environment__branch {
+    --radius-self: var(--radius-in, 10px);
+    border-radius: var(--radius-self);
+    box-sizing: border-box;
+}
+
+.block > .environment__branch,
+.environment__branch > .block {
+    --radius-in: var(--radius-out);
+}
+
+.block {
+    --gap: 2px;
+    --radius-out: max(0px, calc(var(--radius-self) - var(--gap)));
+    background-color: #ffd54f;
+    height: 6vh;
+    border: 1px solid black;
+    margin: 0;
+    cursor: grab;
+    user-select: none;
+
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 6px;
+    padding: var(--gap);
+    width: fit-content;
+    height: fit-content;
+}
+
+.horizontal-branch-alignment {
+    flex-direction: row;
+}
+
+.vertical-branch-alignment {
+    --gap: 4px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: var(--gap) 6px;
+}
+
+.vertical-branch-alignment > .environment__operation {
+    text-align: center;
+}
+
+.vertical-branch-alignment .environment__branch {
+    align-self: center;
+}
+
+.environment__operation {
+    pointer-events: none;
+}
+
+.category {
+    font-size: 2em;
+    font-weight: bold;
+    opacity:0.7;
+    margin: 25px 0px 0px 10px;
+    user-select: none;
+}
+
+editor > .block {
+    position: absolute;
+    background-color: #ffd54f;
+    border: 1px solid black;
+    --gap: 4px;
+    padding: var(--gap) 0.45em;
+    cursor: grab;
+    user-select: none;
+}
+
+.environment__if-block,
+.environment__for-block,
+.environment__while-block,
+editor > .environment__if-block,
+editor > .environment__for-block,
+editor > .environment__while-block {
+    background-color: #ff9800;
+}
+
+.environment__branch {
+    --gap: 1px;
+    --radius-out: max(0px, calc(var(--radius-self) - var(--gap)));
+    min-width: 28px;
+    min-height: 20px;
+    background-color: white;
+    padding: var(--gap);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    height: max-content;
+}
+
+.environment__branch:empty {
+    width: 28px;
+    height: 20px;
+}
+
+.environment__branch.highlight {
+    outline: 2px dashed orange;
+}
+
+.environment__input-number {
+    width: 3em; 
+    border-radius: var(--radius-out, 10px);
+}
+
+input[type="checkbox"].environment__input-number {
+    width: 1.35em;
+    height: 1.35em;
+}
+
+.centered {
+    text-align: center;
+}
+
 
 .environment__console {
     flex-grow: 2
