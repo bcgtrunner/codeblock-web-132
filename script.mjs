@@ -21,6 +21,7 @@ const variableBlock = palette.querySelector(".environment__variable-block")
 const assignBlock = palette.querySelector(".environment__assign-block")
 const plusBlock = palette.querySelector(".environment__plus-block")
 const greaterBlock = palette.querySelector(".environment__gt-block")
+const lessBlock = palette.querySelector(".environment__lt-block")
 const andBlock = palette.querySelector(".environment__and-block")
 const ifBlock = palette.querySelector(".environment__if-block")
 const forBlock = palette.querySelector(".environment__for-block")
@@ -80,9 +81,13 @@ returnBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("return", "return");
     startDragging(uiNode, e, e.target);
 });
+lessBlock.addEventListener('pointerdown', (e) => {
+    const uiNode = manager.spawnNode("call", "<").setOperation(new ASTNode("variable", "<"));
+    startDragging(uiNode, e, e.target);
+});
 
 function startDragging(uiNode, e, blockElement) {
-    console.log(uiNode);
+    blockElement = blockElement.closest(".block");
     e.stopPropagation(); /* чтобы клик не дошёл до palette document иначе могут начаться глюки */
     draggingBlock = uiNode;
     const rect = blockElement.getBoundingClientRect();
