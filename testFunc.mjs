@@ -1,4 +1,4 @@
-import { ASTNode, Interpreter, EvalError } from "./index.mjs";
+import { ASTNode, Interpreter, EvalError } from "./interpreter.mjs";
 import { Debugger } from "./debugger.mjs";
 
 const V = (name) => new ASTNode("variable", name);
