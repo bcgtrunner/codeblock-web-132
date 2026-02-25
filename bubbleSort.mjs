@@ -1,4 +1,4 @@
-import { ASTNode, Interpreter } from "./index.mjs";
+import { ASTNode, Interpreter } from "./interpreter.mjs";
 
 const tree = new ASTNode("block", null, [
   new ASTNode("assign", null, [

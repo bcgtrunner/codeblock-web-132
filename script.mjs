@@ -1,5 +1,4 @@
-'use strict'
-import { ASTNode, Interpreter } from "./index.mjs";
+import { ASTNode, Interpreter } from "./interpreter.mjs";
 import { UINodeManager } from "./UINodeManager.mjs";
 import { Console } from "./console.mjs";
 const manager = new UINodeManager();
@@ -20,6 +19,7 @@ const boolBlock = palette.querySelector(".environment__boolLiteral-block")
 const variableBlock = palette.querySelector(".environment__variable-block")
 const assignBlock = palette.querySelector(".environment__assign-block")
 const plusBlock = palette.querySelector(".environment__plus-block")
+const minusBlock = palette.querySelector(".environment__minus-block")
 const greaterBlock = palette.querySelector(".environment__gt-block")
 const lessBlock = palette.querySelector(".environment__lt-block")
 const andBlock = palette.querySelector(".environment__and-block")
@@ -51,6 +51,10 @@ assignBlock.addEventListener('pointerdown', (e) => {
 });
 plusBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("call", "+").setOperation(new ASTNode("variable", "+"));
+    startDragging(uiNode, e, e.target);
+});
+minusBlock.addEventListener('pointerdown', (e) => {
+    const uiNode = manager.spawnNode("call", "-").setOperation(new ASTNode("variable", "-"));
     startDragging(uiNode, e, e.target);
 });
 greaterBlock.addEventListener('pointerdown', (e) => {
@@ -87,6 +91,7 @@ lessBlock.addEventListener('pointerdown', (e) => {
 });
 
 function startDragging(uiNode, e, blockElement) {
+    console.log(uiNode);
     blockElement = blockElement.closest(".block");
     e.stopPropagation(); /* чтобы клик не дошёл до palette document иначе могут начаться глюки */
     draggingBlock = uiNode;

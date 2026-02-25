@@ -1,4 +1,4 @@
-import { ASTNode, Interpreter } from "./index.mjs"
+import { ASTNode } from "./interpreter.mjs"
 
 class UINode {
     constructor(type, element, value = null, branches = null) {
