@@ -20,6 +20,7 @@ const boolBlock = palette.querySelector(".environment__boolLiteral-block")
 const variableBlock = palette.querySelector(".environment__variable-block")
 const assignBlock = palette.querySelector(".environment__assign-block")
 const plusBlock = palette.querySelector(".environment__plus-block")
+const minusBlock = palette.querySelector(".environment__minus-block")
 const greaterBlock = palette.querySelector(".environment__gt-block")
 const andBlock = palette.querySelector(".environment__and-block")
 const ifBlock = palette.querySelector(".environment__if-block")
@@ -50,6 +51,10 @@ assignBlock.addEventListener('pointerdown', (e) => {
 });
 plusBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("call", "+").setOperation(new ASTNode("variable", "+"));
+    startDragging(uiNode, e, e.target);
+});
+minusBlock.addEventListener('pointerdown', (e) => {
+    const uiNode = manager.spawnNode("call", "-").setOperation(new ASTNode("variable", "-"));
     startDragging(uiNode, e, e.target);
 });
 greaterBlock.addEventListener('pointerdown', (e) => {
