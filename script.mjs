@@ -92,6 +92,7 @@ lessBlock.addEventListener('pointerdown', (e) => {
 });
 
 function startDragging(uiNode, e, blockElement) {
+    console.log(uiNode);
     blockElement = blockElement.closest(".block");
     e.stopPropagation(); /* чтобы клик не дошёл до palette document иначе могут начаться глюки */
     draggingBlock = uiNode;
