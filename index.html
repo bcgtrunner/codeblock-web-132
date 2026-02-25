@@ -3,10 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codeblock 132</title>
+    <link rel="stylesheet" href="style.css">
+    <title>Codeblock Web 132</title>
 </head>
 <body>
-</body>
-<script src="bubbleSort.mjs" type="module"></script>
+    <script src="script.mjs" type="module"></script>
+	<section class = "environment">
+        <section class="environment__block-palette container">
+            <div class="category" id="arrays">Main</div>
+            <div class="environment__numberLiteral-block block">
+                <div class="environment__operation">number</div>
+                <input type="number" class = "environment__input-number">
+            </div>
 
+            <div class="environment__stringLiteral-block block">
+                <div class="environment__operation">string</div>
+                <input type="text" class = "environment__input-number">
+            </div>
+            <div class="environment__boolLiteral-block block">
+                <div class="environment__operation">bool</div>
+                <input type="checkbox" class = "environment__input-number">
+            </div>
+            <div class="environment__variable-block block">
+                <div class = environment__operation>variable</div> 
+                <input type="text" class = "environment__input-number">
+            </div>
+
+            <div class="environment__assign-block block">
+                <div class = "environment__branch"></div> 
+                <div class = environment__operation>=</div> 
+                <div class = "environment__branch"></div> 
+            </div>
+
+            <div class="environment__block-block block vertical-branch-alignment">
+                <div class = environment__operation>block</div> 
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__return-block block">
+                <div class = environment__operation>return</div> 
+                <div class="environment__branch"></div>
+            </div>
+
+            <div class="category" id="math">Math Operators</div>
+            <div class="environment__plus-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">+</div>
+                <div class="environment__branch"></div>
+            </div>
+
+            <div class="environment__minus-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">-</div>
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__multiply-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">*</div>
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__divide-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">/</div>
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__intDivide-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">//</div>
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__mod-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">%</div>
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__power-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">**</div>
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__sqrt-block block">
+                <div class="environment__operation">sqrt</div>
+                <div class="environment__branch"></div>
+            </div>
+
+            <div class="environment__abs-block block">
+                <div class="environment__operation">abs</div>
+                <div class="environment__branch"></div>
+            </div>
+
+            <div class="category" id="arrays">Arrays</div>
+            <div class="environment__array-block block">array</div>
+            <div class="environment__at-block block">at</div>
+            <div class="environment__erase_at-block block">remove</div>
+            <div class="environment__len-block block">len</div>
+
+            <div class="category" id="logic">Logic</div>
+            <div class="environment__if-block block vertical-branch-alignment">
+                <div class="environment__operation">if</div>
+                <div class="environment__branch"></div>
+                <div class="centered">then</div>
+                <div class="environment__branch"></div>
+                <div class="centered">else</div>
+                <div class="environment__branch"></div>
+            </div>          
+            <div class="environment__for-block block vertical-branch-alignment">
+                <div class="environment__operation">for</div>
+                <div style="text-align: center;">var</div>
+                <div class="environment__branch"></div>
+                <div style="text-align: center;">cond</div>
+                <div class="environment__branch"></div>
+                <div style="text-align: center;">step</div>
+                <div class="environment__branch"></div>
+                <div style="text-align: center;">do</div>
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__while-block block vertical-branch-alignment">
+                <div class="environment__operation">while</div>
+                <div class="environment__branch"></div>
+                <div class="centered">do</div>
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__eq-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">==</div>
+                <div class="environment__branch"></div>
+            </div>
+
+            <div class="environment__neq-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">!=</div>
+                <div class="environment__branch"></div>
+            </div>
+
+            <div class="environment__lt-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">&lt;</div>
+                <div class="environment__branch"></div>
+            </div>
+
+            <div class="environment__gt-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">&gt;</div>
+                <div class="environment__branch"></div>
+            </div>
+
+            <div class="environment__lte-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">&lt;=</div>
+                <div class="environment__branch"></div>
+            </div>
+
+            <div class="environment__gte-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">&gt;=</div>
+                <div class="environment__branch"></div>
+            </div>
+
+            <div class="environment__and-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">and</div>
+                <div class="environment__branch"></div>
+            </div>
+
+            <div class="environment__or-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">or</div>
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__not-block block">
+                <div class="environment__operation">not</div>
+                <div class="environment__branch"></div>
+            </div>
+        </section>
+        <section class="environment__code-editor container"> </section>
+        <section class = "environment__console container">
+            <div class = "console_output"></div>
+            <div class="console_input-wrapper">
+                <span>>&nbsp;</span>
+                <input class="console_input" type="text"/>   
+            </div>
+        </section>
+        <section class="environment__toolbar container">
+            <button class="environment__run">▶️</button>
+        </section>
+    </section>
+</body>
 </html>
