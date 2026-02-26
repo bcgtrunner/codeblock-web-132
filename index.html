@@ -92,10 +92,24 @@
             </div>
 
             <div class="category" id="arrays">Arrays</div>
-            <div class="environment__array-block block">array</div>
-            <div class="environment__at-block block">at</div>
-            <div class="environment__erase_at-block block">remove</div>
-            <div class="environment__len-block block">len</div>
+            <div class="environment__array-block block vertical-branch-alignment">
+                <div class = environment__operation>array</div> 
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__at-block block horizontal-branch-alignment">
+                <div class="environment__branch"></div>
+                <div class = environment__operation>at</div>
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__erase_at-block block">
+                <div class="environment__branch"></div>
+                <div class = environment__operation>remove</div>
+                <div class="environment__branch"></div>
+            </div>
+            <div class="environment__len-block block">
+                <div class = environment__operation>len</div>
+                <div class="environment__branch"></div>
+            </div>
 
             <div class="category" id="logic">Logic</div>
             <div class="environment__if-block block vertical-branch-alignment">

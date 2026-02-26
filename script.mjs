@@ -28,6 +28,9 @@ const forBlock = palette.querySelector(".environment__for-block")
 const whileBlock = palette.querySelector(".environment__while-block")
 const blockBlock = palette.querySelector(".environment__block-block")
 const returnBlock = palette.querySelector(".environment__return-block")
+const arrayBlock = palette.querySelector(".environment__array-block")
+const atBlock = palette.querySelector(".environment__at-block")
+const lenBlock = palette.querySelector(".environment__len-block")
 
 numberBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("number", "number")
@@ -81,6 +84,10 @@ blockBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("block", "block");
     startDragging(uiNode, e, e.target);
 });
+arrayBlock.addEventListener('pointerdown', (e) => {
+    const uiNode = manager.spawnNode("array", "array");
+    startDragging(uiNode, e, e.target);
+});
 returnBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("return", "return");
     startDragging(uiNode, e, e.target);
@@ -89,7 +96,14 @@ lessBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("call", "<").setOperation(new ASTNode("variable", "<"));
     startDragging(uiNode, e, e.target);
 });
-
+atBlock.addEventListener('pointerdown', (e) => {
+    const uiNode = manager.spawnNode("call", "at").setOperation(new ASTNode("variable", "at"));
+    startDragging(uiNode, e, e.target);
+});
+lenBlock.addEventListener('pointerdown', (e) => {
+    const uiNode = manager.spawnNode("call", "len").setOperation(new ASTNode("variable", "len"));
+    startDragging(uiNode, e, e.target);
+});
 function startDragging(uiNode, e, blockElement) {
     console.log(uiNode);
     blockElement = blockElement.closest(".block");

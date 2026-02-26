@@ -5,7 +5,7 @@ class UINodeManager {
         this.activeBlocks = new Map(); 
     }
     
-    spawnNode(type, label) {
+    spawnNode(type, label, branchCount = 0) {
         const value = null;
         const element = document.createElement("div");
         const uiNode = new UINode(type, element);
@@ -34,6 +34,9 @@ class UINodeManager {
                 input.className = "environment__input-number"
                 element.appendChild(input);
                 input.value = value;
+                input.addEventListener("change", (e) => {
+                    uiNode.node.value = e.target.value;
+                })
                 break;
             }
             case "bool": {
@@ -60,24 +63,17 @@ class UINodeManager {
                 })
                 break;
             }
-            case "assign": {
-                const left = this.createDivElement("", "environment__branch")
-    
-                const right = this.createDivElement("", "environment__branch")
-
-                element.appendChild(left);
-                element.appendChild(text);
-                element.appendChild(right);
-                uiNode.setBranches([left, right]);
-                break;
-            }
+            case "assign": 
             case "call": {
-                uiNode.node.children.push()
-
-                const left = this.createDivElement("", "environment__branch")
-    
+                if (label === "len") {
+                    const right = this.createDivElement("", "environment__branch")
+                    element.appendChild(text);
+                    element.appendChild(right);
+                    uiNode.setBranches([right]);
+                    break;
+                }
                 const right = this.createDivElement("", "environment__branch")
-
+                const left = this.createDivElement("", "environment__branch")
                 element.appendChild(left);
                 element.appendChild(text);
                 element.appendChild(right);
@@ -132,6 +128,14 @@ class UINodeManager {
                 element.append(doDiv); 
                 element.appendChild(body);
                 uiNode.setBranches([init, condition, step, body]);
+                break;
+            }
+            case "array": {
+                element.classList.add("vertical-branch-alignment");
+                element.appendChild(text);
+                const body = this.createDivElement("", "environment__branch")
+                element.appendChild(body);
+                uiNode.setBranches([body]);
                 break;
             }
             case "block": {
