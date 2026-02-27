@@ -154,6 +154,24 @@ class UINodeManager {
                 uiNode.setBranches([body]);
                 break;
             }
+            case "function": {
+                element.classList.add("vertical-branch-alignment");
+                element.appendChild(text);
+                const argsDiv = this.createDivElement("args", "centered");
+                const returnsDiv = this.createDivElement("returns", "centered");
+                const bodyDiv = this.createDivElement("body", "centered");
+                const argsBranch = this.createDivElement("", "environment__branch");
+                const returnsBranch = this.createDivElement("", "environment__branch");
+                const bodyBranch = this.createDivElement("", "environment__branch");
+                element.appendChild(argsDiv);
+                element.appendChild(argsBranch);
+                element.appendChild(returnsDiv);
+                element.appendChild(returnsBranch);
+                element.appendChild(bodyDiv);
+                element.appendChild(bodyBranch);
+                uiNode.setBranches([argsBranch, returnsBranch, bodyBranch]);
+                break;
+            }
         }
         this.activeBlocks.set(uiNode.node.id, uiNode);
         console.log(this.activeBlocks)

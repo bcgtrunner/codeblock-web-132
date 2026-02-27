@@ -32,6 +32,9 @@ class UINode {
             case "return": {
                 return !(this.node.children[0]);
             }
+            case "function": {
+                return false;
+            }
         }
         return true;
     }
