@@ -1,3 +1,4 @@
+import { ASTNode } from "./interpreter.mjs";
 import { UINode } from "./UINode.mjs";
 
 class UINodeManager {
@@ -63,8 +64,75 @@ class UINodeManager {
                 })
                 break;
             }
-            case "assign": 
+            case "param": {
+                element.appendChild(text);
+
+                const nameInput = document.createElement("input");
+                nameInput.type = "text";
+                nameInput.className = "environment__input-number";
+                nameInput.placeholder = "name";
+
+                const ofType = this.createDivElement("of type", "centered");
+
+                const typeInput = document.createElement("input");
+                typeInput.type = "text";
+                typeInput.className = "environment__input-number";
+                typeInput.placeholder = "type";
+
+                uiNode.node.value = { name: "", type: "" };
+
+                nameInput.addEventListener("change", (e) => {
+                    uiNode.node.value = {
+                        ...uiNode.node.value,
+                        name: e.target.value
+                    };
+                });
+
+                typeInput.addEventListener("change", (e) => {
+                    uiNode.node.value = {
+                        ...uiNode.node.value,
+                        type: e.target.value
+                    };
+                });
+
+                element.appendChild(nameInput);
+                element.appendChild(ofType);
+                element.appendChild(typeInput);
+                break;
+            }
+            case "type": {
+                element.appendChild(text);
+                const input = document.createElement("input");
+                input.type = "text";
+                input.className = "environment__input-number";
+                input.placeholder = "type";
+                uiNode.node.value = "";
+                input.addEventListener("change", (e) => {
+                    uiNode.node.value = e.target.value;
+                });
+                element.appendChild(input);
+                break;
+            }
+            case "assign": {
+                const right = this.createDivElement("", "environment__branch")
+                const left = this.createDivElement("", "environment__branch")
+                element.appendChild(left);
+                element.appendChild(text);
+                element.appendChild(right);
+                uiNode.setBranches([left, right]);
+                break;
+            }
             case "call": {
+                if (label === "call") {
+                    uiNode.node.value = "generic-call";
+                    const first = this.createDivElement("", "environment__branch");
+                    const second = this.createDivElement("", "environment__branch");
+                    element.appendChild(first);
+                    element.appendChild(text);
+                    element.appendChild(second);
+                    uiNode.setBranches([first, second]);
+                    break;
+                }
                 if (label === "len") {
                     const right = this.createDivElement("", "environment__branch")
                     element.appendChild(text);
@@ -156,6 +224,7 @@ class UINodeManager {
             }
             case "function": {
                 element.classList.add("vertical-branch-alignment");
+                uiNode.node.children[0] = new ASTNode("block", null, []);
                 element.appendChild(text);
                 const argsDiv = this.createDivElement("args", "centered");
                 const returnsDiv = this.createDivElement("returns", "centered");

@@ -18,6 +18,7 @@ const stringBlock = palette.querySelector(".environment__stringLiteral-block")
 const boolBlock = palette.querySelector(".environment__boolLiteral-block")
 const variableBlock = palette.querySelector(".environment__variable-block")
 const assignBlock = palette.querySelector(".environment__assign-block")
+const callBlock = palette.querySelector(".environment__call-block")
 const plusBlock = palette.querySelector(".environment__plus-block")
 const minusBlock = palette.querySelector(".environment__minus-block")
 const greaterBlock = palette.querySelector(".environment__gt-block")
@@ -32,6 +33,8 @@ const arrayBlock = palette.querySelector(".environment__array-block")
 const atBlock = palette.querySelector(".environment__at-block")
 const lenBlock = palette.querySelector(".environment__len-block")
 const functionBlock = palette.querySelector(".environment__function-block")
+const paramBlock = palette.querySelector(".environment__param-block")
+const typeBlock = palette.querySelector(".environment__type-block")
 
 numberBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("number", "number")
@@ -51,6 +54,10 @@ variableBlock.addEventListener('pointerdown', (e) => {
 });
 assignBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("assign", "=")
+    startDragging(uiNode, e, e.target);
+});
+callBlock.addEventListener('pointerdown', (e) => {
+    const uiNode = manager.spawnNode("call", "call");
     startDragging(uiNode, e, e.target);
 });
 plusBlock.addEventListener('pointerdown', (e) => {
@@ -107,6 +114,14 @@ lenBlock.addEventListener('pointerdown', (e) => {
 });
 functionBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("function", "function");
+    startDragging(uiNode, e, e.target);
+});
+paramBlock.addEventListener('pointerdown', (e) => {
+    const uiNode = manager.spawnNode("param", "param");
+    startDragging(uiNode, e, e.target);
+});
+typeBlock.addEventListener('pointerdown', (e) => {
+    const uiNode = manager.spawnNode("type", "type");
     startDragging(uiNode, e, e.target);
 });
 
