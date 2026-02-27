@@ -1,4 +1,4 @@
-import { ASTNode, Interpreter } from "./index.mjs"
+import { ASTNode } from "./interpreter.mjs"
 
 class UINode {
     constructor(type, element, value = null, branches = null) {
@@ -29,12 +29,15 @@ class UINode {
             case "call": {
                 return (index === 0 && !(this.node.children[1])) || (!(this.node.children[2]) && index === 1);
             }
+            case "return": {
+                return !(this.node.children[0]);
+            }
         }
         return true;
     }
 
     appendChild(childUINode, branch) {
-        if (this.node.token == "block") {
+        if (this.node.token == "block" || this.node.token == "array") {
             this.node.children.push(childUINode.node);
             branch.appendChild(childUINode.element);
             return;
@@ -50,8 +53,9 @@ class UINode {
         const index = this.node.children.indexOf(childUINOde.node);
         if (index !== -1) {
             this.node.children[index] = undefined;
-            if (this.node.token == "block") this.node.children.splice(index, 1);
-            // this.node.children.splice(index, 1);
+            if (this.node.token == "block" || this.node.token === "array") {
+                this.node.children.splice(index, 1);
+            }
         }
     }
 
