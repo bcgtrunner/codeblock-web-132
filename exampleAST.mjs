@@ -1,4 +1,4 @@
-import { ASTNode, Interpreter } from "./index.mjs"
+import { ASTNode, Interpreter } from "./interpreter.mjs"
 
 function N(n) { return new ASTNode("number", n) }
 function V(name) { return new ASTNode("variable", name) }

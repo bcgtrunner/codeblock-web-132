@@ -1,4 +1,4 @@
-import { Interpreter, ASTNode, EvalError } from "./index.mjs";
+import { Interpreter, ASTNode, EvalError } from "./interpreter.mjs";
 import { Debugger } from "./debugger.mjs";
 
 const tree = new ASTNode("block", null, [
