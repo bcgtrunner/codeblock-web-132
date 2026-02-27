@@ -573,7 +573,12 @@ class Interpreter {
     }
 
     async run() {
-        return await this.eval(this.tree);
+        // in the debugger (stack trace) we should not see builtins
+        // thus we add another frame to separate builtins from everything else 
+        this.stack.pushFrame();
+        const result = await this.eval(this.tree);
+        this.stack.popFrame();
+        return result;
     }
 }
 
