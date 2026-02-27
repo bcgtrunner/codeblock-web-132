@@ -378,11 +378,20 @@ class Interpreter {
                     break;
                 
                 case "function":
+                    if (!node.children[0] || node.children[0].token !== "block") {
+                        throw new EvalError("Function AST invalid: children[0] must be params block");
+                    }
+                    if (!node.children[1] || node.children[1].token !== "type") {
+                        throw new EvalError("Function AST invalid: children[1] must be return type node");
+                    }
+                    if (!node.children[2]) {
+                        throw new EvalError("Function AST invalid: children[2] must be function body node");
+                    }
                     result = new Var("function", {
                         kind: "user",
-                        params: node.value.params,
-                        returns: node.value.returns,
-                        impl: node.children[0]
+                        params: node.children[0].children.map(ch => ch.value),
+                        returns: node.children[1].value,
+                        impl: node.children[2]
                     })
                     break;
 
@@ -546,6 +555,12 @@ class Interpreter {
                 case "return":
                     result = await this.eval(node.children[0]);
                     break;
+                
+                case "param":
+                    throw new Error("Params must not be use outside of function arguments.")
+                
+                case "type":
+                    throw new Error("Type nodes must not be used outside of function return signatures.")
 
                 default:
                     throw new EvalError(`Unknown AST node token: ${node.token}`);

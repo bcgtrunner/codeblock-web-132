@@ -12,8 +12,12 @@ const ArrayLit = (items) => new ASTNode("array", null, items);
 const If = (cond, thenNode, elseNode) => new ASTNode("if", null, [cond, thenNode, elseNode]);
 const While = (cond, body) => new ASTNode("while", null, [cond, body]);
 
-const Fn = (params = [], returns = null, body = []) =>
-  new ASTNode("function", { params, returns }, body);
+const Fn = (params = [], returns = "any", body = []) =>
+  new ASTNode("function", null, [
+    new ASTNode("block", null, params.map((p) => new ASTNode("param", p))),
+    new ASTNode("type", returns),
+    body.length === 1 ? body[0] : new ASTNode("block", null, body)
+  ]);
 
 async function run(tree) {
     const interpreter = new Interpreter(tree);

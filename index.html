@@ -34,6 +34,12 @@
                 <div class = environment__operation>=</div> 
                 <div class = "environment__branch"></div> 
             </div>
+            
+            <div class="environment__call-block block">
+                <div class="environment__branch"></div>
+                <div class="environment__operation">call</div>
+                <div class="environment__branch"></div>
+            </div>
 
             <div class="environment__block-block block vertical-branch-alignment">
                 <div class = environment__operation>block</div> 
@@ -197,6 +203,20 @@
                 <div class="environment__branch"></div>
                 <div class="centered">body</div>
                 <div class="environment__branch"></div>
+            </div>
+
+            <div class="environment__param-block block">
+                <div class="environment__operation">param</div>
+                <input type="text" class = "environment__input-number">
+                <div class="centered">of type</div>
+                <!--TODO: Make this a multiple choice, instead of text--> 
+                <input type="text" class = "environment__input-number">
+            </div>
+            
+            <div class="environment__type-block block">
+                <div class="environment__operation">type</div>
+                <!--TODO: Make this a multiple choice, instead of text--> 
+                <input type="text" class = "environment__input-number">
             </div>
         </section>
         <section class="environment__code-editor container"> </section>
