@@ -7,7 +7,7 @@ const palette = document.querySelector(".environment__block-palette");
 const editor = document.querySelector(".environment__code-editor");
 const editorConsole = new Console();
 
-editorConsole.print("HELLO,WORLD!")
+editorConsole.print("HELLO, WORLD!")
 let draggingBlock = null; // какой блок сейчас тащим
 let lastBranch = null; // состояние текущей ветки; Это память о прошлой ветке, над которой был курсор.
 let offsetX = 0;
@@ -31,6 +31,7 @@ const returnBlock = palette.querySelector(".environment__return-block")
 const arrayBlock = palette.querySelector(".environment__array-block")
 const atBlock = palette.querySelector(".environment__at-block")
 const lenBlock = palette.querySelector(".environment__len-block")
+const functionBlock = palette.querySelector(".environment__function-block")
 
 numberBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("number", "number")
@@ -104,6 +105,11 @@ lenBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("call", "len").setOperation(new ASTNode("variable", "len"));
     startDragging(uiNode, e, e.target);
 });
+functionBlock.addEventListener('pointerdown', (e) => {
+    const uiNode = manager.spawnNode("function", "function");
+    startDragging(uiNode, e, e.target);
+});
+
 function startDragging(uiNode, e, blockElement) {
     console.log(uiNode);
     blockElement = blockElement.closest(".block");
@@ -129,10 +135,8 @@ function dragging(uiNode, e) {
             lastBranch = branchElement;
         }
     }
-    else {
-        if (lastBranch) {
-            lastBranch.classList.remove('highlight');
-        }
+    else if (lastBranch) {
+        lastBranch.classList.remove('highlight');
     }
 }
 
