@@ -1,4 +1,4 @@
-import { ASTNode, Interpreter } from "./interpreter.mjs";
+import { ASTNode, Interpreter, EvalError } from "./interpreter.mjs";
 
 function N(n) { return new ASTNode("number", n); }
 function B(b) { return new ASTNode("bool", b); }
@@ -7,119 +7,162 @@ function Call(name, ...args) {
     return new ASTNode("call", null, [V(name), ...args]);
 }
 
-Test2();
+function assertEqual(actual, expected, label) {
+    if (actual !== expected) {
+        throw new Error(`${label}: expected ${expected}, got ${actual}`);
+    }
+}
 
-function Test1() {
-    const callAdd = Call("+", V("a"), N(1));
+async function expectEvalError(tree, messagePart, label) {
+    try {
+        const interp = new Interpreter(tree);
+        await interp.run();
+        throw new Error(`${label}: expected EvalError`);
+    } catch (e) {
+        if (!(e instanceof EvalError)) {
+            throw new Error(`${label}: expected EvalError, got ${e.constructor.name}`);
+        }
+        if (!e.message.includes(messagePart)) {
+            throw new Error(`${label}: expected message containing "${messagePart}", got "${e.message}"`);
+        }
+    }
+}
 
-    const block = new ASTNode("block", null, [
-        new ASTNode("assign", null, [
-            V("a"),
-            callAdd
-        ]),
-        new ASTNode("return", null, [V("a")]),
-    ]);
-
-    const callWhile = new ASTNode("while", null, [
-        Call("<", V("a"), N(100)),
-        block,
-    ]);
-
-    const block1 = new ASTNode("block", null, [
-        new ASTNode("assign", null, [
-            V("a"),
-            N(3)
-        ]),
-        callWhile,
-        new ASTNode("block"),
-        new ASTNode("return", null, [V("a")])
-    ]);
-
-    const callIf = new ASTNode("if", null, [
-        Call("and",
+async function testIfBranches() {
+    const root = new ASTNode("block", null, [
+        new ASTNode("assign", null, [V("a"), N(3)]),
+        new ASTNode("if", null, [
             B(true),
-            Call("==", N(3), N(3))
-        ),
-        block,
-        new ASTNode("block")
-    ]);
-
-    const root = new ASTNode("assign", null, [
-        V("x"),
-        block1
+            new ASTNode("assign", null, [V("a"), N(4)]),
+            new ASTNode("assign", null, [V("a"), N(99)])
+        ]),
+        new ASTNode("if", null, [
+            B(false),
+            new ASTNode("assign", null, [V("a"), N(100)]),
+            new ASTNode("assign", null, [V("a"), N(5)])
+        ]),
+        new ASTNode("return", null, [V("a")])
     ]);
 
     const interp = new Interpreter(root);
-    const result = interp.run();
-
-    console.log("AST root:", root);
-    console.log("Result:", result);
-    console.log("Stack frames:", interp.stack.frames);
-    console.log("x =", interp.stack.lookup("x"));
+    const result = await interp.run();
+    assertEqual(result.value, 5, "if true/false branches");
 }
 
-function Test2() {
-    const callAddI = new ASTNode("assign", null, [
-        V("i"),
-        Call("+", V("i"), N(1))
-    ]);
-
-    const loopBlock = new ASTNode("block", null, [
-        new ASTNode("assign", null, [
-            V("a"),
-            Call("+", V("a"), Call("at", V("arr"), V("i")))
-        ]),
-        callAddI,
-        new ASTNode("return", null, [V("a")])
-    ]);
-
-    const callWhile = new ASTNode("while", null, [
-        Call("<", V("i"), N(4)),
-        loopBlock
-    ]);
-
-    const root = new ASTNode("block", null, [
+async function testWhileLoopSumAndZeroIterations() {
+    const sumTree = new ASTNode("block", null, [
         new ASTNode("assign", null, [V("a"), N(0)]),
         new ASTNode("assign", null, [V("i"), N(0)]),
-        new ASTNode("assign", null, [
-            V("arr"),
-            new ASTNode("array", null, [N(11), N(15), N(12)])
-        ]),
+        new ASTNode("assign", null, [V("arr"), new ASTNode("array", null, [N(11), N(15), N(12)])]),
         Call("push", V("arr"), N(100)),
-        callWhile,
-        new ASTNode("return", null, [V("a")])
-    ]);
-
-    const interp = new Interpreter(root);
-    const result = interp.run();
-    console.log("Result:", result);
-    console.log("Stack frames:", interp.stack.frames);
-    console.log("Сумма элементов массива:", result.value); // 38
-}
-
-function Test3() {
-    const forLoop = new ASTNode("for", null, [
-    new ASTNode("assign", null, [V("i"), N(0)]),
-        Call("<=", V("i"), N(10)),
-        new ASTNode("assign", null, [
-            V("i"), 
-            Call("+", V("i"), N(1))
+        new ASTNode("while", null, [
+            Call("<", V("i"), N(4)),
+            new ASTNode("block", null, [
+                new ASTNode("assign", null, [V("a"), Call("+", V("a"), Call("at", V("arr"), V("i")))]),
+                new ASTNode("assign", null, [V("i"), Call("+", V("i"), N(1))])
+            ])
         ]),
-        new ASTNode("assign", null, [
-            V("a"), 
-            Call("+", V("a"), V("i"))
-        ])
-    ]);
-
-    const block = new ASTNode("block", null, [
-        new ASTNode("assign", null, [V("a"), N(0)]),
-        forLoop,
         new ASTNode("return", null, [V("a")])
     ]);
 
-    const interp = new Interpreter(block);
-    const result = interp.run();
-    console.log("Result:", result);
-    console.log("Stack frames:", interp.stack.frames);
-    console.log("Сумма элементов массива:", result.value);
+    const sumInterp = new Interpreter(sumTree);
+    const sumResult = await sumInterp.run();
+    assertEqual(sumResult.value, 138, "while loop sum");
+
+    const zeroWhileTree = new ASTNode("block", null, [
+        new ASTNode("assign", null, [V("x"), N(10)]),
+        new ASTNode("while", null, [
+            B(false),
+            new ASTNode("assign", null, [V("x"), N(999)])
+        ]),
+        new ASTNode("return", null, [V("x")])
+    ]);
+    const zeroWhileInterp = new Interpreter(zeroWhileTree);
+    const zeroWhileResult = await zeroWhileInterp.run();
+    assertEqual(zeroWhileResult.value, 10, "while zero iterations");
 }
+
+async function testForLoopAndScopeAndZeroIterations() {
+    const forTree = new ASTNode("block", null, [
+        new ASTNode("assign", null, [V("a"), N(0)]),
+        new ASTNode("for", null, [
+            new ASTNode("assign", null, [V("i"), N(0)]),
+            Call("<=", V("i"), N(10)),
+            new ASTNode("assign", null, [V("i"), Call("+", V("i"), N(1))]),
+            new ASTNode("assign", null, [V("a"), Call("+", V("a"), V("i"))])
+        ]),
+        new ASTNode("return", null, [V("a")])
+    ]);
+
+    const interp = new Interpreter(forTree);
+    const result = await interp.run();
+    assertEqual(result.value, 55, "for loop sum");
+    assertEqual(interp.stack.lookup("i"), null, "for loop scope cleanup (i should not leak)");
+
+    const zeroForTree = new ASTNode("block", null, [
+        new ASTNode("assign", null, [V("x"), N(10)]),
+        new ASTNode("for", null, [
+            new ASTNode("assign", null, [V("i"), N(0)]),
+            B(false),
+            new ASTNode("assign", null, [V("i"), Call("+", V("i"), N(1))]),
+            new ASTNode("assign", null, [V("x"), N(999)])
+        ]),
+        new ASTNode("return", null, [V("x")])
+    ]);
+    const zeroForInterp = new Interpreter(zeroForTree);
+    const zeroForResult = await zeroForInterp.run();
+    assertEqual(zeroForResult.value, 10, "for zero iterations");
+}
+
+async function testConditionTypeErrors() {
+    await expectEvalError(
+        new ASTNode("while", null, [N(1), new ASTNode("number", 0)]),
+        "Bool expected",
+        "while condition type"
+    );
+
+    await expectEvalError(
+        new ASTNode("for", null, [
+            new ASTNode("assign", null, [V("i"), N(0)]),
+            N(1),
+            new ASTNode("assign", null, [V("i"), Call("+", V("i"), N(1))]),
+            new ASTNode("number", 0)
+        ]),
+        "Bool expected",
+        "for condition type"
+    );
+}
+
+async function testReturnShortCircuitInBlock() {
+    const tree = new ASTNode("block", null, [
+        new ASTNode("assign", null, [V("x"), N(1)]),
+        new ASTNode("return", null, [N(7)]),
+        new ASTNode("assign", null, [V("x"), N(999)])
+    ]);
+
+    const interp = new Interpreter(tree);
+    const result = await interp.run();
+    assertEqual(result.value, 7, "return short-circuit in block");
+}
+
+async function main() {
+    const tests = [
+        ["if branches", testIfBranches],
+        ["while loop", testWhileLoopSumAndZeroIterations],
+        ["for loop", testForLoopAndScopeAndZeroIterations],
+        ["condition type errors", testConditionTypeErrors],
+        ["return short-circuit", testReturnShortCircuitInBlock]
+    ];
+
+    for (const [name, fn] of tests) {
+        try {
+            await fn();
+            console.log(`[PASS] ${name}`);
+        } catch (e) {
+            console.error(`[FAIL] ${name}: ${e.message}`);
+            process.exitCode = 1;
+        }
+    }
+}
+
+await main();
