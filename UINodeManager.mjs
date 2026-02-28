@@ -6,16 +6,14 @@ class UINodeManager {
         this.activeBlocks = new Map(); 
     }
     
-    spawnNode(type, label, branchCount = 0) {
+    spawnNode(type, label) {
         const value = null;
         const element = document.createElement("div");
         const uiNode = new UINode(type, element);
         element.className = `environment__${type}-block block`
         element.id = uiNode.node.id;
         element.style.position = 'absolute'; 
-        const text = document.createElement("div");
-        text.innerHTML = label;
-        text.classList.add('environment__operation');
+        const text = this.createDivElement(label, "environment__operation")
         switch (type) {
             case "number": {
                 element.appendChild(text);
@@ -133,11 +131,27 @@ class UINodeManager {
                     uiNode.setBranches([first, second]);
                     break;
                 }
-                if (label === "len") {
+                if (label === "len" || label === "sqrt" || label == "abs" || label == "not") {
                     const right = this.createDivElement("", "environment__branch")
                     element.appendChild(text);
                     element.appendChild(right);
                     uiNode.setBranches([right]);
+                    break;
+                }
+                if (label == "set at" || label == "insert at")
+                {
+                    const labelParts = label.split(" ");
+                    const setDiv = this.createDivElement(labelParts[0], "environment__operation")
+                    const atDiv = this.createDivElement(labelParts[1], "environment__operation")
+                    const left = this.createDivElement("", "environment__branch")
+                    const middle = this.createDivElement("", "environment__branch")
+                    const right = this.createDivElement("", "environment__branch")
+                    element.appendChild(left);
+                    element.appendChild(setDiv);
+                    element.appendChild(middle);
+                    element.appendChild(atDiv);
+                    element.appendChild(right);
+                    uiNode.setBranches([left, middle, right]);
                     break;
                 }
                 const right = this.createDivElement("", "environment__branch")
