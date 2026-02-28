@@ -258,6 +258,7 @@ playButton.addEventListener("click", async e => {
         try {
             const result = await interp.run();
             console.log(result);
+            editorConsole.print(`${result.type} ${result.value}`);
         } catch (e) {
             if (e.path) {
                 highlightErrorPath(e.path);
