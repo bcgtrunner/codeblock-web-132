@@ -1,4 +1,4 @@
-import { ASTNode, Interpreter, EvalError } from "./interpreter.mjs";
+import { ASTNode, Interpreter, EvalError } from "../interpreter.mjs";
 
 function N(n) { return new ASTNode("number", n); }
 function B(b) { return new ASTNode("bool", b); }
