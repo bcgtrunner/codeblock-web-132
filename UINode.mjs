@@ -38,7 +38,7 @@ class UINode {
                     if (index === 1) return true;
                     return false;
                 }
-                return (index === 0 && !(this.node.children[1])) || (!(this.node.children[2]) && index === 1);
+                return (index === 0 && !(this.node.children[1])) || (!(this.node.children[2]) && index === 1) || (!(this.node.children[3]) && index === 2);
             }
             case "return": {
                 return !(this.node.children[0]);
@@ -96,8 +96,8 @@ class UINode {
             return;
         }
 
+        const index = this.node.children.indexOf(childUINode.node);
         if (this.node.token === "call" && this.node.value === "generic-call") {
-            const index = this.node.children.indexOf(childUINode.node);
             if (index === -1) return;
             if (index === 0) {
                 this.node.children[0] = undefined;
@@ -107,7 +107,6 @@ class UINode {
             return;
         }
 
-        const index = this.node.children.indexOf(childUINode.node);
         if (index === -1) return;
         this.node.children[index] = undefined;
         if (this.node.token == "block" || this.node.token === "array") {

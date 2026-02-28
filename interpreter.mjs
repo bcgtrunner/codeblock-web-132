@@ -181,7 +181,7 @@ class Interpreter {
             return new Var(found.type, found.value);
         }));
 
-        this.stack.set("set_at", makeBuiltin(["array", "number", "any"], "any", (array, i, newValue) => {
+        this.stack.set("set_at", makeBuiltin(["array", "number", "any"], "any", (array, newValue, i) => {
             if (i.value < 0 || i.value >= array.value.length) {
                 throw new Error(`Array index ${i.value} out of bounds`);
             }
@@ -190,7 +190,7 @@ class Interpreter {
             return newVar;
         }));
 
-        this.stack.set("insert_at", makeBuiltin(["array", "number", "any"], "any", (array, i, newValue) => {
+        this.stack.set("insert_at", makeBuiltin(["array", "number", "any"], "any", (array, newValue, i) => {
             if (i.value < 0 || i.value > array.value.length) {
                 throw new Error(`Insert index ${i.value} out of bounds (0 to ${array.value.length})`);
             }
