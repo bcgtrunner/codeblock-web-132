@@ -1,5 +1,4 @@
-import { ASTNode, Interpreter, EvalError } from "./interpreter.mjs";
-import { Debugger } from "./debugger.mjs";
+import { ASTNode, Interpreter, EvalError } from "../interpreter.mjs";
 
 const V = (name) => new ASTNode("variable", name);
 const Num = (n) => new ASTNode("number", n);
@@ -26,10 +25,10 @@ async function run(tree) {
         result = await interpreter.run();
     } catch (e) {
         if (e instanceof EvalError) {
-            console.log("Ошибка:", e.message);
-            console.log("Trace (от места ошибки до корня):");
+            console.log("Error:", e.message);
+            console.log("Trace (from error site to root):");
             e.path.forEach((node, i) => {
-                console.log(`${i}: ${node.token}${node.value !== null ? ` (${node.value})` : ''}`);
+                console.log(`${i}: ${node.token}${node.value !== null ? ` (${node.value})` : ""}`);
             });
         } else {
             console.error(e);
@@ -106,7 +105,6 @@ const tests = [
         Assign("counter", Call(V("+"), V("counter"), Num(1))),
         Ret(V("counter"))
       ])),
-      // call increment three times, final return from block should be the third call result
       Call(V("increment")),
       Call(V("increment")),
       Ret(Call(V("increment")))
@@ -170,12 +168,11 @@ const tests = [
   },
 
   {
-    name: "Type error (calling number function with string) — should throw",
+    name: "Type error (calling number function with string) - should throw",
     tree: Block([
       Assign("double", Fn([{ type: "number", name: "x" }], "number", [
         Ret(Call(V("*"), V("x"), Num(2)))
       ])),
-      // this call is intentionally wrong type
       Call(V("double"), Str("hello"))
     ]),
     expectError: true
@@ -208,24 +205,34 @@ const tests = [
 ];
 
 console.log("=== TESTING USER-DEFINED FUNCTIONS ===\n");
-let val;
+let failed = 0;
 let idx = 0;
 for (const t of tests) {
     try {
-        val = await run(t.tree);
+        const val = await run(t.tree);
         if (t.expectError) {
-            console.error(`Test ${idx + 1} "${t.name}" FAILED — expected an error but got:`, val);
+            console.error(`Test ${idx + 1} "${t.name}" FAILED - expected an error but got:`, val);
+            failed++;
         } else if (typeof t.expect !== "undefined" && val !== t.expect) {
-            console.error(`Test ${idx + 1} "${t.name}" FAILED — expected ${t.expect} but got ${val}`);
+            console.error(`Test ${idx + 1} "${t.name}" FAILED - expected ${t.expect} but got ${val}`);
+            failed++;
         } else {
-            console.log(`Test ${idx + 1} "${t.name}" passed — result:`, val);
+            console.log(`Test ${idx + 1} "${t.name}" passed - result:`, val);
         }
     } catch (e) {
         if (t.expectError) {
-            console.log(`Test ${idx + 1} "${t.name}" passed — expected error:`, e.message);
+            console.log(`Test ${idx + 1} "${t.name}" passed - expected error:`, e.message);
         } else {
-          console.error(`Test ${idx + 1} "${t.name}" FAILED with error:`, e.message);
+            console.error(`Test ${idx + 1} "${t.name}" FAILED with error:`, e.message);
+            failed++;
         }
     }
     idx++;
+}
+
+if (failed > 0) {
+    process.exitCode = 1;
+    console.error(`\nFunction tests failed: ${failed}`);
+} else {
+    console.log("\nFunction tests passed");
 }
