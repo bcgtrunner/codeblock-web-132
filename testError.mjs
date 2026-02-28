@@ -1,4 +1,4 @@
-import { ASTNode, Interpreter, EvalError } from "./interpreter.mjs"
+import { ASTNode, Interpreter, EvalError } from "./interpreter.mjs";
 
 const tree = new ASTNode("block", null, [
     new ASTNode("assign", null, [
@@ -11,7 +11,7 @@ const tree = new ASTNode("block", null, [
             new ASTNode("call", null, [
                 new ASTNode("variable", "+"),
                 new ASTNode("number", 10),
-                new ASTNode("variable", "z")  // <- 'z' не определена, вызовет EvalError
+                new ASTNode("variable", "z") // <- 'z' is undefined; should throw EvalError
             ])
         ])
     ])
@@ -20,13 +20,13 @@ const tree = new ASTNode("block", null, [
 const interpreter = new Interpreter(tree);
 
 try {
-    interpreter.run();
+    await interpreter.run();
 } catch (e) {
     if (e instanceof EvalError) {
-        console.log("Ошибка:", e.message);
-        console.log("Trace (от места ошибки до корня):");
+        console.log("Error:", e.message);
+        console.log("Trace (from error site to root):");
         e.path.forEach((node, i) => {
-            console.log(`${i}: ${node.token}${node.value !== null ? ` (${node.value})` : ''}`);
+            console.log(`${i}: ${node.token}${node.value !== null ? ` (${node.value})` : ""}`);
         });
     } else {
         console.error(e);
