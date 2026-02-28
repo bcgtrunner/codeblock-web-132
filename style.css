@@ -16,8 +16,8 @@ html, body {
 }
 
 img {
-    width:40px;
-    height:40px;
+    width: 40px;
+    height: 40px;
     margin-top: 6px;
     margin-left: 5px;
 }
@@ -50,12 +50,7 @@ img {
 }
 
 .environment__console {
-    flex-grow: 2
-} 
-.container {
-    border: 2px solid black;
-    
-    /* margin-top: 7vh; */
+    flex-grow: 2;
 }
 
 .block,
@@ -74,7 +69,6 @@ img {
     --gap: 2px;
     --radius-out: max(0px, calc(var(--radius-self) - var(--gap)));
     background-color: #ffd54f;
-    height: 6vh;
     border: 1px solid black;
     margin: 0;
     cursor: grab;
@@ -116,28 +110,30 @@ img {
 .category {
     font-size: 2em;
     font-weight: bold;
-    opacity:0.7;
-    margin: 25px 0px 0px 10px;
+    opacity: 0.7;
+    margin: 25px 0 0 10px;
     user-select: none;
 }
 
-editor > .block {
+.environment__code-editor > .block {
     position: absolute;
-    background-color: #ffd54f;
-    border: 1px solid black;
     --gap: 4px;
     padding: var(--gap) 0.45em;
-    cursor: grab;
-    user-select: none;
+}
+.block.error-highlight {
+    background-color: #ef9a9a;
 }
 
 .environment__if-block,
 .environment__for-block,
-.environment__while-block,
-editor > .environment__if-block,
-editor > .environment__for-block,
-editor > .environment__while-block {
+.environment__while-block {
     background-color: #ff9800;
+}
+
+.environment__if-block.error-highlight,
+.environment__for-block.error-highlight,
+.environment__while-block.error-highlight {
+    background-color: #f44336;
 }
 
 .environment__branch {
@@ -178,12 +174,6 @@ input[type="checkbox"].environment__input-number {
 .centered {
     text-align: center;
 }
-
-
-.environment__console {
-    flex-grow: 2
-}
-
 .container {
     border: 1px solid;
 }

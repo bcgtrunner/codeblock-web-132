@@ -12,6 +12,7 @@ let draggingBlock = null; // какой блок сейчас тащим
 let lastBranch = null; // состояние текущей ветки; Это память о прошлой ветке, над которой был курсор.
 let offsetX = 0;
 let offsetY = 0;
+const errorHighlights = new Set();
 
 const numberBlock = palette.querySelector(".environment__numberLiteral-block")
 const stringBlock = palette.querySelector(".environment__stringLiteral-block")
@@ -21,6 +22,7 @@ const assignBlock = palette.querySelector(".environment__assign-block")
 const callBlock = palette.querySelector(".environment__call-block")
 const plusBlock = palette.querySelector(".environment__plus-block")
 const minusBlock = palette.querySelector(".environment__minus-block")
+const divideBlock = palette.querySelector(".environment__divide-block")
 const greaterBlock = palette.querySelector(".environment__gt-block")
 const lessBlock = palette.querySelector(".environment__lt-block")
 const andBlock = palette.querySelector(".environment__and-block")
@@ -66,6 +68,10 @@ plusBlock.addEventListener('pointerdown', (e) => {
 });
 minusBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("call", "-").setOperation(new ASTNode("variable", "-"));
+    startDragging(uiNode, e, e.target);
+});
+divideBlock.addEventListener('pointerdown', (e) => {
+    const uiNode = manager.spawnNode("call", "/").setOperation(new ASTNode("variable", "/"));
     startDragging(uiNode, e, e.target);
 });
 greaterBlock.addEventListener('pointerdown', (e) => {
@@ -225,14 +231,38 @@ function getBranchUnderCursor(x,y) {
     return maxLayerBranch ? maxLayerBranch.at(-1) : null;
 }
 
+function clearErrorHighlights() {
+    for (const uiNode of errorHighlights) {
+        uiNode.element.classList.remove("error-highlight");
+    }
+    errorHighlights.clear();
+}
+
+function highlightErrorPath(path) {
+    if (!Array.isArray(path)) return;
+    for (const node of path) {
+        const uiNode = manager.getClosestUINode(node);
+        if (!uiNode) continue;
+        uiNode.element.classList.add("error-highlight");
+        errorHighlights.add(uiNode);
+    }
+}
+
 const playButton = document.querySelector(".environment__run")
 playButton.addEventListener("click", async e => {
+    clearErrorHighlights();
     const roots = [...manager.activeBlocks.values()]
         .filter(elem => !elem.element.parentElement.closest(".block"))
     for (const root of roots) {
         const interp = new Interpreter(root.node);
-        const result = await interp.run();
-        console.log(result);
-        editorConsole.print(`${result.type} ${result.value}`);
+        try {
+            const result = await interp.run();
+            console.log(result);
+        } catch (e) {
+            if (e.path) {
+                highlightErrorPath(e.path);
+            }
+            editorConsole.print(`Error: ${e.message}`);
+        }
     }
 })
