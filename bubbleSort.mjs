@@ -44,14 +44,14 @@ const tree = Block([
                   Call(
                     V("set_at"),
                     V("arr"),
-                    V("j"),
-                    Call(V("at"), V("arr"), Call(V("+"), V("j"), N(1)))
+                    Call(V("at"), V("arr"), Call(V("+"), V("j"), N(1))),
+                    V("j")
                   ),
                   Call(
                     V("set_at"),
                     V("arr"),
-                    Call(V("+"), V("j"), N(1)),
-                    V("temp")
+                    V("temp"),
+                    Call(V("+"), V("j"), N(1))
                   )
                 ]),
                 Block([])

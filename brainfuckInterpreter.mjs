@@ -42,15 +42,15 @@ const ltBranch = Block([
 const plusBranch = Call(
     V("set_at"),
     V("tape"),
-    V("ptr"),
-    Call(V("+"), CellAtPtr(), Num(1))
+    Call(V("+"), CellAtPtr(), Num(1)),
+    V("ptr")
 );
 
 const minusBranch = Call(
     V("set_at"),
     V("tape"),
-    V("ptr"),
-    Call(V("-"), CellAtPtr(), Num(1))
+    Call(V("-"), CellAtPtr(), Num(1)),
+    V("ptr")
 );
 
 const dotBranch = Call(V("push"), V("output"), CellAtPtr());
@@ -58,11 +58,11 @@ const dotBranch = Call(V("push"), V("output"), CellAtPtr());
 const commaBranch = If(
     Call(V("<"), V("inp_ptr"), Call(V("len"), V("input"))),
     Block([
-        Call(V("set_at"), V("tape"), V("ptr"), Call(V("at"), V("input"), V("inp_ptr"))),
+        Call(V("set_at"), V("tape"), Call(V("at"), V("input"), V("inp_ptr")), V("ptr")),
         Assign("inp_ptr", Call(V("+"), V("inp_ptr"), Num(1)))
     ]),
     Block([
-        Call(V("set_at"), V("tape"), V("ptr"), Num(0))
+        Call(V("set_at"), V("tape"), Num(0), V("ptr"))
     ])
 );
 
