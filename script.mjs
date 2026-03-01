@@ -411,8 +411,7 @@ function highlightErrorPath(path) {
     }
 }
 
-const playButton = document.querySelector(".environment__run")
-playButton.addEventListener("click", async e => {
+export async function runEditorBlocks() {
     clearErrorHighlights();
     const roots = [...manager.activeBlocks.values()]
         .filter(elem => !elem.element.parentElement.closest(".block"))
@@ -429,5 +428,25 @@ playButton.addEventListener("click", async e => {
             editorConsole.print(`Error: ${e.message}`);
         }
     }
-})
+}
 
+export function clearEditorBlocks() {
+    // 1. Находим все корневые узлы (те, что прикреплены к рабочей области)
+    const roots = [...manager.activeBlocks.values()]
+        .filter(uiNode => !uiNode.parent);
+
+    // 2. Удаляем каждый узел из DOM и очищаем ссылки
+    for (const uiNode of manager.activeBlocks.values()) {
+        uiNode.remove();
+    }
+
+    // 3. Полностью очищаем коллекцию активных блоков
+    manager.activeBlocks.clear();
+
+    console.log("Editor cleared: all nodes removed.");
+}
+
+const playButton = document.querySelector(".environment__run")
+playButton.addEventListener("click", async e => {
+    await runEditorBlocks();
+})

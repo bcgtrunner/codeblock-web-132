@@ -1,3 +1,5 @@
+import { clearEditorBlocks, runEditorBlocks } from "./script.mjs";
+// help run clear debbug
 class Console
 {
     constructor() {
@@ -14,13 +16,27 @@ class Console
     print(text) {
         this.output.innerHTML += `<div> ${text}</div>`;
     }
-
+    
     execute() {
-        const text = this.input.value;
-        if (text === 'run') {}
-        this.output.innerHTML += `<div>> ${text}</div>`;
-        this.output.innerHTML += `<div> Text entered: "${text}"</div>`;
-        this.input.value = '';
+        const command = this.input.value;
+        this.input.value = "";
+        this.output.innerHTML += `<div>> ${command}</div>`;
+        if (command === 'help') {
+            this.output.innerHTML += `<div> Available commands: <br>run<br>clear<br>debbug<br>help</div>`;
+        }
+        else if (command === 'run') {
+            runEditorBlocks();
+            this.output.innerHTML += `<div> Command: '${command}' executed</div>`;
+        }
+        else if (command === 'clear') {
+            clearEditorBlocks();
+            this.output.innerHTML += `<div> Command: '${command}' executed<div>`;
+        }
+        else if (command === 'debbug') {
+        }
+        else {
+            this.output.innerHTML += `<div> Command: '${command}' is unrecognised. See 'help'.</div>`;
+        }
     }
 }
-export {Console}
+export { Console }
