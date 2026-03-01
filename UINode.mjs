@@ -38,7 +38,8 @@ class UINode {
                     if (index === 1) return true;
                     return false;
                 }
-                return (index === 0 && !(this.node.children[1])) || (!(this.node.children[2]) && index === 1) || (!(this.node.children[3]) && index === 2);
+                if (index < 0) return false;
+                return !this.node.children[index + 1];
             }
             case "return": {
                 return !(this.node.children[0]);

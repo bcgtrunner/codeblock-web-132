@@ -123,43 +123,10 @@ class UINodeManager {
             case "call": {
                 if (label === "call") {
                     uiNode.node.value = "generic-call";
-                    const first = this.createDivElement("", "environment__branch");
-                    const second = this.createDivElement("", "environment__branch");
-                    element.appendChild(first);
-                    element.appendChild(text);
-                    element.appendChild(second);
-                    uiNode.setBranches([first, second]);
-                    break;
                 }
-                if (label === "len" || label === "sqrt" || label == "abs" || label == "not") {
-                    const right = this.createDivElement("", "environment__branch")
-                    element.appendChild(text);
-                    element.appendChild(right);
-                    uiNode.setBranches([right]);
-                    break;
-                }
-                if (label == "set at" || label == "insert at")
-                {
-                    const labelParts = label.split(" ");
-                    const setDiv = this.createDivElement(labelParts[0], "environment__operation")
-                    const atDiv = this.createDivElement(labelParts[1], "environment__operation")
-                    const left = this.createDivElement("", "environment__branch")
-                    const middle = this.createDivElement("", "environment__branch")
-                    const right = this.createDivElement("", "environment__branch")
-                    element.appendChild(left);
-                    element.appendChild(setDiv);
-                    element.appendChild(middle);
-                    element.appendChild(atDiv);
-                    element.appendChild(right);
-                    uiNode.setBranches([left, middle, right]);
-                    break;
-                }
-                const right = this.createDivElement("", "environment__branch")
-                const left = this.createDivElement("", "environment__branch")
-                element.appendChild(left);
-                element.appendChild(text);
-                element.appendChild(right);
-                uiNode.setBranches([left, right]);
+                const parts = this.getCallTemplateParts(label);
+                const branches = this.renderHorizontalBranchTemplate(element, parts);
+                uiNode.setBranches(branches);
                 break;
             }
             case "if": {
@@ -326,6 +293,102 @@ class UINodeManager {
         div.innerHTML = label;
         div.className = className;
         return div;
+    }
+
+    getCallTemplateParts(label) {
+        const templates = {
+            call: ["", "call", ""],
+
+            "+": ["", "+", ""],
+            "-": ["", "-", ""],
+            "*": ["", "*", ""],
+            "/": ["", "/", ""],
+            "//": ["", "//", ""],
+            "%": ["", "%", ""],
+            "**": ["", "**", ""],
+
+            "==": ["", "==", ""],
+            "!=": ["", "!=", ""],
+            "<": ["", "<", ""],
+            ">": ["", ">", ""],
+            "<=": ["", "<=", ""],
+            ">=": ["", ">=", ""],
+            and: ["", "and", ""],
+            or: ["", "or", ""],
+
+            at: ["", "at", ""],
+            len: ["len", ""],
+            push: ["", "push", ""],
+            pop: ["pop", ""],
+            "set at": ["", "set", "at", ""],
+            "insert at": ["", "insert", "at", ""],
+            "remove at": ["", "remove at", ""],
+
+            not: ["not", ""],
+            sqrt: ["sqrt", ""],
+            abs: ["abs", ""],
+            floor: ["floor", ""],
+            ceil: ["ceil", ""],
+            round: ["round", ""],
+            trunc: ["trunc", ""],
+            sin: ["sin", ""],
+            cos: ["cos", ""],
+            tan: ["tan", ""],
+            log: ["log", ""],
+            exp: ["exp", ""],
+            sign: ["sign", ""],
+            asin: ["asin", ""],
+            acos: ["acos", ""],
+            atan: ["atan", ""],
+            log10: ["log10", ""],
+            log2: ["log2", ""],
+            atan2: ["atan2", "", ""],
+            min: ["min", "", ""],
+            max: ["max", "", ""],
+
+            strlen: ["strlen", ""],
+            upper: ["upper", ""],
+            lower: ["lower", ""],
+            trim: ["trim", ""],
+            substring: ["", "substring", "", ""],
+            split: ["", "split", ""],
+            join: ["", "join", ""],
+            startsWith: ["", "startsWith", ""],
+            endsWith: ["", "endsWith", ""],
+            replace: ["", "replace", "with", ""],
+            charAt: ["", "charAt", ""],
+
+            boolToNumber: ["bool", "&rarr; number"],
+            numberToBool: ["number", "&rarr; bool"],
+            numberToString: ["number", "&rarr; string"],
+            boolToString: ["bool", "&rarr; string"],
+            stringToNumber: ["string", "&rarr; number"],
+            stringToBool: ["string", "&rarr; bool"],
+            arrayToBool: ["array", "&rarr; bool"],
+            arrayToString: ["array", "&rarr; string"],
+            typeof: ["any", "&rarr; type"]
+        };
+
+        return templates[label] ?? ["", label, ""];
+    }
+
+    renderHorizontalBranchTemplate(element, parts) {
+        const branches = [];
+
+        for (let i = 0; i < parts.length; i++) {
+            const part = parts[i];
+            if (part !== "") {
+                element.appendChild(this.createDivElement(part, "environment__operation"));
+            }
+
+            if (i < parts.length - 1) {
+                const branch = this.createDivElement("", "environment__branch");
+                branches.push(branch);
+                element.appendChild(branch);
+            }
+        }
+
+        return branches;
     }
 }
 

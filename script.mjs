@@ -29,6 +29,24 @@ const modBlock = palette.querySelector(".environment__mod-block")
 const powerBlock = palette.querySelector(".environment__power-block")
 const sqrtBlock = palette.querySelector(".environment__sqrt-block")
 const absBlock = palette.querySelector(".environment__abs-block")
+const floorBlock = palette.querySelector(".environment__floor-block")
+const ceilBlock = palette.querySelector(".environment__ceil-block")
+const roundBlock = palette.querySelector(".environment__round-block")
+const truncBlock = palette.querySelector(".environment__trunc-block")
+const sinBlock = palette.querySelector(".environment__sin-block")
+const cosBlock = palette.querySelector(".environment__cos-block")
+const tanBlock = palette.querySelector(".environment__tan-block")
+const logBlock = palette.querySelector(".environment__log-block")
+const expBlock = palette.querySelector(".environment__exp-block")
+const minBlock = palette.querySelector(".environment__min-block")
+const maxBlock = palette.querySelector(".environment__max-block")
+const signBlock = palette.querySelector(".environment__sign-block")
+const atan2Block = palette.querySelector(".environment__atan2-block")
+const asinBlock = palette.querySelector(".environment__asin-block")
+const acosBlock = palette.querySelector(".environment__acos-block")
+const atanBlock = palette.querySelector(".environment__atan-block")
+const log10Block = palette.querySelector(".environment__log10-block")
+const log2Block = palette.querySelector(".environment__log2-block")
 const greaterBlock = palette.querySelector(".environment__gt-block")
 const lessBlock = palette.querySelector(".environment__lt-block")
 const eqBlock = palette.querySelector(".environment__eq-block")
@@ -49,9 +67,39 @@ const removeAtBlock = palette.querySelector(".environment__erase_at-block")
 const insertAtBlock = palette.querySelector(".environment__insert_at-block")
 const setAtBlock = palette.querySelector(".environment__set_at-block")
 const lenBlock = palette.querySelector(".environment__len-block")
+const pushBlock = palette.querySelector(".environment__push-block")
+const popBlock = palette.querySelector(".environment__pop-block")
+const strlenBlock = palette.querySelector(".environment__strlen-block")
+const upperBlock = palette.querySelector(".environment__upper-block")
+const lowerBlock = palette.querySelector(".environment__lower-block")
+const trimBlock = palette.querySelector(".environment__trim-block")
+const substringBlock = palette.querySelector(".environment__substring-block")
+const splitBlock = palette.querySelector(".environment__split-block")
+const joinBlock = palette.querySelector(".environment__join-block")
+const startsWithBlock = palette.querySelector(".environment__starts-with-block")
+const endsWithBlock = palette.querySelector(".environment__ends-with-block")
+const replaceBlock = palette.querySelector(".environment__replace-block")
+const charAtBlock = palette.querySelector(".environment__char-at-block")
+const boolToNumberBlock = palette.querySelector(".environment__bool-to-number-block")
+const numberToBoolBlock = palette.querySelector(".environment__number-to-bool-block")
+const numberToStringBlock = palette.querySelector(".environment__number-to-string-block")
+const boolToStringBlock = palette.querySelector(".environment__bool-to-string-block")
+const stringToNumberBlock = palette.querySelector(".environment__string-to-number-block")
+const stringToBoolBlock = palette.querySelector(".environment__string-to-bool-block")
+const arrayToBoolBlock = palette.querySelector(".environment__array-to-bool-block")
+const arrayToStringBlock = palette.querySelector(".environment__array-to-string-block")
+const typeofBlock = palette.querySelector(".environment__typeof-block")
 const functionBlock = palette.querySelector(".environment__function-block")
 const paramBlock = palette.querySelector(".environment__param-block")
 const typeBlock = palette.querySelector(".environment__type-block")
+
+function bindCallBlock(blockElement, operation) {
+    if (!blockElement) return;
+    blockElement.addEventListener('pointerdown', (e) => {
+        const uiNode = manager.spawnNode("call", operation).setOperation(new ASTNode("variable", operation));
+        startDragging(uiNode, e, e.target);
+    });
+}
 
 numberBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("number", "number")
@@ -113,6 +161,24 @@ absBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("call", "abs").setOperation(new ASTNode("variable", "abs"));
     startDragging(uiNode, e, e.target);
 });
+bindCallBlock(floorBlock, "floor");
+bindCallBlock(ceilBlock, "ceil");
+bindCallBlock(roundBlock, "round");
+bindCallBlock(truncBlock, "trunc");
+bindCallBlock(sinBlock, "sin");
+bindCallBlock(cosBlock, "cos");
+bindCallBlock(tanBlock, "tan");
+bindCallBlock(logBlock, "log");
+bindCallBlock(expBlock, "exp");
+bindCallBlock(minBlock, "min");
+bindCallBlock(maxBlock, "max");
+bindCallBlock(signBlock, "sign");
+bindCallBlock(atan2Block, "atan2");
+bindCallBlock(asinBlock, "asin");
+bindCallBlock(acosBlock, "acos");
+bindCallBlock(atanBlock, "atan");
+bindCallBlock(log10Block, "log10");
+bindCallBlock(log2Block, "log2");
 eqBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("call", "==").setOperation(new ASTNode("variable", "=="));
     startDragging(uiNode, e, e.target);
@@ -193,6 +259,28 @@ lenBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("call", "len").setOperation(new ASTNode("variable", "len"));
     startDragging(uiNode, e, e.target);
 });
+bindCallBlock(pushBlock, "push");
+bindCallBlock(popBlock, "pop");
+bindCallBlock(strlenBlock, "strlen");
+bindCallBlock(upperBlock, "upper");
+bindCallBlock(lowerBlock, "lower");
+bindCallBlock(trimBlock, "trim");
+bindCallBlock(substringBlock, "substring");
+bindCallBlock(splitBlock, "split");
+bindCallBlock(joinBlock, "join");
+bindCallBlock(startsWithBlock, "startsWith");
+bindCallBlock(endsWithBlock, "endsWith");
+bindCallBlock(replaceBlock, "replace");
+bindCallBlock(charAtBlock, "charAt");
+bindCallBlock(boolToNumberBlock, "boolToNumber");
+bindCallBlock(numberToBoolBlock, "numberToBool");
+bindCallBlock(numberToStringBlock, "numberToString");
+bindCallBlock(boolToStringBlock, "boolToString");
+bindCallBlock(stringToNumberBlock, "stringToNumber");
+bindCallBlock(stringToBoolBlock, "stringToBool");
+bindCallBlock(arrayToBoolBlock, "arrayToBool");
+bindCallBlock(arrayToStringBlock, "arrayToString");
+bindCallBlock(typeofBlock, "typeof");
 functionBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("function", "function");
     startDragging(uiNode, e, e.target);
@@ -342,3 +430,4 @@ playButton.addEventListener("click", async e => {
         }
     }
 })
+
