@@ -128,7 +128,7 @@ class UINode {
 
     remove() {
         this.element.remove();
-            this.parent = null;
+        this.parent = null;
     }
 }
 
