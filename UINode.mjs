@@ -50,8 +50,12 @@ class UINode {
                 if (index === 2) return !this.node.children[2] && childUINode.node.token !== "param" && childUINode.node.token !== "type";
                 return false;
             }
+            case "block":
+            case "array": {
+                return true;
+            }
         }
-        return true;
+        return !this.node.children[index];
     }
 
     appendChild(childUINode, branch) {
