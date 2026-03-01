@@ -6,7 +6,19 @@ const manager = new UINodeManager();
 
 const palette = document.querySelector(".environment__block-palette");
 const editor = document.querySelector(".environment__code-editor");
+const consolePane = document.querySelector(".environment__console");
+const environment = document.querySelector(".environment");
+const toolbarPane = document.querySelector(".environment__toolbar");
+const paletteEditorSplitter = document.querySelector(".environment__splitter--palette-editor");
+const editorConsoleSplitter = document.querySelector(".environment__splitter--editor-console");
 const editorConsole = new Console();
+for (const group of palette.querySelectorAll(".palette-group")) {
+    const title = group.querySelector(".category");
+    if (!title) continue;
+    title.addEventListener("click", () => {
+        group.classList.toggle("is-collapsed");
+    });
+}
 
 editorConsole.print("HELLO, WORLD!")
 let draggingBlock = null; // какой блок сейчас тащим
@@ -14,6 +26,12 @@ let lastBranch = null; // состояние текущей ветки; Это �
 let offsetX = 0;
 let offsetY = 0;
 const errorHighlights = new Set();
+const MIN_WIDTH_FALLBACK = {
+    palette: 220,
+    editor: 320,
+    console: 220,
+};
+let activeResize = null;
 
 const numberBlock = palette.querySelector(".environment__numberLiteral-block")
 const stringBlock = palette.querySelector(".environment__stringLiteral-block")
@@ -94,10 +112,10 @@ const functionBlock = palette.querySelector(".environment__function-block")
 const paramBlock = palette.querySelector(".environment__param-block")
 const typeBlock = palette.querySelector(".environment__type-block")
 
-function bindCallBlock(blockElement, operation) {
+function bindCallBlock(blockElement, operation, label = operation) {
     if (!blockElement) return;
     blockElement.addEventListener('pointerdown', (e) => {
-        const uiNode = manager.spawnNode("call", operation).setOperation(new ASTNode("variable", operation));
+        const uiNode = manager.spawnNode("call", label).setOperation(new ASTNode("variable", operation));
         startDragging(uiNode, e, e.target);
     });
 }
@@ -126,42 +144,15 @@ callBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("call", "call");
     startDragging(uiNode, e, e.target);
 });
-plusBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "+").setOperation(new ASTNode("variable", "+"));
-    startDragging(uiNode, e, e.target);
-});
-minusBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "-").setOperation(new ASTNode("variable", "-"));
-    startDragging(uiNode, e, e.target);
-});
-multiplayBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "*").setOperation(new ASTNode("variable", "*"));
-    startDragging(uiNode, e, e.target);
-});
-divideBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "/").setOperation(new ASTNode("variable", "/"));
-    startDragging(uiNode, e, e.target);
-});
-divideFloorBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "//").setOperation(new ASTNode("variable", "//"));
-    startDragging(uiNode, e, e.target);
-});
-modBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "%").setOperation(new ASTNode("variable", "%"));
-    startDragging(uiNode, e, e.target);
-});
-powerBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "**").setOperation(new ASTNode("variable", "**"));
-    startDragging(uiNode, e, e.target);
-});
-sqrtBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "sqrt").setOperation(new ASTNode("variable", "sqrt"));
-    startDragging(uiNode, e, e.target);
-});
-absBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "abs").setOperation(new ASTNode("variable", "abs"));
-    startDragging(uiNode, e, e.target);
-});
+bindCallBlock(plusBlock, "+");
+bindCallBlock(minusBlock, "-");
+bindCallBlock(multiplayBlock, "*");
+bindCallBlock(divideBlock, "/");
+bindCallBlock(divideFloorBlock, "//");
+bindCallBlock(modBlock, "%");
+bindCallBlock(powerBlock, "**");
+bindCallBlock(sqrtBlock, "sqrt");
+bindCallBlock(absBlock, "abs");
 bindCallBlock(floorBlock, "floor");
 bindCallBlock(ceilBlock, "ceil");
 bindCallBlock(roundBlock, "round");
@@ -180,38 +171,14 @@ bindCallBlock(acosBlock, "acos");
 bindCallBlock(atanBlock, "atan");
 bindCallBlock(log10Block, "log10");
 bindCallBlock(log2Block, "log2");
-eqBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "==").setOperation(new ASTNode("variable", "=="));
-    startDragging(uiNode, e, e.target);
-});
-neqBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "!=").setOperation(new ASTNode("variable", "!="));
-    startDragging(uiNode, e, e.target);
-});
-lteBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "<=").setOperation(new ASTNode("variable", "<="));
-    startDragging(uiNode, e, e.target);
-});
-gteBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", ">=").setOperation(new ASTNode("variable", ">="));
-    startDragging(uiNode, e, e.target);
-});
-greaterBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", ">").setOperation(new ASTNode("variable", ">"));
-    startDragging(uiNode, e, e.target);
-});
-andBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "and").setOperation(new ASTNode("variable", "and"));
-    startDragging(uiNode, e, e.target);
-});
-orBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "or").setOperation(new ASTNode("variable", "or"));
-    startDragging(uiNode, e, e.target);
-});
-notBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "not").setOperation(new ASTNode("variable", "not"));
-    startDragging(uiNode, e, e.target);
-});
+bindCallBlock(eqBlock, "==");
+bindCallBlock(neqBlock, "!=");
+bindCallBlock(lteBlock, "<=");
+bindCallBlock(gteBlock, ">=");
+bindCallBlock(greaterBlock, ">");
+bindCallBlock(andBlock, "and");
+bindCallBlock(orBlock, "or");
+bindCallBlock(notBlock, "not");
 ifBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("if", "if");
     startDragging(uiNode, e, e.target);
@@ -236,30 +203,12 @@ returnBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("return", "return");
     startDragging(uiNode, e, e.target);
 });
-lessBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "<").setOperation(new ASTNode("variable", "<"));
-    startDragging(uiNode, e, e.target);
-});
-removeAtBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "remove at").setOperation(new ASTNode("variable", "erase_at"));
-    startDragging(uiNode, e, e.target);
-});
-insertAtBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "insert at").setOperation(new ASTNode("variable", "insert_at"));
-    startDragging(uiNode, e, e.target);
-});
-atBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "at").setOperation(new ASTNode("variable", "at"));
-    startDragging(uiNode, e, e.target);
-});
-setAtBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "set at").setOperation(new ASTNode("variable", "set_at"));
-    startDragging(uiNode, e, e.target);
-});
-lenBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("call", "len").setOperation(new ASTNode("variable", "len"));
-    startDragging(uiNode, e, e.target);
-});
+bindCallBlock(lessBlock, "<");
+bindCallBlock(removeAtBlock, "erase_at", "remove at");
+bindCallBlock(insertAtBlock, "insert_at", "insert at");
+bindCallBlock(atBlock, "at");
+bindCallBlock(setAtBlock, "set_at", "set at");
+bindCallBlock(lenBlock, "len");
 bindCallBlock(pushBlock, "push");
 bindCallBlock(popBlock, "pop");
 bindCallBlock(strlenBlock, "strlen");
@@ -294,6 +243,121 @@ typeBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("type", "type");
     startDragging(uiNode, e, e.target);
 });
+
+function setPaneWidth(pane, widthPx) {
+    pane.style.flex = `0 0 ${widthPx}px`;
+    pane.style.width = `${widthPx}px`;
+}
+
+function getSplitterTotalWidth() {
+    return paletteEditorSplitter.offsetWidth + editorConsoleSplitter.offsetWidth;
+}
+
+function getAvailableWorkWidth() {
+    return environment.clientWidth - toolbarPane.offsetWidth - getSplitterTotalWidth();
+}
+
+function initializePaneWidths() {
+    setPaneWidth(palette, palette.offsetWidth);
+    setPaneWidth(consolePane, consolePane.offsetWidth);
+    setPaneWidth(editor, editor.offsetWidth);
+}
+
+function applyWidths(newPaletteWidth, newEditorWidth, newConsoleWidth) {
+    setPaneWidth(palette, newPaletteWidth);
+    setPaneWidth(editor, newEditorWidth);
+    setPaneWidth(consolePane, newConsoleWidth);
+}
+
+function clamp(value, min, max) {
+    if (max < min) return min;
+    return Math.min(Math.max(value, min), max);
+}
+
+function getCssMinWidthPx(element, fallback) {
+    const minWidth = Number.parseFloat(getComputedStyle(element).minWidth);
+    return Number.isFinite(minWidth) ? minWidth : fallback;
+}
+
+function getPaneMinWidths() {
+    return {
+        palette: getCssMinWidthPx(palette, MIN_WIDTH_FALLBACK.palette),
+        editor: getCssMinWidthPx(editor, MIN_WIDTH_FALLBACK.editor),
+        console: getCssMinWidthPx(consolePane, MIN_WIDTH_FALLBACK.console),
+    };
+}
+
+function resizeFromPaletteSplitter(clientX, fixedConsoleWidth) {
+    const envRect = environment.getBoundingClientRect();
+    const available = getAvailableWorkWidth();
+    const minWidths = getPaneMinWidths();
+    const minPaletteWidth = minWidths.palette;
+    const minEditorWidth = minWidths.editor;
+    const minConsoleWidth = minWidths.console;
+
+    const maxPalette = available - minEditorWidth - minConsoleWidth;
+    const targetPalette = clamp(clientX - envRect.left, minPaletteWidth, maxPalette);
+    let targetEditor = available - targetPalette - fixedConsoleWidth;
+    let targetConsole = fixedConsoleWidth;
+
+    if (targetEditor < minEditorWidth) {
+        targetEditor = minEditorWidth;
+        targetConsole = available - targetPalette - targetEditor;
+    }
+
+    if (targetConsole < minConsoleWidth) {
+        targetConsole = minConsoleWidth;
+        targetEditor = available - targetPalette - targetConsole;
+    }
+
+    applyWidths(targetPalette, targetEditor, targetConsole);
+}
+
+function resizeFromConsoleSplitter(clientX, fixedPaletteWidth) {
+    const envRect = environment.getBoundingClientRect();
+    const available = getAvailableWorkWidth();
+    const minWidths = getPaneMinWidths();
+    const minEditorWidth = minWidths.editor;
+    const minConsoleWidth = minWidths.console;
+    const editorStart = envRect.left + fixedPaletteWidth + paletteEditorSplitter.offsetWidth;
+
+    const minX = editorStart + minEditorWidth;
+    const maxX = envRect.left + available - minConsoleWidth;
+    const clampedX = clamp(clientX, minX, maxX);
+    const targetEditor = clampedX - editorStart;
+    const targetConsole = available - fixedPaletteWidth - targetEditor;
+
+    applyWidths(fixedPaletteWidth, targetEditor, targetConsole);
+}
+
+function beginResize(splitter, e) {
+    activeResize = {
+        splitter,
+        fixedConsoleWidth: consolePane.offsetWidth,
+        fixedPaletteWidth: palette.offsetWidth,
+    };
+    splitter.setPointerCapture(e.pointerId);
+    e.preventDefault();
+}
+
+paletteEditorSplitter.addEventListener("pointerdown", (e) => {
+    beginResize(paletteEditorSplitter, e);
+});
+
+editorConsoleSplitter.addEventListener("pointerdown", (e) => {
+    beginResize(editorConsoleSplitter, e);
+});
+
+window.addEventListener("resize", () => {
+    const available = getAvailableWorkWidth();
+    const minWidths = getPaneMinWidths();
+    const paletteWidth = clamp(palette.offsetWidth, minWidths.palette, available - minWidths.editor - minWidths.console);
+    const consoleWidth = clamp(consolePane.offsetWidth, minWidths.console, available - paletteWidth - minWidths.editor);
+    const editorWidth = available - paletteWidth - consoleWidth;
+    applyWidths(paletteWidth, editorWidth, consoleWidth);
+});
+
+initializePaneWidths();
 
 function startDragging(uiNode, e, blockElement) {
     console.log(uiNode);
@@ -336,11 +400,25 @@ editor.addEventListener('pointerdown', (e) => {
 });
 
 document.addEventListener('pointermove', (e) => {
+    if (activeResize) {
+        if (activeResize.splitter === paletteEditorSplitter) {
+            resizeFromPaletteSplitter(e.clientX, activeResize.fixedConsoleWidth);
+        } else if (activeResize.splitter === editorConsoleSplitter) {
+            resizeFromConsoleSplitter(e.clientX, activeResize.fixedPaletteWidth);
+        }
+        return;
+    }
     if (!draggingBlock) return;
     dragging(draggingBlock, e);
 });
 
 document.addEventListener('pointerup', (e) => {
+    if (activeResize) {
+        activeResize.splitter.releasePointerCapture(e.pointerId);
+        activeResize = null;
+        document.body.style.cursor = "";
+        return;
+    }
     if (!draggingBlock) return;
 
     const branchElement = getBranchUnderCursor(e.clientX, e.clientY);
@@ -425,11 +503,12 @@ export async function runEditorBlocks() {
         try {
             const result = await interp.run();
             console.log(result);
-            editorConsole.print(`${result.type} ${result.value}`);
+            editorConsole.print(`${result.type} ${JSON.stringify(result.value)}`);
         } catch (e) {
             if (e.path) {
                 highlightErrorPath(e.path);
             }
+            console.error(e);
             editorConsole.print(`Error: ${e.message}`);
         }
     }
