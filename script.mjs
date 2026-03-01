@@ -1,5 +1,6 @@
 import { ASTNode, Interpreter } from "./interpreter.mjs";
 import { UINodeManager } from "./UINodeManager.mjs";
+import { Debugger } from "./debugger.mjs";
 import { Console } from "./console.mjs";
 const manager = new UINodeManager();
 
@@ -411,6 +412,10 @@ function highlightErrorPath(path) {
     }
 }
 
+export function getRootBlocks() {
+    return [...manager.activeBlocks.values()].filter(uiNode => !uiNode.parent);
+}
+
 export async function runEditorBlocks() {
     clearErrorHighlights();
     const roots = [...manager.activeBlocks.values()]
@@ -431,19 +436,54 @@ export async function runEditorBlocks() {
 }
 
 export function clearEditorBlocks() {
-    // 1. Находим все корневые узлы (те, что прикреплены к рабочей области)
     const roots = [...manager.activeBlocks.values()]
         .filter(uiNode => !uiNode.parent);
-
-    // 2. Удаляем каждый узел из DOM и очищаем ссылки
     for (const uiNode of manager.activeBlocks.values()) {
         uiNode.remove();
     }
-
-    // 3. Полностью очищаем коллекцию активных блоков
     manager.activeBlocks.clear();
+    console.log("Editor cleared");
+}
 
-    console.log("Editor cleared: all nodes removed.");
+export async function runDebugMode(tree, promise, callback) {
+    const interpreter = new Interpreter(tree);
+
+    const debuggerInstance = new Debugger(interpreter, {
+        enabled: true,
+        stepMode: true,
+        onPause: async ({ node, stack }) => {
+            editorConsole.print(`Paused at: ${node.token} ${node.value}`);
+            console.log("Stack:", stack);
+            for (const frame of stack.slice(1)) {
+                for (const [key, value] of Object.entries(frame)) {
+                    editorConsole.print(`Stack: ${key} ${JSON.stringify(value)}`)
+                }
+            }
+            await promise;
+        }
+    });
+
+    interpreter.debugger = debuggerInstance;
+
+    try {
+        const result = await interpreter.run();
+        if (result) {
+            editorConsole.print(`Debug Result: ${result.type} ${JSON.stringify(result.value)}`);
+        }
+    } catch (e) {
+        if (e.path) {
+            highlightErrorPath(e.path);
+        }
+        editorConsole.print(`Debug Error: ${e.message}`);
+        
+        if (e.path) {
+            e.path.forEach((node, i) => {
+                console.log(`${i}: ${node.token}`);
+            });
+        }
+    } finally {
+        callback();
+    }
 }
 
 const playButton = document.querySelector(".environment__run")
