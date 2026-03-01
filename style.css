@@ -1,6 +1,6 @@
 header {
     background-color: blueviolet;
-    height: 50px;
+    height: 3.125em;
     flex-shrink: 0;
 }
 
@@ -16,15 +16,15 @@ html, body {
 }
 
 img {
-    width:40px;
-    height:40px;
-    margin-top: 6px;
-    margin-left: 5px;
+    width: 2.5em;
+    height: 2.5em;
+    margin-top: 0.375em;
+    margin-left: 0.3125em;
 }
 
 .logo {
-    margin-top: 20px;
-    margin-left: 5px;
+    margin-top: 1.25em;
+    margin-left: 0.3125em;
 }
 
 .environment {
@@ -50,41 +50,27 @@ img {
 }
 
 .environment__console {
-    flex-grow: 2
-} 
-.container {
-    border: 2px solid black;
-    
-    /* margin-top: 7vh; */
+    flex-grow: 2;
 }
 
 .block,
 .environment__branch {
-    --radius-self: var(--radius-in, 10px);
-    border-radius: var(--radius-self);
     box-sizing: border-box;
 }
 
-.block > .environment__branch,
-.environment__branch > .block {
-    --radius-in: var(--radius-out);
-}
-
 .block {
-    --gap: 2px;
-    --radius-out: max(0px, calc(var(--radius-self) - var(--gap)));
     background-color: #ffd54f;
-    height: 6vh;
-    border: 1px solid black;
+    border: 0.0625em solid black;
+    border-radius: 0.5em;
     margin: 0;
     cursor: grab;
     user-select: none;
+    padding: 0.125em;
 
     display: flex;
     align-items: center;
     flex-direction: row;
-    gap: 6px;
-    padding: var(--gap);
+    gap: 0.375em;
     width: fit-content;
     height: fit-content;
 }
@@ -94,11 +80,9 @@ img {
 }
 
 .vertical-branch-alignment {
-    --gap: 4px;
     flex-direction: column;
     align-items: stretch;
-    gap: 4px;
-    padding: var(--gap) 6px;
+    gap: 0.25em;
 }
 
 .vertical-branch-alignment > .environment__operation {
@@ -116,37 +100,36 @@ img {
 .category {
     font-size: 2em;
     font-weight: bold;
-    opacity:0.7;
-    margin: 25px 0px 0px 10px;
+    opacity: 0.7;
+    margin: 1.5625em 0 0 0.625em;
     user-select: none;
 }
 
-editor > .block {
+.environment__code-editor > .block {
     position: absolute;
-    background-color: #ffd54f;
-    border: 1px solid black;
-    --gap: 4px;
-    padding: var(--gap) 0.45em;
-    cursor: grab;
-    user-select: none;
+}
+.block.error-highlight {
+    background-color: #ef9a9a;
 }
 
 .environment__if-block,
 .environment__for-block,
-.environment__while-block,
-editor > .environment__if-block,
-editor > .environment__for-block,
-editor > .environment__while-block {
+.environment__while-block {
     background-color: #ff9800;
 }
 
+.environment__if-block.error-highlight,
+.environment__for-block.error-highlight,
+.environment__while-block.error-highlight {
+    background-color: #f44336;
+}
+
 .environment__branch {
-    --gap: 1px;
-    --radius-out: max(0px, calc(var(--radius-self) - var(--gap)));
-    min-width: 28px;
-    min-height: 20px;
+    border-radius: 0.5em;
+    padding: 0.0625em;
+    min-width: 1.75em;
+    min-height: 1.25em;
     background-color: white;
-    padding: var(--gap);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -157,17 +140,17 @@ editor > .environment__while-block {
 }
 
 .environment__branch:empty {
-    width: 28px;
-    height: 20px;
+    width: 1.75em;
+    height: 1.25em;
 }
 
 .environment__branch.highlight {
-    outline: 2px dashed orange;
+    outline: 0.125em dashed orange;
 }
 
 .environment__input-number {
-    width: 3em; 
-    border-radius: var(--radius-out, 10px);
+    width: 3em;
+    border-radius: 0.5em;
 }
 
 input[type="checkbox"].environment__input-number {
@@ -178,22 +161,16 @@ input[type="checkbox"].environment__input-number {
 .centered {
     text-align: center;
 }
-
-
-.environment__console {
-    flex-grow: 2
-}
-
 .container {
-    border: 1px solid;
+    border: 0.0625em solid;
 }
 
 .console_output {
-    margin-left: 3px;
+    margin-left: 0.1875em;
 }
 
 .console_input-wrapper {
-    margin-left: 3px;
+    margin-left: 0.1875em;
 }
 .console_input {
     border: none;

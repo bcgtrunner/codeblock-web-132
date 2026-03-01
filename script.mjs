@@ -12,6 +12,7 @@ let draggingBlock = null; // какой блок сейчас тащим
 let lastBranch = null; // состояние текущей ветки; Это память о прошлой ветке, над которой был курсор.
 let offsetX = 0;
 let offsetY = 0;
+const errorHighlights = new Set();
 
 const numberBlock = palette.querySelector(".environment__numberLiteral-block")
 const stringBlock = palette.querySelector(".environment__stringLiteral-block")
@@ -305,14 +306,39 @@ function getBranchUnderCursor(x,y) {
     return maxLayerBranch ? maxLayerBranch.at(-1) : null;
 }
 
+function clearErrorHighlights() {
+    for (const uiNode of errorHighlights) {
+        uiNode.element.classList.remove("error-highlight");
+    }
+    errorHighlights.clear();
+}
+
+function highlightErrorPath(path) {
+    if (!Array.isArray(path)) return;
+    for (const node of path) {
+        const uiNode = manager.getClosestUINode(node);
+        if (!uiNode) continue;
+        uiNode.element.classList.add("error-highlight");
+        errorHighlights.add(uiNode);
+    }
+}
+
 const playButton = document.querySelector(".environment__run")
 playButton.addEventListener("click", async e => {
+    clearErrorHighlights();
     const roots = [...manager.activeBlocks.values()]
         .filter(elem => !elem.element.parentElement.closest(".block"))
     for (const root of roots) {
         const interp = new Interpreter(root.node);
-        const result = await interp.run();
-        console.log(result);
-        editorConsole.print(`${result.type} ${result.value}`);
+        try {
+            const result = await interp.run();
+            console.log(result);
+            editorConsole.print(`${result.type} ${result.value}`);
+        } catch (e) {
+            if (e.path) {
+                highlightErrorPath(e.path);
+            }
+            editorConsole.print(`Error: ${e.message}`);
+        }
     }
 })

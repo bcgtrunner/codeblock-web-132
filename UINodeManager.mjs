@@ -279,6 +279,40 @@ class UINodeManager {
     getNode(id) {
         return this.activeBlocks.get(id)
     }
+
+    getClosestUINode(astNode) {
+        if (!astNode) return null;
+
+        const direct = this.activeBlocks.get(astNode.id);
+        if (direct) return direct;
+
+        const roots = [...this.activeBlocks.values()].filter(ui => !ui.parent);
+        const visited = new Set();
+        let result = null;
+
+        const walk = (node, closestUI) => {
+            if (!node || visited.has(node.id) || result) return;
+            visited.add(node.id);
+
+            const mappedUI = this.activeBlocks.get(node.id) || closestUI;
+            if (node.id === astNode.id) {
+                result = mappedUI;
+                return;
+            }
+
+            for (const child of node.children || []) {
+                walk(child, mappedUI);
+                if (result) return;
+            }
+        };
+
+        for (const root of roots) {
+            walk(root.node, root);
+            if (result) break;
+        }
+
+        return result;
+    }
     
     removeNode(uiNode)
     {
