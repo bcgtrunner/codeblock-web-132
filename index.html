@@ -10,6 +10,7 @@
     <script src="script.mjs" type="module"></script>
 	<section class = "environment">
         <section class="environment__block-palette container">
+            <div class="palette-group palette-group--main">
             <div class="category" id="arrays">Main</div>
             <div class="environment__numberLiteral-block block">
                 <div class="environment__operation">number</div>
@@ -50,6 +51,8 @@
                 <div class="environment__branch"></div>
             </div>
 
+            </div>
+            <div class="palette-group palette-group--math">
             <div class="category" id="math">Math</div>
             <div class="environment__plus-block block">
                 <div class="environment__branch"></div>
@@ -172,6 +175,8 @@
                 <div class="environment__branch"></div>
             </div>
 
+            </div>
+            <div class="palette-group palette-group--arrays">
             <div class="category" id="arrays">Arrays</div>
             <div class="environment__array-block block vertical-branch-alignment">
                 <div class = environment__operation>array</div> 
@@ -215,6 +220,8 @@
                 <div class="environment__branch"></div>
             </div>
 
+            </div>
+            <div class="palette-group palette-group--strings">
             <div class="category" id="strings">Strings</div>
             <div class="environment__strlen-block block">
                 <div class="environment__operation">strlen</div>
@@ -270,6 +277,8 @@
                 <div class="environment__operation">charAt</div>
                 <div class="environment__branch"></div>
             </div>
+            </div>
+            <div class="palette-group palette-group--convert">
             <div class="category" id="convert">Convert</div>
             <div class="environment__bool-to-number-block block">
                 <div class="environment__operation">bool</div>
@@ -317,7 +326,9 @@
                 <div class="environment__operation">&rarr; type</div>
             </div>
 
-            <div class="category" id="logic">Logic</div>
+            </div>
+            <div class="palette-group palette-group--control-flow">
+            <div class="category" id="control-flow">Control Flow</div>
             <div class="environment__if-block block vertical-branch-alignment">
                 <div class="environment__operation">if</div>
                 <div class="environment__branch"></div>
@@ -343,6 +354,10 @@
                 <div class="centered">do</div>
                 <div class="environment__branch"></div>
             </div>
+            </div>
+
+            <div class="palette-group palette-group--logic">
+            <div class="category" id="logic">Logic</div>
             <div class="environment__eq-block block">
                 <div class="environment__branch"></div>
                 <div class="environment__operation">==</div>
@@ -394,7 +409,10 @@
                 <div class="environment__operation">not</div>
                 <div class="environment__branch"></div>
             </div>
+            </div>
 
+            <div class="palette-group palette-group--functions">
+            <div class="category" id="functions">Functions</div>
             <div class="environment__function-block block vertical-branch-alignment">
                 <div class="environment__operation">function</div>
                 <div class="centered">args</div>
@@ -418,8 +436,11 @@
                 <!--TODO: Make this a multiple choice, instead of text--> 
                 <input type="text" class = "environment__input-number">
             </div>
+            </div>
         </section>
+        <div class="environment__splitter environment__splitter--palette-editor" aria-hidden="true"></div>
         <section class="environment__code-editor container"> </section>
+        <div class="environment__splitter environment__splitter--editor-console" aria-hidden="true"></div>
         <section class = "environment__console container">
             <div class = "console_output"></div>
             <div class="console_input-wrapper">
