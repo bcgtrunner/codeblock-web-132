@@ -49,6 +49,7 @@ class EvalError extends Error {
 class Interpreter {
     constructor(tree, options = {}) {
         this.debugger = options.debugger || null;
+        this.console = options.console || null;
         this.tree = tree;
         this.stack = new CallStack();
 
@@ -354,6 +355,24 @@ class Interpreter {
         this.stack.set("typeof", makeBuiltin(["any"], "string", (something) => {
             return new Var("string", something.type);
         }))
+
+        this.stack.set("input", makeBuiltin([], "string", async () => {
+            let res = null;
+            if (this.console)
+                res = await this.console.waitForInput();
+            else
+                res = prompt();
+            if (res === null) res = "";
+            return new Var("string", res);
+        }))
+
+        this.stack.set("print", makeBuiltin(["string"], "void", (message) => {
+            if (this.console) {
+                this.console.log(message.value);
+            } else
+                console.log(message.value);
+            return new Var("void", null);
+        }))
     }
 
     async eval(node) {
@@ -477,7 +496,7 @@ class Interpreter {
                                 throw new EvalError(`Argument ${i} should be ${fn.params[i]}, got ${args[i].type}`);
                         }
     
-                        result = fn.impl(...args);
+                        result = await fn.impl(...args);
                         if (result.type !== fn.returns && fn.returns !== "any")
                             throw new EvalError(`Function should return ${fn.returns}, got ${result.type}`);
                     }

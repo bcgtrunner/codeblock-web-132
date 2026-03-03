@@ -7,74 +7,120 @@ class Console {
         this.input.addEventListener("keydown", this.inputKeyPress);
     }
 
-    print(text) {
+    scrollToBottom() {
+        this.output.scrollTop = this.output.scrollHeight;
+    }
+
+    log(text) {
         this.output.innerHTML += `<div> ${text}</div>`;
+        this.scrollToBottom();
     }
 
     inputKeyPress = (e) => {
         if (e.key == "Enter") {
-            this.execute();
+            void this.execute();
         }
     }
+
+    error(message) {
+        this.output.innerHTML += `<div> ${message}</div>`;
+        this.scrollToBottom();
+    }
     
-    execute() {
-        const command = this.input.value.trim();
+    waitForDebugStep() {
+        return new Promise(resolve => {
+            const stepHandler = (e) => {
+                if (e.key !== "Enter") return;
+                e.preventDefault();
+                this.input.removeEventListener("keydown", stepHandler);
+                resolve();
+            };
+            this.input.addEventListener("keydown", stepHandler);
+        });
+    }
+
+    async execute() {
+        const inp = this.input.value;
+        const command = inp.split(' ')[0];
+        const flags = inp.split(' ').slice(1)
         this.input.value = "";
-        if (command !== 'cls') {
-            this.output.innerHTML += `<div class="console_input-wrapper"><span class="console_prefix">></span> ${command}</div>`;
+        console.log(command )
+        if (command !== 'clear') {
+            this.output.innerHTML += `<div class="console_input-wrapper"><span class="console_prefix">></span> ${inp}</div>`;
+            this.scrollToBottom();
         }
-        
         if (command === '') return;
 
         if (command === 'help') {
-            this.print("Available commands: run, clear, cls, debug, help. Use [command] -help for details.");
+            this.log("Available commands: run, reset, clear, debug, help. Use [command] -help for details.");
         }
-        else if (command === 'cls -help') {
-            this.print("Usage: cls - clears the console screen.");
+        else if (command === 'clear' && (flags[0] === '-h' || flags[0] === '-help')) {
+            this.log("Usage: clear - clears the console screen.");
         }
-        else if (command === 'cls') {
+        else if (command === 'clear') {
             this.clear();
         }
-        else if (command === 'run -help') {
-            this.print("Usage: run - executes all blocks currently in the editor.");
+        else if (command === 'run' && (flags[0] === '-h' || flags[0] === '-help')) {
+            this.log("Usage: run - executes all blocks currently in the editor.");
         }
         else if (command === 'run') {
             runEditorBlocks();
-            this.print(`Command: '${command}' executed`);
+            this.log(`Command: '${command}' executed`);
         }
-        else if (command === 'clear -help') {
-            this.print("Usage: clear - removes all blocks from the editor.");
+        else if (command === 'reset' && (flags[0] === '-h' || flags[0] === '-help')) {
+            this.log("Usage: reset - removes all blocks from the editor.");
         }
-        else if (command === 'clear') {
+        else if (command === 'reset') {
             clearEditorBlocks();
-            this.print(`Command: '${command}' executed`);
+            this.log(`Command: '${command}' executed`);
         }
-        else if (command === 'debug -help') {
-            this.print("Usage: debug - starts step-by-step execution. Press Enter to move to the next step.");
+        else if (command === 'debug' && (flags[0] === '-h' || flags[0] === '-help')) {
+            this.log("Usage: debug - starts step-by-step execution. Press Enter to move to the next step.");
         }
         else if (command === 'debug') {
-            this.input.removeEventListener("keydown", this.inputKeyPress);
             const roots = getRootBlocks();
-            for (const root of roots) {
-                runDebugMode(
-                    root.node, 
-                    new Promise(resolve => {
-                        const stepHandler = (e) => {
-                            if(e.key === "Enter") {
-                                this.input.removeEventListener("keydown", stepHandler);
-                                resolve();
-                            }
-                        };
-                        this.input.addEventListener("keydown", stepHandler);
-                    }), 
-                    () => this.input.addEventListener("keydown", this.inputKeyPress)
-                );
+            if (roots.length === 0) {
+                this.log("No nodes to interpret");
+                return;
             }
-            this.print("Debug mode started...");
+
+            this.input.removeEventListener("keydown", this.inputKeyPress);
+            try {
+                for (const root of roots) {
+                    this.log("Debug mode started...");
+                    await runDebugMode(
+                        root.node,
+                        () => this.waitForDebugStep()
+                    );
+                }
+            } finally {
+                this.input.addEventListener("keydown", this.inputKeyPress);
+            }
         }
         else {
-            this.print(`Command: '${command}' is unrecognised. See 'help'.`);
+            this.log(`Command: '${command}' is unrecognised. See 'help'.`);
         }
+    }
+
+    async waitForInput() {
+        const p = new Promise(resolve => {
+            const stepHandler = (e) => {
+                if(e.key === "Enter") {
+                    this.input.removeEventListener("keydown", stepHandler);
+                    resolve();
+                }
+            };
+            this.input.addEventListener("keydown", stepHandler);
+        })
+        this.log("Waiting for input:");
+        this.input.removeEventListener("keydown", this.inputKeyPress);
+        await p;        
+        this.input.addEventListener("keydown", this.inputKeyPress);
+        
+        const value = this.input.value;
+        this.input.value = "";
+        this.log(value)
+        return value;
     }
 
     clear() {

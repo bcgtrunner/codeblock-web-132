@@ -19,8 +19,7 @@ for (const group of palette.querySelectorAll(".palette-group")) {
         group.classList.toggle("is-collapsed");
     });
 }
-
-editorConsole.print("HELLO, WORLD!")
+editorConsole.log("HELLO, WORLD!")
 let draggingBlock = null; // какой блок сейчас тащим
 let lastBranch = null; // состояние текущей ветки; Это память о прошлой ветке, над которой был курсор.
 let offsetX = 0;
@@ -99,6 +98,8 @@ const startsWithBlock = palette.querySelector(".environment__starts-with-block")
 const endsWithBlock = palette.querySelector(".environment__ends-with-block")
 const replaceBlock = palette.querySelector(".environment__replace-block")
 const charAtBlock = palette.querySelector(".environment__char-at-block")
+const inputBlock = palette.querySelector(".environment__input-block")
+const printBlock = palette.querySelector(".environment__print-block")
 const boolToNumberBlock = palette.querySelector(".environment__bool-to-number-block")
 const numberToBoolBlock = palette.querySelector(".environment__number-to-bool-block")
 const numberToStringBlock = palette.querySelector(".environment__number-to-string-block")
@@ -231,6 +232,8 @@ bindCallBlock(stringToBoolBlock, "stringToBool");
 bindCallBlock(arrayToBoolBlock, "arrayToBool");
 bindCallBlock(arrayToStringBlock, "arrayToString");
 bindCallBlock(typeofBlock, "typeof");
+bindCallBlock(inputBlock, "input");
+bindCallBlock(printBlock, "print");
 functionBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("function", "function");
     startDragging(uiNode, e, e.target);
@@ -499,17 +502,19 @@ export async function runEditorBlocks() {
     const roots = [...manager.activeBlocks.values()]
         .filter(elem => !elem.element.parentElement.closest(".block"))
     for (const root of roots) {
-        const interp = new Interpreter(root.node);
+        const interp = new Interpreter(root.node, {
+            console: editorConsole
+        });
         try {
             const result = await interp.run();
             console.log(result);
-            editorConsole.print(`${result.type} ${JSON.stringify(result.value)}`);
+            editorConsole.log(`${result.type} ${JSON.stringify(result.value)}`);
         } catch (e) {
             if (e.path) {
                 highlightErrorPath(e.path);
             }
             console.error(e);
-            editorConsole.print(`Error: ${e.message}`);
+            editorConsole.log(`Error: ${e.message}`);
         }
     }
 }
@@ -524,41 +529,40 @@ export function clearEditorBlocks() {
     console.log("Editor cleared");
 }
 
-export async function runDebugMode(tree, promise, callback) {
-    const interpreter = new Interpreter(tree);
-
+export async function runDebugMode(tree, waitForStep, callback) {
+    const interpreter = new Interpreter(tree, {
+        console: editorConsole
+    });
     const debuggerInstance = new Debugger(interpreter, {
         enabled: true,
         stepMode: true,
         onPause: async ({ node, stack }) => {
-            // Уведомление о текущем шаге
-            editorConsole.print(`--- Debug Step ---`);
-            editorConsole.print(`Paused at: ${node.token} ${node.value}`);
+            editorConsole.log(`--- Debug Step ---`);
+            editorConsole.log(`Paused at: ${node.token} ${node.value}`);
             
             console.log("Stack:", stack);
             for (const frame of stack.slice(1)) {
                 for (const [key, value] of Object.entries(frame)) {
-                    editorConsole.print(`Stack: ${key} ${JSON.stringify(value)}`);
+                    editorConsole.log(`Stack: ${key} ${JSON.stringify(value)}`);
                 }
             }
-            editorConsole.print(`<span style="color: #aaa;">Press <b>Enter</b>, to move to the next step...</span>`);
-            await promise;
+
+            editorConsole.log(`<span style="color: #aaa;">Press <b>Enter</b>, to move to the next step...</span>`);
+            await waitForStep();
         }
     });
-
     interpreter.debugger = debuggerInstance;
-
     try {
         const result = await interpreter.run();
         
         if (result) {
-            editorConsole.print(`<b>Debug Result:</b> ${result.type} ${JSON.stringify(result.value)}`);
+            editorConsole.log(`<b>Debug Result:</b> ${result.type} ${JSON.stringify(result.value)}`);
         }
     } catch (e) {
         if (e.path) {
             highlightErrorPath(e.path);
         }
-        editorConsole.print(`<span style="color: #ff4444;">Debug Error: ${e.message}</span>`);
+        editorConsole.log(`<span style="color: #ff4444;">Debug Error: ${e.message}</span>`);
         
         if (e.path) {
             e.path.forEach((node, i) => {
@@ -566,8 +570,8 @@ export async function runDebugMode(tree, promise, callback) {
             });
         }
     } finally {
-        editorConsole.print("<i>Debug session finished. Normal console mode restored.</i>");
-        callback();
+        editorConsole.log("<i>Debug session finished. Normal console mode restored.</i>");
+        callback?.();
     }
 }
 
