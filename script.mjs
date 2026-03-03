@@ -15,6 +15,7 @@ const editorConsole = new Console();
 for (const group of palette.querySelectorAll(".palette-group")) {
     const title = group.querySelector(".category");
     if (!title) continue;
+    group.classList.add("is-collapsed");
     title.addEventListener("click", () => {
         group.classList.toggle("is-collapsed");
     });
@@ -575,7 +576,28 @@ export async function runDebugMode(tree, waitForStep, callback) {
     }
 }
 
-const playButton = document.querySelector(".environment__run")
-playButton.addEventListener("click", async e => {
-    await runEditorBlocks();
-})
+const playButton = document.querySelector(".environment__run");
+const debugButton = document.querySelector(".environment__debug");
+const resetButton = document.querySelector(".environment__reset");
+const clearButton = document.querySelector(".environment__clear");
+
+async function executeConsoleCommand(command) {
+    editorConsole.input.value = command;
+    await editorConsole.execute();
+}
+
+playButton.addEventListener("click", async () => {
+    await executeConsoleCommand("run");
+});
+
+debugButton?.addEventListener("click", async () => {
+    await executeConsoleCommand("debug");
+});
+
+resetButton?.addEventListener("click", async () => {
+    await executeConsoleCommand("reset");
+});
+
+clearButton?.addEventListener("click", async () => {
+    await executeConsoleCommand("clear");
+});
