@@ -70,6 +70,9 @@ img {
 .environment__console {
     flex: 0 0 20em;
     min-width: 16em;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
 .environment__splitter {
@@ -258,11 +261,16 @@ input[type="checkbox"].environment__input-number {
 
 .console_output {
     margin-left: 0.1875em;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .console_input-wrapper {
     margin-left: 0.1875em;
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
     gap: 0.5em;
 }

@@ -366,7 +366,10 @@ class UINodeManager {
             stringToBool: ["string", "&rarr; bool"],
             arrayToBool: ["array", "&rarr; bool"],
             arrayToString: ["array", "&rarr; string"],
-            typeof: ["any", "&rarr; type"]
+            typeof: ["any", "&rarr; type"],
+
+            input: ["input"],
+            print: ["print", ""],
         };
 
         return templates[label] ?? ["", label, ""];
