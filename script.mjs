@@ -531,13 +531,17 @@ export async function runDebugMode(tree, promise, callback) {
         enabled: true,
         stepMode: true,
         onPause: async ({ node, stack }) => {
+            // Уведомление о текущем шаге
+            editorConsole.print(`--- Debug Step ---`);
             editorConsole.print(`Paused at: ${node.token} ${node.value}`);
+            
             console.log("Stack:", stack);
             for (const frame of stack.slice(1)) {
                 for (const [key, value] of Object.entries(frame)) {
-                    editorConsole.print(`Stack: ${key} ${JSON.stringify(value)}`)
+                    editorConsole.print(`Stack: ${key} ${JSON.stringify(value)}`);
                 }
             }
+            editorConsole.print(`<span style="color: #aaa;">Press <b>Enter</b>, to move to the next step...</span>`);
             await promise;
         }
     });
@@ -546,14 +550,15 @@ export async function runDebugMode(tree, promise, callback) {
 
     try {
         const result = await interpreter.run();
+        
         if (result) {
-            editorConsole.print(`Debug Result: ${result.type} ${JSON.stringify(result.value)}`);
+            editorConsole.print(`<b>Debug Result:</b> ${result.type} ${JSON.stringify(result.value)}`);
         }
     } catch (e) {
         if (e.path) {
             highlightErrorPath(e.path);
         }
-        editorConsole.print(`Debug Error: ${e.message}`);
+        editorConsole.print(`<span style="color: #ff4444;">Debug Error: ${e.message}</span>`);
         
         if (e.path) {
             e.path.forEach((node, i) => {
@@ -561,6 +566,7 @@ export async function runDebugMode(tree, promise, callback) {
             });
         }
     } finally {
+        editorConsole.print("<i>Debug session finished. Normal console mode restored.</i>");
         callback();
     }
 }

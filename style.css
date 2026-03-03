@@ -262,8 +262,23 @@ input[type="checkbox"].environment__input-number {
 
 .console_input-wrapper {
     margin-left: 0.1875em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
 }
+
+.console_prefix {
+    color: inherit;
+    user-select: none;
+}
+
 .console_input {
+    flex: 1;
     border: none;
     outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    padding: 0;
 }
