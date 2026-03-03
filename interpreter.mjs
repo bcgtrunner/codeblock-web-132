@@ -368,7 +368,7 @@ class Interpreter {
 
         this.stack.set("print", makeBuiltin(["string"], "void", (message) => {
             if (this.console) {
-                this.console.log(message.value);
+                this.console.log(`<span class="console_msg--program">${message.value}</span>`);
             } else
                 console.log(message.value);
             return new Var("void", null);

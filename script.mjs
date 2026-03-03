@@ -19,7 +19,7 @@ for (const group of palette.querySelectorAll(".palette-group")) {
         group.classList.toggle("is-collapsed");
     });
 }
-editorConsole.log("HELLO, WORLD!")
+editorConsole.log('<span class="console_msg--debug">HELLO, WORLD!</span>')
 let draggingBlock = null; // какой блок сейчас тащим
 let lastBranch = null; // состояние текущей ветки; Это память о прошлой ветке, над которой был курсор.
 let offsetX = 0;
@@ -508,13 +508,13 @@ export async function runEditorBlocks() {
         try {
             const result = await interp.run();
             console.log(result);
-            editorConsole.log(`${result.type} ${JSON.stringify(result.value)}`);
+            editorConsole.log(`<span class="console_msg--debug">${result.type} ${JSON.stringify(result.value)}</span>`);
         } catch (e) {
             if (e.path) {
                 highlightErrorPath(e.path);
             }
             console.error(e);
-            editorConsole.log(`Error: ${e.message}`);
+            editorConsole.log(`<span class="console_msg--error">Error: ${e.message}</span>`);
         }
     }
 }
@@ -537,17 +537,17 @@ export async function runDebugMode(tree, waitForStep, callback) {
         enabled: true,
         stepMode: true,
         onPause: async ({ node, stack }) => {
-            editorConsole.log(`--- Debug Step ---`);
-            editorConsole.log(`Paused at: ${node.token} ${node.value}`);
+            editorConsole.log('<span class="console_msg--debug">--- Debug Step ---</span>');
+            editorConsole.log(`<span class="console_msg--debug">Paused at: ${node.token} ${node.value}</span>`);
             
             console.log("Stack:", stack);
             for (const frame of stack.slice(1)) {
                 for (const [key, value] of Object.entries(frame)) {
-                    editorConsole.log(`Stack: ${key} ${JSON.stringify(value)}`);
+                    editorConsole.log(`<span class="console_msg--debug">Stack: ${key} ${JSON.stringify(value)}</span>`);
                 }
             }
 
-            editorConsole.log(`<span style="color: #aaa;">Press <b>Enter</b>, to move to the next step...</span>`);
+            editorConsole.log('<span class="console_msg--debug">Press <b>Enter</b>, to move to the next step...</span>');
             await waitForStep();
         }
     });
@@ -556,13 +556,13 @@ export async function runDebugMode(tree, waitForStep, callback) {
         const result = await interpreter.run();
         
         if (result) {
-            editorConsole.log(`<b>Debug Result:</b> ${result.type} ${JSON.stringify(result.value)}`);
+            editorConsole.log(`<span class="console_msg--debug"><b>Debug Result:</b> ${result.type} ${JSON.stringify(result.value)}</span>`);
         }
     } catch (e) {
         if (e.path) {
             highlightErrorPath(e.path);
         }
-        editorConsole.log(`<span style="color: #ff4444;">Debug Error: ${e.message}</span>`);
+        editorConsole.log(`<span class="console_msg--error">Debug Error: ${e.message}</span>`);
         
         if (e.path) {
             e.path.forEach((node, i) => {
@@ -570,7 +570,7 @@ export async function runDebugMode(tree, waitForStep, callback) {
             });
         }
     } finally {
-        editorConsole.log("<i>Debug session finished. Normal console mode restored.</i>");
+        editorConsole.log('<span class="console_msg--debug"><i>Debug session finished. Normal console mode restored.</i></span>');
         callback?.();
     }
 }
