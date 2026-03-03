@@ -267,6 +267,22 @@ input[type="checkbox"].environment__input-number {
     overflow-x: hidden;
 }
 
+.console_output > div {
+    margin: 0.125em 0;
+}
+
+.console_msg--program {
+    color: #1b5e20;
+}
+
+.console_msg--debug {
+    color: #0d47a1;
+}
+
+.console_msg--error {
+    color: #b71c1c;
+}
+
 .console_input-wrapper {
     margin-left: 0.1875em;
     display: flex;

@@ -80,14 +80,14 @@ class Console {
         else if (command === 'debug') {
             const roots = getRootBlocks();
             if (roots.length === 0) {
-                this.log("No nodes to interpret");
+                this.log('<span class="console_msg--debug">No nodes to interpret</span>');
                 return;
             }
 
             this.input.removeEventListener("keydown", this.inputKeyPress);
             try {
                 for (const root of roots) {
-                    this.log("Debug mode started...");
+                    this.log('<span class="console_msg--debug">Debug mode started...</span>');
                     await runDebugMode(
                         root.node,
                         () => this.waitForDebugStep()
@@ -112,7 +112,7 @@ class Console {
             };
             this.input.addEventListener("keydown", stepHandler);
         })
-        this.log("Waiting for input:");
+        this.log('<span class="console_msg--debug">Waiting for input:</span>');
         this.input.removeEventListener("keydown", this.inputKeyPress);
         await p;        
         this.input.addEventListener("keydown", this.inputKeyPress);
