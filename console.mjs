@@ -1,7 +1,6 @@
 import { clearEditorBlocks, getRootBlocks, runDebugMode, runEditorBlocks } from "./script.mjs";
-// help run clear debug
-class Console
-{
+
+class Console {
     constructor() {
         this.output = document.querySelector(".console_output");
         this.input = document.querySelector(".console_input");
@@ -21,18 +20,37 @@ class Console
     execute() {
         const command = this.input.value.trim();
         this.input.value = "";
-        this.output.innerHTML += `<div>> ${command}</div>`;
+        if (command !== 'cls') {
+            this.output.innerHTML += `<div class="console_input-wrapper"><span class="console_prefix">></span> ${command}</div>`;
+        }
+        
         if (command === '') return;
-        else if (command === 'help') {
-            this.output.innerHTML += `<div> Available commands: <br>run<br>clear<br>debug<br>help</div>`;
+
+        if (command === 'help') {
+            this.print("Available commands: run, clear, cls, debug, help. Use [command] -help for details.");
+        }
+        else if (command === 'cls -help') {
+            this.print("Usage: cls - clears the console screen.");
+        }
+        else if (command === 'cls') {
+            this.clear();
+        }
+        else if (command === 'run -help') {
+            this.print("Usage: run - executes all blocks currently in the editor.");
         }
         else if (command === 'run') {
             runEditorBlocks();
-            this.output.innerHTML += `<div> Command: '${command}' executed</div>`;
+            this.print(`Command: '${command}' executed`);
+        }
+        else if (command === 'clear -help') {
+            this.print("Usage: clear - removes all blocks from the editor.");
         }
         else if (command === 'clear') {
             clearEditorBlocks();
-            this.output.innerHTML += `<div> Command: '${command}' executed<div>`;
+            this.print(`Command: '${command}' executed`);
+        }
+        else if (command === 'debug -help') {
+            this.print("Usage: debug - starts step-by-step execution. Press Enter to move to the next step.");
         }
         else if (command === 'debug') {
             this.input.removeEventListener("keydown", this.inputKeyPress);
@@ -41,23 +59,26 @@ class Console
                 runDebugMode(
                     root.node, 
                     new Promise(resolve => {
-                    this.input.addEventListener("keydown",
-                        (e) => {
-                            if(e.key === "Enter")
-                            {
+                        const stepHandler = (e) => {
+                            if(e.key === "Enter") {
+                                this.input.removeEventListener("keydown", stepHandler);
                                 resolve();
                             }
-                        })
+                        };
+                        this.input.addEventListener("keydown", stepHandler);
                     }), 
                     () => this.input.addEventListener("keydown", this.inputKeyPress)
-                )
-                
+                );
             }
             this.print("Debug mode started...");
         }
         else {
-            this.output.innerHTML += `<div> Command: '${command}' is unrecognised. See 'help'.</div>`;
+            this.print(`Command: '${command}' is unrecognised. See 'help'.`);
         }
     }
+
+    clear() {
+        this.output.innerHTML = "";
+    }
 }
-export { Console }
+export { Console };
