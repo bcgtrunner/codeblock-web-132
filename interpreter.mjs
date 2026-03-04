@@ -49,6 +49,7 @@ class EvalError extends Error {
 class Interpreter {
     constructor(tree, options = {}) {
         this.debugger = options.debugger || null;
+        this.console = options.console || null;
         this.tree = tree;
         this.stack = new CallStack();
 
@@ -181,7 +182,7 @@ class Interpreter {
             return new Var(found.type, found.value);
         }));
 
-        this.stack.set("set_at", makeBuiltin(["array", "number", "any"], "any", (array, i, newValue) => {
+        this.stack.set("set_at", makeBuiltin(["array", "any", "number"], "any", (array, newValue, i) => {
             if (i.value < 0 || i.value >= array.value.length) {
                 throw new Error(`Array index ${i.value} out of bounds`);
             }
@@ -190,7 +191,7 @@ class Interpreter {
             return newVar;
         }));
 
-        this.stack.set("insert_at", makeBuiltin(["array", "number", "any"], "any", (array, i, newValue) => {
+        this.stack.set("insert_at", makeBuiltin(["array", "any", "number"], "any", (array, newValue, i) => {
             if (i.value < 0 || i.value > array.value.length) {
                 throw new Error(`Insert index ${i.value} out of bounds (0 to ${array.value.length})`);
             }
@@ -354,6 +355,24 @@ class Interpreter {
         this.stack.set("typeof", makeBuiltin(["any"], "string", (something) => {
             return new Var("string", something.type);
         }))
+
+        this.stack.set("input", makeBuiltin([], "string", async () => {
+            let res = null;
+            if (this.console)
+                res = await this.console.waitForInput();
+            else
+                res = prompt();
+            if (res === null) res = "";
+            return new Var("string", res);
+        }))
+
+        this.stack.set("print", makeBuiltin(["string"], "void", (message) => {
+            if (this.console) {
+                this.console.log(`<span class="console_msg--program">${message.value}</span>`);
+            } else
+                console.log(message.value);
+            return new Var("void", null);
+        }))
     }
 
     async eval(node) {
@@ -378,11 +397,20 @@ class Interpreter {
                     break;
                 
                 case "function":
+                    if (!node.children[0] || node.children[0].token !== "block") {
+                        throw new EvalError("Function AST invalid: children[0] must be params block");
+                    }
+                    if (!node.children[1] || node.children[1].token !== "type") {
+                        throw new EvalError("Function AST invalid: children[1] must be return type node");
+                    }
+                    if (!node.children[2]) {
+                        throw new EvalError("Function AST invalid: children[2] must be function body node");
+                    }
                     result = new Var("function", {
                         kind: "user",
-                        params: node.value.params,
-                        returns: node.value.returns,
-                        impl: node.children[0]
+                        params: node.children[0].children.map(ch => ch.value),
+                        returns: node.children[1].value,
+                        impl: node.children[2]
                     })
                     break;
 
@@ -468,7 +496,7 @@ class Interpreter {
                                 throw new EvalError(`Argument ${i} should be ${fn.params[i]}, got ${args[i].type}`);
                         }
     
-                        result = fn.impl(...args);
+                        result = await fn.impl(...args);
                         if (result.type !== fn.returns && fn.returns !== "any")
                             throw new EvalError(`Function should return ${fn.returns}, got ${result.type}`);
                     }
@@ -546,6 +574,12 @@ class Interpreter {
                 case "return":
                     result = await this.eval(node.children[0]);
                     break;
+                
+                case "param":
+                    throw new Error("Params must not be use outside of function arguments.")
+                
+                case "type":
+                    throw new Error("Type nodes must not be used outside of function return signatures.")
 
                 default:
                     throw new EvalError(`Unknown AST node token: ${node.token}`);
@@ -573,7 +607,12 @@ class Interpreter {
     }
 
     async run() {
-        return await this.eval(this.tree);
+        // in the debugger (stack trace) we should not see builtins
+        // thus we add another frame to separate builtins from everything else 
+        this.stack.pushFrame();
+        const result = await this.eval(this.tree);
+        this.stack.popFrame();
+        return result;
     }
 }
 
