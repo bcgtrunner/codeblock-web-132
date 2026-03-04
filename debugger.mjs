@@ -1,7 +1,6 @@
 class Debugger {
     constructor(interpreter, options = {}) {
         this.interpreter = interpreter;
-
         this.enabled = options.enabled ?? true;
         this.stepMode = options.stepMode ?? false;
         this.breakpoints = this.watchList = new Set();
@@ -53,16 +52,7 @@ class Debugger {
     }
 
     printStack() {
-        const frames = this.interpreter.stack.frames;
-
-        console.log("📚 Stack:");
-        frames.forEach((frame, i) => {
-            console.log(`  Frame ${i}:`);
-            for (const key in frame) {
-                const v = frame[key];
-                console.log(`    ${key} = (${v.type}) ${v.value}`);
-            }
-        });
+        console.log(this.interpreter.stack);
     }
 
     printWatch() {
@@ -86,7 +76,7 @@ class Debugger {
 
         console.log(`${pad}➡ Enter: ${node.token}${node.value !== null ? ` (${node.value})` : ""}`);
 
-        await this.pauseIfNeeded(node);
+        // await this.pauseIfNeeded(node);
 
         this.printWatch();
 
@@ -95,6 +85,8 @@ class Debugger {
 
     async onNodeExit(node, result) {
         if (!this.enabled) return;
+
+        await this.pauseIfNeeded(node);
 
         this.indent--;
 
