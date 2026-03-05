@@ -231,7 +231,7 @@ class UINodeManager {
     canAttach(uiNode, parent, branchElement) {
         return parent.canAppendChild(uiNode, branchElement);
     }
-
+    
     attach(uiNode, parent, branchElement) {
         parent.appendChild(uiNode, branchElement);
         uiNode.attachTo(parent);
@@ -284,6 +284,7 @@ class UINodeManager {
     removeNode(uiNode)
     {
         this.activeBlocks.delete(uiNode.node.id)
+        
         uiNode.remove();
     }
 

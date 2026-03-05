@@ -2,6 +2,7 @@ import { ASTNode, Interpreter } from "./interpreter.mjs";
 import { UINodeManager } from "./UINodeManager.mjs";
 import { Debugger } from "./debugger.mjs";
 import { Console } from "./console.mjs";
+import { Converter } from "./converter.mjs";
 const manager = new UINodeManager();
 
 const palette = document.querySelector(".environment__block-palette");
@@ -20,6 +21,8 @@ for (const group of palette.querySelectorAll(".palette-group")) {
         group.classList.toggle("is-collapsed");
     });
 }
+const converter = new Converter(editor, manager);
+converter.toUINodes(new ASTNode("return", null, [new ASTNode("return", null, [new ASTNode("return", null, [new ASTNode("number", 3)])])]));
 editorConsole.log('<span class="console_msg--debug">HELLO, WORLD!</span>')
 let draggingBlock = null; // какой блок сейчас тащим
 let lastBranch = null; // состояние текущей ветки; Это память о прошлой ветке, над которой был курсор.
