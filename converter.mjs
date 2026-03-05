@@ -93,7 +93,13 @@ class Converter
             default:
                 throw new EvalError(`Unknown AST node token: ${node.token}`);
         }
+        const previousId = uiNode.node.id;
         uiNode.node = node;
+        uiNode.element.id = node.id;
+        if (previousId !== node.id) {
+            manager.activeBlocks.delete(previousId);
+            manager.activeBlocks.set(node.id, uiNode);
+        }
         this.editor.append(uiNode.element);
         uiNode.element.style.position = "absolute";
         uiNode.element.style.top  = this.editor.clientHeight / 2 - uiNode.element.clientHeight / 2 + 'px';
