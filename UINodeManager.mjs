@@ -1,5 +1,10 @@
 import { ASTNode } from "./interpreter.mjs";
 import { UINode } from "./UINode.mjs";
+import {
+    getCallDescriptorByLabel,
+    getCallDescriptorByOperation,
+    getGenericCallDescriptor,
+} from "./callDescriptors.mjs";
 
 class UINodeManager {
     constructor() {
@@ -99,11 +104,24 @@ class UINodeManager {
                 break;
             }
             case "call": {
-                if (label === "call") {
-                    uiNode.node.value = "generic-call";
+                const callMode = options.callMode ?? (label === "call" ? "generic" : "fixed");
+                const descriptor = callMode === "generic"
+                    ? getGenericCallDescriptor()
+                    : (options.operation
+                        ? getCallDescriptorByOperation(options.operation)
+                        : getCallDescriptorByLabel(label));
+
+                if (!descriptor) {
+                    throw new Error(`Unknown call descriptor: ${options.operation ?? label}`);
                 }
-                const parts = this.getCallTemplateParts(label);
-                const branches = this.renderHorizontalBranchTemplate(element, parts);
+
+                uiNode.setCallMetadata({
+                    mode: callMode,
+                    label: descriptor.label,
+                    operation: descriptor.operation,
+                });
+
+                const branches = this.renderHorizontalBranchTemplate(element, descriptor.templateParts);
                 uiNode.setBranches(branches);
                 break;
             }
@@ -202,7 +220,6 @@ class UINodeManager {
             }
         }
         this.activeBlocks.set(uiNode.node.id, uiNode);
-        console.log(this.activeBlocks)
         return uiNode;
     }
 
@@ -213,6 +230,23 @@ class UINodeManager {
     attach(uiNode, parent, branchElement) {
         parent.appendChild(uiNode, branchElement);
         uiNode.attachTo(parent);
+        return uiNode;
+    }
+
+    attachView(uiNode, parent, branchElement) {
+        branchElement.appendChild(uiNode.element);
+        uiNode.attachTo(parent);
+        return uiNode;
+    }
+
+    adoptNode(uiNode, astNode) {
+        const previousId = uiNode.node.id;
+        uiNode.node = astNode;
+        uiNode.element.id = astNode.id;
+        if (previousId !== astNode.id) {
+            this.activeBlocks.delete(previousId);
+            this.activeBlocks.set(astNode.id, uiNode);
+        }
         return uiNode;
     }
 
@@ -292,86 +326,6 @@ class UINodeManager {
             classes.splice(1, 0, `environment__${type}-${signatureType}-block`);
         }
         return classes.join(" ");
-    }
-
-    getCallTemplateParts(label) {
-        const templates = {
-            call: ["", "call", ""],
-
-            "+": ["", "+", ""],
-            "-": ["", "-", ""],
-            "*": ["", "*", ""],
-            "/": ["", "/", ""],
-            "//": ["", "//", ""],
-            "%": ["", "%", ""],
-            "**": ["", "**", ""],
-
-            "==": ["", "==", ""],
-            "!=": ["", "!=", ""],
-            "<": ["", "<", ""],
-            ">": ["", ">", ""],
-            "<=": ["", "<=", ""],
-            ">=": ["", ">=", ""],
-            and: ["", "and", ""],
-            or: ["", "or", ""],
-
-            at: ["", "at", ""],
-            len: ["len", ""],
-            push: ["", "push", ""],
-            pop: ["pop", ""],
-            "set at": ["", "set", "at", ""],
-            "insert at": ["", "insert", "at", ""],
-            "remove at": ["", "remove at", ""],
-
-            not: ["not", ""],
-            sqrt: ["sqrt", ""],
-            abs: ["abs", ""],
-            floor: ["floor", ""],
-            ceil: ["ceil", ""],
-            round: ["round", ""],
-            trunc: ["trunc", ""],
-            sin: ["sin", ""],
-            cos: ["cos", ""],
-            tan: ["tan", ""],
-            log: ["log", ""],
-            exp: ["exp", ""],
-            sign: ["sign", ""],
-            asin: ["asin", ""],
-            acos: ["acos", ""],
-            atan: ["atan", ""],
-            log10: ["log10", ""],
-            log2: ["log2", ""],
-            atan2: ["atan2", "", ""],
-            min: ["min", "", ""],
-            max: ["max", "", ""],
-
-            strlen: ["strlen", ""],
-            upper: ["upper", ""],
-            lower: ["lower", ""],
-            trim: ["trim", ""],
-            substring: ["", "substring", "", ""],
-            split: ["", "split", ""],
-            join: ["", "join", ""],
-            startsWith: ["", "startsWith", ""],
-            endsWith: ["", "endsWith", ""],
-            replace: ["", "replace", "with", ""],
-            charAt: ["", "charAt", ""],
-
-            boolToNumber: ["bool", "&rarr; number"],
-            numberToBool: ["number", "&rarr; bool"],
-            numberToString: ["number", "&rarr; string"],
-            boolToString: ["bool", "&rarr; string"],
-            stringToNumber: ["string", "&rarr; number"],
-            stringToBool: ["string", "&rarr; bool"],
-            arrayToBool: ["array", "&rarr; bool"],
-            arrayToString: ["array", "&rarr; string"],
-            typeof: ["any", "&rarr; type"],
-
-            input: ["input"],
-            print: ["print", ""],
-        };
-
-        return templates[label] ?? ["", label, ""];
     }
 
     renderHorizontalBranchTemplate(element, parts) {
