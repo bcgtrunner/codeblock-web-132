@@ -1,6 +1,7 @@
 import { ASTNode } from "./interpreter.mjs"
 import { UINodeManager } from "./UINodeManager.mjs"
 import { UINode } from "./UINode.mjs";
+
 class Converter
 {
     constructor(editorElement, manager)
