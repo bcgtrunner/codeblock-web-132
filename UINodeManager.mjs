@@ -1,17 +1,26 @@
 import { ASTNode } from "./interpreter.mjs";
 import { UINode } from "./UINode.mjs";
+import {
+    getCallDescriptorByLabel,
+    getCallDescriptorByOperation,
+    getGenericCallDescriptor,
+} from "./callDescriptors.mjs";
 
 class UINodeManager {
     constructor() {
         this.activeBlocks = new Map(); 
     }
     
-    spawnNode(type, label) {
+    spawnNode(type, label, options = {}) {
         const value = null;
         const element = document.createElement("div");
         const uiNode = new UINode(type, element);
-        element.className = `environment__${type}-block block`
+        const signatureType = options.signatureType ?? null;
+        element.className = this.getNodeClassName(type, signatureType);
         element.id = uiNode.node.id;
+        if (signatureType) {
+            element.dataset.signatureType = signatureType;
+        }
         element.style.position = 'absolute'; 
         const text = this.createDivElement(label, "environment__operation")
         switch (type) {
@@ -64,20 +73,11 @@ class UINodeManager {
             }
             case "param": {
                 element.appendChild(text);
-
                 const nameInput = document.createElement("input");
                 nameInput.type = "text";
                 nameInput.className = "environment__input-number";
                 nameInput.placeholder = "name";
-
-                const ofType = this.createDivElement("of type", "centered");
-
-                const typeInput = document.createElement("input");
-                typeInput.type = "text";
-                typeInput.className = "environment__input-number";
-                typeInput.placeholder = "type";
-
-                uiNode.node.value = { name: "", type: "" };
+                uiNode.node.value = { name: "", type: signatureType };
 
                 nameInput.addEventListener("change", (e) => {
                     uiNode.node.value = {
@@ -86,29 +86,12 @@ class UINodeManager {
                     };
                 });
 
-                typeInput.addEventListener("change", (e) => {
-                    uiNode.node.value = {
-                        ...uiNode.node.value,
-                        type: e.target.value
-                    };
-                });
-
                 element.appendChild(nameInput);
-                element.appendChild(ofType);
-                element.appendChild(typeInput);
                 break;
             }
             case "type": {
                 element.appendChild(text);
-                const input = document.createElement("input");
-                input.type = "text";
-                input.className = "environment__input-number";
-                input.placeholder = "type";
-                uiNode.node.value = "";
-                input.addEventListener("change", (e) => {
-                    uiNode.node.value = e.target.value;
-                });
-                element.appendChild(input);
+                uiNode.node.value = signatureType;
                 break;
             }
             case "assign": {
@@ -121,11 +104,24 @@ class UINodeManager {
                 break;
             }
             case "call": {
-                if (label === "call") {
-                    uiNode.node.value = "generic-call";
+                const callMode = options.callMode ?? (label === "call" ? "generic" : "fixed");
+                const descriptor = callMode === "generic"
+                    ? getGenericCallDescriptor()
+                    : (options.operation
+                        ? getCallDescriptorByOperation(options.operation)
+                        : getCallDescriptorByLabel(label));
+
+                if (!descriptor) {
+                    throw new Error(`Unknown call descriptor: ${options.operation ?? label}`);
                 }
-                const parts = this.getCallTemplateParts(label);
-                const branches = this.renderHorizontalBranchTemplate(element, parts);
+
+                uiNode.setCallMetadata({
+                    mode: callMode,
+                    label: descriptor.label,
+                    operation: descriptor.operation,
+                });
+
+                const branches = this.renderHorizontalBranchTemplate(element, descriptor.templateParts);
                 uiNode.setBranches(branches);
                 break;
             }
@@ -224,17 +220,33 @@ class UINodeManager {
             }
         }
         this.activeBlocks.set(uiNode.node.id, uiNode);
-        console.log(this.activeBlocks)
         return uiNode;
     }
 
     canAttach(uiNode, parent, branchElement) {
         return parent.canAppendChild(uiNode, branchElement);
     }
-
+    
     attach(uiNode, parent, branchElement) {
         parent.appendChild(uiNode, branchElement);
         uiNode.attachTo(parent);
+        return uiNode;
+    }
+
+    attachView(uiNode, parent, branchElement) {
+        branchElement.appendChild(uiNode.element);
+        uiNode.attachTo(parent);
+        return uiNode;
+    }
+
+    adoptNode(uiNode, astNode) {
+        const previousId = uiNode.node.id;
+        uiNode.node = astNode;
+        uiNode.element.id = astNode.id;
+        if (previousId !== astNode.id) {
+            this.activeBlocks.delete(previousId);
+            this.activeBlocks.set(astNode.id, uiNode);
+        }
         return uiNode;
     }
 
@@ -283,7 +295,20 @@ class UINodeManager {
     
     removeNode(uiNode)
     {
-        this.activeBlocks.delete(uiNode.node.id)
+        const collectNodeIds = (astNode, ids) => {
+            if (!astNode) return;
+            ids.push(astNode.id);
+            for (const child of astNode.children || []) {
+                collectNodeIds(child, ids);
+            }
+        };
+
+        const idsToDelete = [];
+        collectNodeIds(uiNode.node, idsToDelete);
+        for (const id of idsToDelete) {
+            this.activeBlocks.delete(id);
+        }
+
         uiNode.remove();
     }
 
@@ -295,84 +320,12 @@ class UINodeManager {
         return div;
     }
 
-    getCallTemplateParts(label) {
-        const templates = {
-            call: ["", "call", ""],
-
-            "+": ["", "+", ""],
-            "-": ["", "-", ""],
-            "*": ["", "*", ""],
-            "/": ["", "/", ""],
-            "//": ["", "//", ""],
-            "%": ["", "%", ""],
-            "**": ["", "**", ""],
-
-            "==": ["", "==", ""],
-            "!=": ["", "!=", ""],
-            "<": ["", "<", ""],
-            ">": ["", ">", ""],
-            "<=": ["", "<=", ""],
-            ">=": ["", ">=", ""],
-            and: ["", "and", ""],
-            or: ["", "or", ""],
-
-            at: ["", "at", ""],
-            len: ["len", ""],
-            push: ["", "push", ""],
-            pop: ["pop", ""],
-            "set at": ["", "set", "at", ""],
-            "insert at": ["", "insert", "at", ""],
-            "remove at": ["", "remove at", ""],
-
-            not: ["not", ""],
-            sqrt: ["sqrt", ""],
-            abs: ["abs", ""],
-            floor: ["floor", ""],
-            ceil: ["ceil", ""],
-            round: ["round", ""],
-            trunc: ["trunc", ""],
-            sin: ["sin", ""],
-            cos: ["cos", ""],
-            tan: ["tan", ""],
-            log: ["log", ""],
-            exp: ["exp", ""],
-            sign: ["sign", ""],
-            asin: ["asin", ""],
-            acos: ["acos", ""],
-            atan: ["atan", ""],
-            log10: ["log10", ""],
-            log2: ["log2", ""],
-            atan2: ["atan2", "", ""],
-            min: ["min", "", ""],
-            max: ["max", "", ""],
-
-            strlen: ["strlen", ""],
-            upper: ["upper", ""],
-            lower: ["lower", ""],
-            trim: ["trim", ""],
-            substring: ["", "substring", "", ""],
-            split: ["", "split", ""],
-            join: ["", "join", ""],
-            startsWith: ["", "startsWith", ""],
-            endsWith: ["", "endsWith", ""],
-            replace: ["", "replace", "with", ""],
-            charAt: ["", "charAt", ""],
-
-            boolToNumber: ["bool", "&rarr; number"],
-            numberToBool: ["number", "&rarr; bool"],
-            numberToString: ["number", "&rarr; string"],
-            boolToString: ["bool", "&rarr; string"],
-            stringToNumber: ["string", "&rarr; number"],
-            stringToBool: ["string", "&rarr; bool"],
-            arrayToBool: ["array", "&rarr; bool"],
-            arrayToString: ["array", "&rarr; string"],
-            typeof: ["any", "&rarr; type"],
-
-            input: ["input"],
-            print: ["print", ""],
-        };
-
-        return templates[label] ?? ["", label, ""];
+    getNodeClassName(type, signatureType) {
+        const classes = [`environment__${type}-block`, "block"];
+        if (signatureType && (type === "param" || type === "type")) {
+            classes.splice(1, 0, `environment__${type}-${signatureType}-block`);
+        }
+        return classes.join(" ");
     }
 
     renderHorizontalBranchTemplate(element, parts) {

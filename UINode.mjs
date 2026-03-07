@@ -16,7 +16,36 @@ class UINode {
     setOperation(variable)
     {
         this.node.children[0] = variable;
+        if (this.node.token === "call" && variable?.token === "variable" && !this.isGenericCall()) {
+            this.element.dataset.callOperation = variable.value;
+        }
         return this;
+    }
+
+    setCallMetadata({ mode, label = null, operation = null } = {}) {
+        if (mode) {
+            this.element.dataset.callMode = mode;
+        } else {
+            delete this.element.dataset.callMode;
+        }
+
+        if (label) {
+            this.element.dataset.callLabel = label;
+        } else {
+            delete this.element.dataset.callLabel;
+        }
+
+        if (operation) {
+            this.element.dataset.callOperation = operation;
+        } else {
+            delete this.element.dataset.callOperation;
+        }
+
+        return this;
+    }
+
+    isGenericCall() {
+        return this.node.token === "call" && this.element.dataset.callMode === "generic";
     }
 
     canAppendChild(childUINode, branch) {
@@ -33,7 +62,7 @@ class UINode {
                 (!(this.node.children[1]) && index === 1);
             }
             case "call": {
-                if (this.node.value === "generic-call") {
+                if (this.isGenericCall()) {
                     if (index === 0) return !this.node.children[0];
                     if (index === 1) return true;
                     return false;
@@ -66,7 +95,7 @@ class UINode {
                 this.node.children.push(childUINode.node);
                 break;
             case "call":
-                if (this.node.value === "generic-call") {
+                if (this.isGenericCall()) {
                     if (index === 0) this.node.children[0] = childUINode.node;
                     else if (index === 1) this.node.children.push(childUINode.node);
                 } else {
@@ -81,7 +110,6 @@ class UINode {
                 this.node.children[index] = childUINode.node;
                 break;
         }
-        console.log(`Node added to branch with index: ${index}`);
         branch.appendChild(childUINode.element);
     }
 
@@ -102,7 +130,7 @@ class UINode {
         }
 
         const index = this.node.children.indexOf(childUINode.node);
-        if (this.node.token === "call" && this.node.value === "generic-call") {
+        if (this.node.token === "call" && this.isGenericCall()) {
             if (index === -1) return;
             if (index === 0) {
                 this.node.children[0] = undefined;
@@ -127,6 +155,7 @@ class UINode {
     detach() {
         if (this.parent) {
             this.parent.removeChild(this);
+            this.parent = null;
         }
     }
 
