@@ -285,6 +285,10 @@
                 <div class="environment__operation">charAt</div>
                 <div class="environment__branch"></div>
             </div>
+            <div class="environment__from-char-code-block block">
+                <div class="environment__operation">fromCharCode</div>
+                <div class="environment__branch"></div>
+            </div>
             </div>
             <div class="palette-group palette-group--convert">
             <div class="category" id="convert">Convert</div>
@@ -478,7 +482,9 @@
             </div>
         </section>
         <div class="environment__splitter environment__splitter--palette-editor" aria-hidden="true"></div>
-        <section class="environment__code-editor container"> </section>
+        <section class="environment__code-editor container">
+            <div class="environment__editor-surface" aria-label="Code editor workspace"></div>
+        </section>
         <div class="environment__splitter environment__splitter--editor-console" aria-hidden="true"></div>
         <section class = "environment__console container">
             <div class = "console_output"></div>

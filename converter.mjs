@@ -12,8 +12,8 @@ const PARAM_SIGNATURE_TYPES = new Set(["number", "string", "bool", "array", "fun
 const RETURN_SIGNATURE_TYPES = new Set(["number", "string", "bool", "array", "function", "any", "void"]);
 
 class Converter {
-    constructor(editorElement, manager) {
-        this.editor = editorElement;
+    constructor(surfaceElement, manager) {
+        this.editor = surfaceElement;
         this.manager = manager;
     }
 

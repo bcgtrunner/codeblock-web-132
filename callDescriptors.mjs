@@ -57,6 +57,7 @@ const SPECIALIZED_CALL_DESCRIPTORS = [
     { operation: "endsWith", label: "endsWith", templateParts: ["", "endsWith", ""] },
     { operation: "replace", label: "replace", templateParts: ["", "replace", "with", ""] },
     { operation: "charAt", label: "charAt", templateParts: ["", "charAt", ""] },
+    { operation: "fromCharCode", label: "fromCharCode", templateParts: ["fromCharCode", ""] },
 
     { operation: "boolToNumber", label: "boolToNumber", templateParts: ["bool", "&rarr; number"] },
     { operation: "numberToBool", label: "numberToBool", templateParts: ["number", "&rarr; bool"] },
