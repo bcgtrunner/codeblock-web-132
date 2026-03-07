@@ -9,18 +9,19 @@ import {
     normalizeEditorStateModule,
     serializeEditorStateModule,
 } from "./editorState.mjs";
-import { tree } from "./samples/bubbleSort.mjs";
+import { brainfuck } from "./samples/brainfuckInterpreter.mjs";
 const manager = new UINodeManager();
 
 const palette = document.querySelector(".environment__block-palette");
 const editor = document.querySelector(".environment__code-editor");
+const editorSurface = editor.querySelector(".environment__editor-surface");
 const consolePane = document.querySelector(".environment__console");
 const environment = document.querySelector(".environment");
 const toolbarPane = document.querySelector(".environment__toolbar");
 const paletteEditorSplitter = document.querySelector(".environment__splitter--palette-editor");
 const editorConsoleSplitter = document.querySelector(".environment__splitter--editor-console");
-const converter = new Converter(editor, manager);
-converter.toUINodes(tree)
+const converter = new Converter(editorSurface, manager);
+converter.toUINodes(brainfuck)
 const editorConsole = new Console();
 for (const group of palette.querySelectorAll(".palette-group")) {
     const title = group.querySelector(".category");
@@ -36,12 +37,27 @@ let lastBranch = null; // состояние текущей ветки; Это �
 let offsetX = 0;
 let offsetY = 0;
 const errorHighlights = new Set();
+const EDITOR_SURFACE_SCALE_MULTIPLIER = 10;
+const EDITOR_SURFACE_MIN_WIDTH_PX = 4000;
+const EDITOR_SURFACE_MIN_HEIGHT_PX = 3000;
+const EDITOR_SURFACE_MARGIN_PX = 0;
+const MIN_EDITOR_ZOOM = 0.35;
+const MAX_EDITOR_ZOOM = 2.5;
+const ZOOM_SENSITIVITY = 0.0015;
+const viewportState = {
+    panX: EDITOR_SURFACE_MARGIN_PX,
+    panY: EDITOR_SURFACE_MARGIN_PX,
+    scale: 1,
+    surfaceWidth: 0,
+    surfaceHeight: 0,
+};
 const MIN_WIDTH_FALLBACK = {
     palette: 220,
     editor: 320,
     console: 220,
 };
 let activeResize = null;
+let activePan = null;
 
 const numberBlock = palette.querySelector(".environment__numberLiteral-block")
 const stringBlock = palette.querySelector(".environment__stringLiteral-block")
@@ -109,6 +125,7 @@ const startsWithBlock = palette.querySelector(".environment__starts-with-block")
 const endsWithBlock = palette.querySelector(".environment__ends-with-block")
 const replaceBlock = palette.querySelector(".environment__replace-block")
 const charAtBlock = palette.querySelector(".environment__char-at-block")
+const fromCharCodeBlock = palette.querySelector(".environment__from-char-code-block")
 const inputBlock = palette.querySelector(".environment__input-block")
 const printBlock = palette.querySelector(".environment__print-block")
 const boolToNumberBlock = palette.querySelector(".environment__bool-to-number-block")
@@ -240,6 +257,7 @@ bindCallBlock(startsWithBlock, "startsWith");
 bindCallBlock(endsWithBlock, "endsWith");
 bindCallBlock(replaceBlock, "replace");
 bindCallBlock(charAtBlock, "charAt");
+bindCallBlock(fromCharCodeBlock, "fromCharCode");
 bindCallBlock(boolToNumberBlock, "boolToNumber");
 bindCallBlock(numberToBoolBlock, "numberToBool");
 bindCallBlock(numberToStringBlock, "numberToString");
@@ -313,6 +331,61 @@ function getPaneMinWidths() {
     };
 }
 
+function updateEditorSurfaceSize() {
+    viewportState.surfaceWidth = Math.max(
+        EDITOR_SURFACE_MIN_WIDTH_PX,
+        Math.ceil(editor.clientWidth * EDITOR_SURFACE_SCALE_MULTIPLIER)
+    );
+    viewportState.surfaceHeight = Math.max(
+        EDITOR_SURFACE_MIN_HEIGHT_PX,
+        Math.ceil(editor.clientHeight * EDITOR_SURFACE_SCALE_MULTIPLIER)
+    );
+    editorSurface.style.width = `${viewportState.surfaceWidth}px`;
+    editorSurface.style.height = `${viewportState.surfaceHeight}px`;
+}
+
+function clampPan(panX, panY, scale = viewportState.scale) {
+    const minPanX = editor.clientWidth - (viewportState.surfaceWidth * scale) - EDITOR_SURFACE_MARGIN_PX;
+    const minPanY = editor.clientHeight - (viewportState.surfaceHeight * scale) - EDITOR_SURFACE_MARGIN_PX;
+    return {
+        x: clamp(panX, minPanX, EDITOR_SURFACE_MARGIN_PX),
+        y: clamp(panY, minPanY, EDITOR_SURFACE_MARGIN_PX),
+    };
+}
+
+function applyViewportTransform() {
+    const clampedPan = clampPan(viewportState.panX, viewportState.panY);
+    viewportState.panX = clampedPan.x;
+    viewportState.panY = clampedPan.y;
+    editorSurface.style.transform = `translate(${viewportState.panX}px, ${viewportState.panY}px) scale(${viewportState.scale})`;
+}
+
+function getViewportPoint(clientX, clientY) {
+    const rect = editor.getBoundingClientRect();
+    return {
+        x: clientX - rect.left,
+        y: clientY - rect.top,
+    };
+}
+
+function clientToSurfacePoint(clientX, clientY) {
+    const viewportPoint = getViewportPoint(clientX, clientY);
+    return {
+        x: (viewportPoint.x - viewportState.panX) / viewportState.scale,
+        y: (viewportPoint.y - viewportState.panY) / viewportState.scale,
+    };
+}
+
+function setRootNodePosition(uiNode, left, top) {
+    uiNode.element.style.left = `${left}px`;
+    uiNode.element.style.top = `${top}px`;
+}
+
+function positionDraggedBlockAtClient(uiNode, clientX, clientY) {
+    const surfacePoint = clientToSurfacePoint(clientX, clientY);
+    setRootNodePosition(uiNode, surfacePoint.x - offsetX, surfacePoint.y - offsetY);
+}
+
 function resizeFromPaletteSplitter(clientX, fixedConsoleWidth) {
     const envRect = environment.getBoundingClientRect();
     const available = getAvailableWorkWidth();
@@ -381,9 +454,13 @@ window.addEventListener("resize", () => {
     const consoleWidth = clamp(consolePane.offsetWidth, minWidths.console, available - paletteWidth - minWidths.editor);
     const editorWidth = available - paletteWidth - consoleWidth;
     applyWidths(paletteWidth, editorWidth, consoleWidth);
+    updateEditorSurfaceSize();
+    applyViewportTransform();
 });
 
 initializePaneWidths();
+updateEditorSurfaceSize();
+applyViewportTransform();
 
 function startDragging(uiNode, e, blockElement) {
     console.log(uiNode);
@@ -391,39 +468,74 @@ function startDragging(uiNode, e, blockElement) {
     e.stopPropagation(); /* чтобы клик не дошёл до palette */
     draggingBlock = uiNode;
     const rect = blockElement.getBoundingClientRect();
-    editor.parentElement.append(uiNode.element);
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
+    editorSurface.append(uiNode.element);
+    offsetX = (e.clientX - rect.left) / viewportState.scale;
+    offsetY = (e.clientY - rect.top) / viewportState.scale;
     uiNode.element.style.position = "absolute";
-    uiNode.element.style.top  = (e.clientY - offsetY) + 'px';
-    uiNode.element.style.left = (e.clientX - offsetX) + 'px';
+    uiNode.element.classList.add("is-dragging");
+    positionDraggedBlockAtClient(uiNode, e.clientX, e.clientY);
 }
 
 function dragging(uiNode, e) {
-    uiNode.element.style.left = (e.clientX - offsetX) + 'px';
-    uiNode.element.style.top  = (e.clientY - offsetY) + 'px';
+    positionDraggedBlockAtClient(uiNode, e.clientX, e.clientY);
     const branchElement = getBranchUnderCursor(e.clientX, e.clientY);
     if (branchElement) {
         const nodeBranchParent = manager.getNode(branchElement.parentElement.id);
         if (nodeBranchParent && manager.canAttach(uiNode, nodeBranchParent, branchElement)) {
+            if (lastBranch && lastBranch !== branchElement) {
+                lastBranch.classList.remove('highlight');
+            }
             branchElement.classList.add('highlight');
             lastBranch = branchElement;
         }
     }
     else if (lastBranch) {
         lastBranch.classList.remove('highlight');
+        lastBranch = null;
     }
 }
 
 editor.addEventListener('pointerdown', (e) => {
     if (e.target.classList.contains("environment__input-number")) return;
     const blockElement = e.target.closest(".block");
-    if (!blockElement) return;
-    const uiNode = manager.getNode(blockElement.id);
-    manager.detach(uiNode);
-    startDragging(uiNode, e, blockElement);
-    console.log(manager);
+    if (blockElement) {
+        const uiNode = manager.getNode(blockElement.id);
+        manager.detach(uiNode);
+        startDragging(uiNode, e, blockElement);
+        console.log(manager);
+        return;
+    }
+
+    if (e.button !== 0 && e.button !== 1) return;
+    activePan = {
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        startPanX: viewportState.panX,
+        startPanY: viewportState.panY,
+    };
+    editor.classList.add("is-panning");
+    editor.setPointerCapture(e.pointerId);
+    e.preventDefault();
 });
+
+editor.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const viewportPoint = getViewportPoint(e.clientX, e.clientY);
+    const nextScale = clamp(
+        viewportState.scale * Math.exp(-e.deltaY * ZOOM_SENSITIVITY),
+        MIN_EDITOR_ZOOM,
+        MAX_EDITOR_ZOOM
+    );
+    if (nextScale === viewportState.scale) return;
+
+    const focusX = (viewportPoint.x - viewportState.panX) / viewportState.scale;
+    const focusY = (viewportPoint.y - viewportState.panY) / viewportState.scale;
+    viewportState.scale = nextScale;
+    viewportState.panX = viewportPoint.x - (focusX * nextScale);
+    viewportState.panY = viewportPoint.y - (focusY * nextScale);
+    applyViewportTransform();
+}, { passive: false });
 
 document.addEventListener('pointermove', (e) => {
     if (activeResize) {
@@ -432,6 +544,14 @@ document.addEventListener('pointermove', (e) => {
         } else if (activeResize.splitter === editorConsoleSplitter) {
             resizeFromConsoleSplitter(e.clientX, activeResize.fixedPaletteWidth);
         }
+        updateEditorSurfaceSize();
+        applyViewportTransform();
+        return;
+    }
+    if (activePan) {
+        viewportState.panX = activePan.startPanX + (e.clientX - activePan.startX);
+        viewportState.panY = activePan.startPanY + (e.clientY - activePan.startY);
+        applyViewportTransform();
         return;
     }
     if (!draggingBlock) return;
@@ -443,6 +563,14 @@ document.addEventListener('pointerup', (e) => {
         activeResize.splitter.releasePointerCapture(e.pointerId);
         activeResize = null;
         document.body.style.cursor = "";
+        return;
+    }
+    if (activePan) {
+        editor.classList.remove("is-panning");
+        if (editor.hasPointerCapture(e.pointerId)) {
+            editor.releasePointerCapture(e.pointerId);
+        }
+        activePan = null;
         return;
     }
     if (!draggingBlock) return;
@@ -464,19 +592,20 @@ document.addEventListener('pointerup', (e) => {
             manager.attach(draggingBlock, nodeBranchParent, branchElement);
         }
         else {
+            draggingBlock.element.classList.remove("is-dragging");
+            if (lastBranch) {
+                lastBranch.classList.remove('highlight');
+            }
+            lastBranch = null;
+            draggingBlock = null;
             return;
         }
     } else {
-        // пересчитываем координаты под editor
-        const x = e.clientX - editorRect.left - offsetX;
-        const y = e.clientY - editorRect.top  - offsetY;
-
-        editor.appendChild(draggingBlock.element);
-
-        draggingBlock.element.style.left = x + 'px';
-        draggingBlock.element.style.top  = y + 'px';
+        editorSurface.appendChild(draggingBlock.element);
+        positionDraggedBlockAtClient(draggingBlock, e.clientX, e.clientY);
     }
 
+    draggingBlock.element.classList.remove("is-dragging");
     if (lastBranch) { 
         lastBranch.classList.remove('highlight'); 
     }

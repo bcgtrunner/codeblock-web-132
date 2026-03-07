@@ -219,7 +219,7 @@ const tape = []
 for (let i = 0; i < 50; i++) {
     tape.push(0)
 }
-const brainfuck = buildTree("program", tape);
+const brainfuck = buildTree("+[->++<]>.", tape);
 
 async function runBrainfuck(program, inputNumbers = []) {
     const interpreter = new Interpreter(buildTree(program, inputNumbers));
