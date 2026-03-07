@@ -443,6 +443,7 @@ document.addEventListener('pointerup', (e) => {
         e.clientY >= editorRect.top &&
         e.clientY <= editorRect.bottom;
     if (!isInsideEditor) {
+        console.log("BLOCK DELETED!!!");
         manager.removeNode(draggingBlock)
     } else if (branchElement && branchElement.parentElement !== draggingBlock.element) {
         const nodeBranchParent = manager.getNode(branchElement.parentElement.id);
