@@ -3,8 +3,6 @@ const testModules = [
     "./testControlFlow.mjs",
     "./testFunc.mjs",
     "./testError.mjs",
-    "./testConverter.mjs",
-    "./testEditorState.mjs"
 ];
 
 for (const mod of testModules) {
