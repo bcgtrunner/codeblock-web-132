@@ -6,12 +6,16 @@ class UINodeManager {
         this.activeBlocks = new Map(); 
     }
     
-    spawnNode(type, label) {
+    spawnNode(type, label, options = {}) {
         const value = null;
         const element = document.createElement("div");
         const uiNode = new UINode(type, element);
-        element.className = `environment__${type}-block block`
+        const signatureType = options.signatureType ?? null;
+        element.className = this.getNodeClassName(type, signatureType);
         element.id = uiNode.node.id;
+        if (signatureType) {
+            element.dataset.signatureType = signatureType;
+        }
         element.style.position = 'absolute'; 
         const text = this.createDivElement(label, "environment__operation")
         switch (type) {
@@ -64,20 +68,11 @@ class UINodeManager {
             }
             case "param": {
                 element.appendChild(text);
-
                 const nameInput = document.createElement("input");
                 nameInput.type = "text";
                 nameInput.className = "environment__input-number";
                 nameInput.placeholder = "name";
-
-                const ofType = this.createDivElement("of type", "centered");
-
-                const typeInput = document.createElement("input");
-                typeInput.type = "text";
-                typeInput.className = "environment__input-number";
-                typeInput.placeholder = "type";
-
-                uiNode.node.value = { name: "", type: "" };
+                uiNode.node.value = { name: "", type: signatureType };
 
                 nameInput.addEventListener("change", (e) => {
                     uiNode.node.value = {
@@ -86,29 +81,12 @@ class UINodeManager {
                     };
                 });
 
-                typeInput.addEventListener("change", (e) => {
-                    uiNode.node.value = {
-                        ...uiNode.node.value,
-                        type: e.target.value
-                    };
-                });
-
                 element.appendChild(nameInput);
-                element.appendChild(ofType);
-                element.appendChild(typeInput);
                 break;
             }
             case "type": {
                 element.appendChild(text);
-                const input = document.createElement("input");
-                input.type = "text";
-                input.className = "environment__input-number";
-                input.placeholder = "type";
-                uiNode.node.value = "";
-                input.addEventListener("change", (e) => {
-                    uiNode.node.value = e.target.value;
-                });
-                element.appendChild(input);
+                uiNode.node.value = signatureType;
                 break;
             }
             case "assign": {
@@ -306,6 +284,14 @@ class UINodeManager {
         div.innerHTML = label;
         div.className = className;
         return div;
+    }
+
+    getNodeClassName(type, signatureType) {
+        const classes = [`environment__${type}-block`, "block"];
+        if (signatureType && (type === "param" || type === "type")) {
+            classes.splice(1, 0, `environment__${type}-${signatureType}-block`);
+        }
+        return classes.join(" ");
     }
 
     getCallTemplateParts(label) {

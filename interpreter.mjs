@@ -616,4 +616,4 @@ class Interpreter {
     }
 }
 
-export { ASTNode, Interpreter, EvalError };
+export { ASTNode, Interpreter, EvalError, Var };
