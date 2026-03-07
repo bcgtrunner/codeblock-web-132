@@ -114,8 +114,8 @@ const arrayToBoolBlock = palette.querySelector(".environment__array-to-bool-bloc
 const arrayToStringBlock = palette.querySelector(".environment__array-to-string-block")
 const typeofBlock = palette.querySelector(".environment__typeof-block")
 const functionBlock = palette.querySelector(".environment__function-block")
-const paramBlock = palette.querySelector(".environment__param-block")
-const typeBlock = palette.querySelector(".environment__type-block")
+const paramBlocks = palette.querySelectorAll('[data-signature-node="param"]')
+const typeBlocks = palette.querySelectorAll('[data-signature-node="type"]')
 
 function bindCallBlock(blockElement, operation, label = operation) {
     if (!blockElement) return;
@@ -242,14 +242,20 @@ functionBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("function", "function");
     startDragging(uiNode, e, e.target);
 });
-paramBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("param", "param");
-    startDragging(uiNode, e, e.target);
-});
-typeBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("type", "type");
-    startDragging(uiNode, e, e.target);
-});
+for (const blockElement of paramBlocks) {
+    blockElement.addEventListener('pointerdown', (e) => {
+        const signatureType = blockElement.dataset.signatureType;
+        const uiNode = manager.spawnNode("param", signatureType, { signatureType });
+        startDragging(uiNode, e, e.target);
+    });
+}
+for (const blockElement of typeBlocks) {
+    blockElement.addEventListener('pointerdown', (e) => {
+        const signatureType = blockElement.dataset.signatureType;
+        const uiNode = manager.spawnNode("type", `type ${signatureType}`, { signatureType });
+        startDragging(uiNode, e, e.target);
+    });
+}
 
 function setPaneWidth(pane, widthPx) {
     pane.style.flex = `0 0 ${widthPx}px`;
