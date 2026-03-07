@@ -1,4 +1,11 @@
-import { clearEditorBlocks, getRootBlocks, runDebugMode, runEditorBlocks } from "./script.mjs";
+import {
+    clearEditorBlocks,
+    getRootBlocks,
+    promptLoadEditorStateFile,
+    runDebugMode,
+    runEditorBlocks,
+    saveEditorStateToFile,
+} from "./script.mjs";
 
 class Console {
     constructor() {
@@ -52,7 +59,7 @@ class Console {
         if (command === '') return;
 
         if (command === 'help') {
-            this.log("Available commands: run, reset, clear, debug, help. Use [command] -help for details.");
+            this.log("Available commands: run, reset, clear, debug, save, load, help. Use [command] -help for details.");
         }
         else if (command === 'clear' && (flags[0] === '-h' || flags[0] === '-help')) {
             this.log("Usage: clear - clears the console screen.");
@@ -96,6 +103,20 @@ class Console {
             } finally {
                 this.input.addEventListener("keydown", this.inputKeyPress);
             }
+        }
+        else if (command === 'save' && (flags[0] === '-h' || flags[0] === '-help')) {
+            this.log("Usage: save - downloads the current editor state as a JavaScript module file.");
+        }
+        else if (command === 'save') {
+            const result = saveEditorStateToFile();
+            this.log(`Command: '${command}' executed (${result.count} root block(s))`);
+        }
+        else if (command === 'load' && (flags[0] === '-h' || flags[0] === '-help')) {
+            this.log("Usage: load - opens a file picker and loads a saved JavaScript state module into the editor.");
+        }
+        else if (command === 'load') {
+            promptLoadEditorStateFile();
+            this.log('<span class="console_msg--debug">Choose a saved state file to load.</span>');
         }
         else {
             this.log(`Command: '${command}' is unrecognised. See 'help'.`);

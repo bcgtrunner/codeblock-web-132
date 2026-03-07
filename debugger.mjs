@@ -40,15 +40,7 @@ class Debugger {
                 });
                 return;
             }
-
-            // await new Promise(resolve => {
-            //     console.log("⏸ Debug pause. Click OK to continue.");
-            //     setTimeout(() => {
-            //         alert("Debugger paused. Press OK to continue.");
-            //         resolve();
-            //     }, 0);
-            // });
-            }
+        }
     }
 
     printStack() {
