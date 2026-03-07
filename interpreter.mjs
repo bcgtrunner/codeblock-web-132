@@ -315,6 +315,15 @@ class Interpreter {
             }
         ));
 
+        this.stack.set("fromCharCode", makeBuiltin(
+            ["number"],
+            "string",
+            (code) => {
+                if (code.value < 0) throw new Error(`Character cide ${i.value} out of bounds`);
+                return new Var("string", String.fromCharCode(code.value));
+            }
+        ));
+
         this.stack.set("boolToNumber", makeBuiltin(["bool"], "number", (b) =>
             new Var("number", b.value ? 1 : 0)
         ));
@@ -616,4 +625,4 @@ class Interpreter {
     }
 }
 
-export { ASTNode, Interpreter, EvalError };
+export { ASTNode, Interpreter, EvalError, Var };

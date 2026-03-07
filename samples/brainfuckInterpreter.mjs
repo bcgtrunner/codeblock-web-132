@@ -1,4 +1,4 @@
-import { ASTNode, Interpreter } from "./interpreter.mjs";
+import { ASTNode, Interpreter } from "../interpreter.mjs";
 
 const V = (name) => new ASTNode("variable", name);
 const Num = (n) => new ASTNode("number", n);
@@ -215,10 +215,16 @@ function buildTree(program, inputNumbers = []) {
     ]);
 }
 
+const tape = []
+for (let i = 0; i < 50; i++) {
+    tape.push(0)
+}
+const brainfuck = buildTree("+[->++<]>.", tape);
+
 async function runBrainfuck(program, inputNumbers = []) {
     const interpreter = new Interpreter(buildTree(program, inputNumbers));
     const outputVar = await interpreter.run();
     return outputVar.value.map((v) => v.value);
 }
 
-export { runBrainfuck };
+export { runBrainfuck, brainfuck };

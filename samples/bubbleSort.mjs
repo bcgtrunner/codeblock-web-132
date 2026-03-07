@@ -1,4 +1,4 @@
-import { ASTNode, Interpreter } from "./interpreter.mjs";
+import { ASTNode, Interpreter } from "../interpreter.mjs";
 
 const V = (name) => new ASTNode("variable", name);
 const N = (n) => new ASTNode("number", n);
@@ -8,7 +8,7 @@ const Block = (nodes) => new ASTNode("block", null, nodes);
 const Ret = (node) => new ASTNode("return", null, [node]);
 const For = (init, cond, step, body) => new ASTNode("for", null, [init, cond, step, body]);
 
-const tree = Block([
+export const tree = Block([
   Assign("bubbleSort", new ASTNode("function", null, [
     new ASTNode("block", null, [
       new ASTNode("param", { type: "array", name: "arr" })
