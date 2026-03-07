@@ -1,8 +1,15 @@
 import { ASTNode, Interpreter } from "./interpreter.mjs";
 import { UINodeManager } from "./UINodeManager.mjs";
+import { Converter } from "./converter.mjs";
 import { Debugger } from "./debugger.mjs";
 import { Console } from "./console.mjs";
-import { Converter } from "./converter.mjs";
+import { getCallDescriptorByOperation } from "./callDescriptors.mjs";
+import {
+    createEditorStateSnapshot,
+    normalizeEditorStateModule,
+    serializeEditorStateModule,
+} from "./editorState.mjs";
+import { tree } from "./samples/bubbleSort.mjs";
 const manager = new UINodeManager();
 
 const palette = document.querySelector(".environment__block-palette");
@@ -12,6 +19,8 @@ const environment = document.querySelector(".environment");
 const toolbarPane = document.querySelector(".environment__toolbar");
 const paletteEditorSplitter = document.querySelector(".environment__splitter--palette-editor");
 const editorConsoleSplitter = document.querySelector(".environment__splitter--editor-console");
+const converter = new Converter(editor, manager);
+converter.toUINodes(tree)
 const editorConsole = new Console();
 for (const group of palette.querySelectorAll(".palette-group")) {
     const title = group.querySelector(".category");
@@ -21,8 +30,6 @@ for (const group of palette.querySelectorAll(".palette-group")) {
         group.classList.toggle("is-collapsed");
     });
 }
-const converter = new Converter(editor, manager);
-converter.toUINodes(new ASTNode("return", null, [new ASTNode("return", null, [new ASTNode("return", null, [new ASTNode("number", 3)])])]));
 editorConsole.log('<span class="console_msg--debug">HELLO, WORLD!</span>')
 let draggingBlock = null; // какой блок сейчас тащим
 let lastBranch = null; // состояние текущей ветки; Это память о прошлой ветке, над которой был курсор.
@@ -117,10 +124,16 @@ const functionBlock = palette.querySelector(".environment__function-block")
 const paramBlocks = palette.querySelectorAll('[data-signature-node="param"]')
 const typeBlocks = palette.querySelectorAll('[data-signature-node="type"]')
 
-function bindCallBlock(blockElement, operation, label = operation) {
+function bindCallBlock(blockElement, operation) {
     if (!blockElement) return;
+    const descriptor = getCallDescriptorByOperation(operation);
+    if (!descriptor) {
+        throw new Error(`Unknown call descriptor for operation: ${operation}`);
+    }
     blockElement.addEventListener('pointerdown', (e) => {
-        const uiNode = manager.spawnNode("call", label).setOperation(new ASTNode("variable", operation));
+        const uiNode = manager
+            .spawnNode("call", descriptor.label, { operation: descriptor.operation })
+            .setOperation(new ASTNode("variable", descriptor.operation));
         startDragging(uiNode, e, e.target);
     });
 }
@@ -209,10 +222,10 @@ returnBlock.addEventListener('pointerdown', (e) => {
     startDragging(uiNode, e, e.target);
 });
 bindCallBlock(lessBlock, "<");
-bindCallBlock(removeAtBlock, "erase_at", "remove at");
-bindCallBlock(insertAtBlock, "insert_at", "insert at");
+bindCallBlock(removeAtBlock, "erase_at");
+bindCallBlock(insertAtBlock, "insert_at");
 bindCallBlock(atBlock, "at");
-bindCallBlock(setAtBlock, "set_at", "set at");
+bindCallBlock(setAtBlock, "set_at");
 bindCallBlock(lenBlock, "len");
 bindCallBlock(pushBlock, "push");
 bindCallBlock(popBlock, "pop");
@@ -508,6 +521,95 @@ export function getRootBlocks() {
     return [...manager.activeBlocks.values()].filter(uiNode => !uiNode.parent);
 }
 
+function createStateFilename() {
+    const now = new Date();
+    const date = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, "0"),
+        String(now.getDate()).padStart(2, "0"),
+    ].join("");
+    const time = [
+        String(now.getHours()).padStart(2, "0"),
+        String(now.getMinutes()).padStart(2, "0"),
+        String(now.getSeconds()).padStart(2, "0"),
+    ].join("");
+    return `editor-state-${date}-${time}.mjs`;
+}
+
+function downloadTextFile(filename, source, mimeType = "text/javascript") {
+    const blob = new Blob([source], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+async function importStateModuleFromFile(file) {
+    if (!file || typeof file.text !== "function") {
+        throw new Error("Please choose a JavaScript state file.");
+    }
+
+    const source = await file.text();
+    const moduleBlob = new Blob([source], { type: "text/javascript" });
+    const moduleUrl = URL.createObjectURL(moduleBlob);
+
+    try {
+        return await import(moduleUrl);
+    } finally {
+        setTimeout(() => URL.revokeObjectURL(moduleUrl), 0);
+    }
+}
+
+export function saveEditorStateToFile() {
+    const roots = getRootBlocks();
+    const state = createEditorStateSnapshot(roots, manager);
+    const filename = createStateFilename();
+    const moduleSource = serializeEditorStateModule(state);
+
+    downloadTextFile(filename, moduleSource);
+    editorConsole.log(
+        `<span class="console_msg--debug">Saved ${roots.length} root block(s) to ${filename}</span>`
+    );
+
+    return { filename, count: roots.length };
+}
+
+export function loadEditorStateModule(moduleNamespace) {
+    const state = normalizeEditorStateModule(moduleNamespace);
+    clearEditorBlocks();
+
+    for (const root of state.roots) {
+        converter.toUINodes(root.tree, {
+            allowPartial: true,
+            position: root.position,
+        });
+    }
+
+    editorConsole.log(
+        `<span class="console_msg--debug">Loaded ${state.roots.length} root block(s)</span>`
+    );
+
+    return state;
+}
+
+export async function loadEditorStateFromFile(file) {
+    const moduleNamespace = await importStateModuleFromFile(file);
+    return loadEditorStateModule(moduleNamespace);
+}
+
+export function promptLoadEditorStateFile() {
+    if (!loadFileInput) {
+        throw new Error("Load file input is not available.");
+    }
+
+    loadFileInput.value = "";
+    loadFileInput.click();
+}
+
 export async function runEditorBlocks() {
     clearErrorHighlights();
     const roots = [...manager.activeBlocks.values()]
@@ -531,8 +633,7 @@ export async function runEditorBlocks() {
 }
 
 export function clearEditorBlocks() {
-    const roots = [...manager.activeBlocks.values()]
-        .filter(uiNode => !uiNode.parent);
+    clearErrorHighlights();
     for (const uiNode of manager.activeBlocks.values()) {
         uiNode.remove();
     }
@@ -590,6 +691,9 @@ const playButton = document.querySelector(".environment__run");
 const debugButton = document.querySelector(".environment__debug");
 const resetButton = document.querySelector(".environment__reset");
 const clearButton = document.querySelector(".environment__clear");
+const saveButton = document.querySelector(".environment__save");
+const loadButton = document.querySelector(".environment__load");
+const loadFileInput = document.querySelector(".environment__load-file");
 
 async function executeConsoleCommand(command) {
     editorConsole.input.value = command;
@@ -610,4 +714,28 @@ resetButton?.addEventListener("click", async () => {
 
 clearButton?.addEventListener("click", async () => {
     await executeConsoleCommand("clear");
+});
+
+saveButton?.addEventListener("click", async () => {
+    await executeConsoleCommand("save");
+});
+
+loadButton?.addEventListener("click", async () => {
+    await executeConsoleCommand("load");
+});
+
+loadFileInput?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+        return;
+    }
+
+    try {
+        await loadEditorStateFromFile(file);
+    } catch (error) {
+        console.error(error);
+        editorConsole.log(`<span class="console_msg--error">Load error: ${error.message}</span>`);
+    } finally {
+        event.target.value = "";
+    }
 });

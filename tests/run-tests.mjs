@@ -2,7 +2,9 @@ const testModules = [
     "./testBuiltins.mjs",
     "./testControlFlow.mjs",
     "./testFunc.mjs",
-    "./testError.mjs"
+    "./testError.mjs",
+    "./testConverter.mjs",
+    "./testEditorState.mjs"
 ];
 
 for (const mod of testModules) {
