@@ -14,7 +14,6 @@ class Converter
         for (let i = 0; i < node.children.length; i++) {
             const childNode = node.children[i];
             const newChild = this.toUINodes(childNode);
-            uiNode.node.children.push(newChild.node);
             this.manager.attach(newChild, uiNode, uiNode.branches[i])
         }
         console.log(uiNode)
@@ -93,6 +92,13 @@ class Converter
 
             default:
                 throw new EvalError(`Unknown AST node token: ${node.token}`);
+        }
+        const previousId = uiNode.node.id;
+        uiNode.node = node;
+        uiNode.element.id = node.id;
+        if (previousId !== node.id) {
+            manager.activeBlocks.delete(previousId);
+            manager.activeBlocks.set(node.id, uiNode);
         }
         this.editor.append(uiNode.element);
         uiNode.element.style.position = "absolute";

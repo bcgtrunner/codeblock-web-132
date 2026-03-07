@@ -283,8 +283,20 @@ class UINodeManager {
     
     removeNode(uiNode)
     {
-        this.activeBlocks.delete(uiNode.node.id)
-        
+        const collectNodeIds = (astNode, ids) => {
+            if (!astNode) return;
+            ids.push(astNode.id);
+            for (const child of astNode.children || []) {
+                collectNodeIds(child, ids);
+            }
+        };
+
+        const idsToDelete = [];
+        collectNodeIds(uiNode.node, idsToDelete);
+        for (const id of idsToDelete) {
+            this.activeBlocks.delete(id);
+        }
+
         uiNode.remove();
     }
 
