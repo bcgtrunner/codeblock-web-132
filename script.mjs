@@ -1,16 +1,27 @@
-import { ASTNode, Interpreter } from "./interpreter.mjs";
+import { ASTNode, Interpreter, Var } from "./interpreter.mjs";
 import { UINodeManager } from "./UINodeManager.mjs";
+import { Converter } from "./converter.mjs";
 import { Debugger } from "./debugger.mjs";
 import { Console } from "./console.mjs";
+import { getCallDescriptorByOperation } from "./callDescriptors.mjs";
+import {
+    createEditorStateSnapshot,
+    normalizeEditorStateModule,
+    serializeEditorStateModule,
+} from "./editorState.mjs";
+import { brainfuck } from "./samples/brainfuckInterpreter.mjs";
 const manager = new UINodeManager();
 
 const palette = document.querySelector(".environment__block-palette");
 const editor = document.querySelector(".environment__code-editor");
+const editorSurface = editor.querySelector(".environment__editor-surface");
 const consolePane = document.querySelector(".environment__console");
 const environment = document.querySelector(".environment");
 const toolbarPane = document.querySelector(".environment__toolbar");
 const paletteEditorSplitter = document.querySelector(".environment__splitter--palette-editor");
 const editorConsoleSplitter = document.querySelector(".environment__splitter--editor-console");
+const converter = new Converter(editorSurface, manager);
+converter.toUINodes(brainfuck)
 const editorConsole = new Console();
 for (const group of palette.querySelectorAll(".palette-group")) {
     const title = group.querySelector(".category");
@@ -26,12 +37,27 @@ let lastBranch = null; // состояние текущей ветки; Это �
 let offsetX = 0;
 let offsetY = 0;
 const errorHighlights = new Set();
+const EDITOR_SURFACE_SCALE_MULTIPLIER = 10;
+const EDITOR_SURFACE_MIN_WIDTH_PX = 4000;
+const EDITOR_SURFACE_MIN_HEIGHT_PX = 3000;
+const EDITOR_SURFACE_MARGIN_PX = 0;
+const MIN_EDITOR_ZOOM = 0.35;
+const MAX_EDITOR_ZOOM = 2.5;
+const ZOOM_SENSITIVITY = 0.0015;
+const viewportState = {
+    panX: EDITOR_SURFACE_MARGIN_PX,
+    panY: EDITOR_SURFACE_MARGIN_PX,
+    scale: 1,
+    surfaceWidth: 0,
+    surfaceHeight: 0,
+};
 const MIN_WIDTH_FALLBACK = {
     palette: 220,
     editor: 320,
     console: 220,
 };
 let activeResize = null;
+let activePan = null;
 
 const numberBlock = palette.querySelector(".environment__numberLiteral-block")
 const stringBlock = palette.querySelector(".environment__stringLiteral-block")
@@ -99,6 +125,7 @@ const startsWithBlock = palette.querySelector(".environment__starts-with-block")
 const endsWithBlock = palette.querySelector(".environment__ends-with-block")
 const replaceBlock = palette.querySelector(".environment__replace-block")
 const charAtBlock = palette.querySelector(".environment__char-at-block")
+const fromCharCodeBlock = palette.querySelector(".environment__from-char-code-block")
 const inputBlock = palette.querySelector(".environment__input-block")
 const printBlock = palette.querySelector(".environment__print-block")
 const boolToNumberBlock = palette.querySelector(".environment__bool-to-number-block")
@@ -111,13 +138,19 @@ const arrayToBoolBlock = palette.querySelector(".environment__array-to-bool-bloc
 const arrayToStringBlock = palette.querySelector(".environment__array-to-string-block")
 const typeofBlock = palette.querySelector(".environment__typeof-block")
 const functionBlock = palette.querySelector(".environment__function-block")
-const paramBlock = palette.querySelector(".environment__param-block")
-const typeBlock = palette.querySelector(".environment__type-block")
+const paramBlocks = palette.querySelectorAll('[data-signature-node="param"]')
+const typeBlocks = palette.querySelectorAll('[data-signature-node="type"]')
 
-function bindCallBlock(blockElement, operation, label = operation) {
+function bindCallBlock(blockElement, operation) {
     if (!blockElement) return;
+    const descriptor = getCallDescriptorByOperation(operation);
+    if (!descriptor) {
+        throw new Error(`Unknown call descriptor for operation: ${operation}`);
+    }
     blockElement.addEventListener('pointerdown', (e) => {
-        const uiNode = manager.spawnNode("call", label).setOperation(new ASTNode("variable", operation));
+        const uiNode = manager
+            .spawnNode("call", descriptor.label, { operation: descriptor.operation })
+            .setOperation(new ASTNode("variable", descriptor.operation));
         startDragging(uiNode, e, e.target);
     });
 }
@@ -206,10 +239,10 @@ returnBlock.addEventListener('pointerdown', (e) => {
     startDragging(uiNode, e, e.target);
 });
 bindCallBlock(lessBlock, "<");
-bindCallBlock(removeAtBlock, "erase_at", "remove at");
-bindCallBlock(insertAtBlock, "insert_at", "insert at");
+bindCallBlock(removeAtBlock, "erase_at");
+bindCallBlock(insertAtBlock, "insert_at");
 bindCallBlock(atBlock, "at");
-bindCallBlock(setAtBlock, "set_at", "set at");
+bindCallBlock(setAtBlock, "set_at");
 bindCallBlock(lenBlock, "len");
 bindCallBlock(pushBlock, "push");
 bindCallBlock(popBlock, "pop");
@@ -224,6 +257,7 @@ bindCallBlock(startsWithBlock, "startsWith");
 bindCallBlock(endsWithBlock, "endsWith");
 bindCallBlock(replaceBlock, "replace");
 bindCallBlock(charAtBlock, "charAt");
+bindCallBlock(fromCharCodeBlock, "fromCharCode");
 bindCallBlock(boolToNumberBlock, "boolToNumber");
 bindCallBlock(numberToBoolBlock, "numberToBool");
 bindCallBlock(numberToStringBlock, "numberToString");
@@ -239,14 +273,20 @@ functionBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("function", "function");
     startDragging(uiNode, e, e.target);
 });
-paramBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("param", "param");
-    startDragging(uiNode, e, e.target);
-});
-typeBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("type", "type");
-    startDragging(uiNode, e, e.target);
-});
+for (const blockElement of paramBlocks) {
+    blockElement.addEventListener('pointerdown', (e) => {
+        const signatureType = blockElement.dataset.signatureType;
+        const uiNode = manager.spawnNode("param", signatureType, { signatureType });
+        startDragging(uiNode, e, e.target);
+    });
+}
+for (const blockElement of typeBlocks) {
+    blockElement.addEventListener('pointerdown', (e) => {
+        const signatureType = blockElement.dataset.signatureType;
+        const uiNode = manager.spawnNode("type", `type ${signatureType}`, { signatureType });
+        startDragging(uiNode, e, e.target);
+    });
+}
 
 function setPaneWidth(pane, widthPx) {
     pane.style.flex = `0 0 ${widthPx}px`;
@@ -289,6 +329,61 @@ function getPaneMinWidths() {
         editor: getCssMinWidthPx(editor, MIN_WIDTH_FALLBACK.editor),
         console: getCssMinWidthPx(consolePane, MIN_WIDTH_FALLBACK.console),
     };
+}
+
+function updateEditorSurfaceSize() {
+    viewportState.surfaceWidth = Math.max(
+        EDITOR_SURFACE_MIN_WIDTH_PX,
+        Math.ceil(editor.clientWidth * EDITOR_SURFACE_SCALE_MULTIPLIER)
+    );
+    viewportState.surfaceHeight = Math.max(
+        EDITOR_SURFACE_MIN_HEIGHT_PX,
+        Math.ceil(editor.clientHeight * EDITOR_SURFACE_SCALE_MULTIPLIER)
+    );
+    editorSurface.style.width = `${viewportState.surfaceWidth}px`;
+    editorSurface.style.height = `${viewportState.surfaceHeight}px`;
+}
+
+function clampPan(panX, panY, scale = viewportState.scale) {
+    const minPanX = editor.clientWidth - (viewportState.surfaceWidth * scale) - EDITOR_SURFACE_MARGIN_PX;
+    const minPanY = editor.clientHeight - (viewportState.surfaceHeight * scale) - EDITOR_SURFACE_MARGIN_PX;
+    return {
+        x: clamp(panX, minPanX, EDITOR_SURFACE_MARGIN_PX),
+        y: clamp(panY, minPanY, EDITOR_SURFACE_MARGIN_PX),
+    };
+}
+
+function applyViewportTransform() {
+    const clampedPan = clampPan(viewportState.panX, viewportState.panY);
+    viewportState.panX = clampedPan.x;
+    viewportState.panY = clampedPan.y;
+    editorSurface.style.transform = `translate(${viewportState.panX}px, ${viewportState.panY}px) scale(${viewportState.scale})`;
+}
+
+function getViewportPoint(clientX, clientY) {
+    const rect = editor.getBoundingClientRect();
+    return {
+        x: clientX - rect.left,
+        y: clientY - rect.top,
+    };
+}
+
+function clientToSurfacePoint(clientX, clientY) {
+    const viewportPoint = getViewportPoint(clientX, clientY);
+    return {
+        x: (viewportPoint.x - viewportState.panX) / viewportState.scale,
+        y: (viewportPoint.y - viewportState.panY) / viewportState.scale,
+    };
+}
+
+function setRootNodePosition(uiNode, left, top) {
+    uiNode.element.style.left = `${left}px`;
+    uiNode.element.style.top = `${top}px`;
+}
+
+function positionDraggedBlockAtClient(uiNode, clientX, clientY) {
+    const surfacePoint = clientToSurfacePoint(clientX, clientY);
+    setRootNodePosition(uiNode, surfacePoint.x - offsetX, surfacePoint.y - offsetY);
 }
 
 function resizeFromPaletteSplitter(clientX, fixedConsoleWidth) {
@@ -359,9 +454,13 @@ window.addEventListener("resize", () => {
     const consoleWidth = clamp(consolePane.offsetWidth, minWidths.console, available - paletteWidth - minWidths.editor);
     const editorWidth = available - paletteWidth - consoleWidth;
     applyWidths(paletteWidth, editorWidth, consoleWidth);
+    updateEditorSurfaceSize();
+    applyViewportTransform();
 });
 
 initializePaneWidths();
+updateEditorSurfaceSize();
+applyViewportTransform();
 
 function startDragging(uiNode, e, blockElement) {
     console.log(uiNode);
@@ -369,39 +468,74 @@ function startDragging(uiNode, e, blockElement) {
     e.stopPropagation(); /* чтобы клик не дошёл до palette */
     draggingBlock = uiNode;
     const rect = blockElement.getBoundingClientRect();
-    editor.parentElement.append(uiNode.element);
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
+    editorSurface.append(uiNode.element);
+    offsetX = (e.clientX - rect.left) / viewportState.scale;
+    offsetY = (e.clientY - rect.top) / viewportState.scale;
     uiNode.element.style.position = "absolute";
-    uiNode.element.style.top  = (e.clientY - offsetY) + 'px';
-    uiNode.element.style.left = (e.clientX - offsetX) + 'px';
+    uiNode.element.classList.add("is-dragging");
+    positionDraggedBlockAtClient(uiNode, e.clientX, e.clientY);
 }
 
 function dragging(uiNode, e) {
-    uiNode.element.style.left = (e.clientX - offsetX) + 'px';
-    uiNode.element.style.top  = (e.clientY - offsetY) + 'px';
+    positionDraggedBlockAtClient(uiNode, e.clientX, e.clientY);
     const branchElement = getBranchUnderCursor(e.clientX, e.clientY);
     if (branchElement) {
         const nodeBranchParent = manager.getNode(branchElement.parentElement.id);
         if (nodeBranchParent && manager.canAttach(uiNode, nodeBranchParent, branchElement)) {
+            if (lastBranch && lastBranch !== branchElement) {
+                lastBranch.classList.remove('highlight');
+            }
             branchElement.classList.add('highlight');
             lastBranch = branchElement;
         }
     }
     else if (lastBranch) {
         lastBranch.classList.remove('highlight');
+        lastBranch = null;
     }
 }
 
 editor.addEventListener('pointerdown', (e) => {
     if (e.target.classList.contains("environment__input-number")) return;
     const blockElement = e.target.closest(".block");
-    if (!blockElement) return;
-    const uiNode = manager.getNode(blockElement.id);
-    manager.detach(uiNode);
-    startDragging(uiNode, e, blockElement);
-    console.log(manager);
+    if (blockElement) {
+        const uiNode = manager.getNode(blockElement.id);
+        manager.detach(uiNode);
+        startDragging(uiNode, e, blockElement);
+        console.log(manager);
+        return;
+    }
+
+    if (e.button !== 0 && e.button !== 1) return;
+    activePan = {
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        startPanX: viewportState.panX,
+        startPanY: viewportState.panY,
+    };
+    editor.classList.add("is-panning");
+    editor.setPointerCapture(e.pointerId);
+    e.preventDefault();
 });
+
+editor.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const viewportPoint = getViewportPoint(e.clientX, e.clientY);
+    const nextScale = clamp(
+        viewportState.scale * Math.exp(-e.deltaY * ZOOM_SENSITIVITY),
+        MIN_EDITOR_ZOOM,
+        MAX_EDITOR_ZOOM
+    );
+    if (nextScale === viewportState.scale) return;
+
+    const focusX = (viewportPoint.x - viewportState.panX) / viewportState.scale;
+    const focusY = (viewportPoint.y - viewportState.panY) / viewportState.scale;
+    viewportState.scale = nextScale;
+    viewportState.panX = viewportPoint.x - (focusX * nextScale);
+    viewportState.panY = viewportPoint.y - (focusY * nextScale);
+    applyViewportTransform();
+}, { passive: false });
 
 document.addEventListener('pointermove', (e) => {
     if (activeResize) {
@@ -410,6 +544,14 @@ document.addEventListener('pointermove', (e) => {
         } else if (activeResize.splitter === editorConsoleSplitter) {
             resizeFromConsoleSplitter(e.clientX, activeResize.fixedPaletteWidth);
         }
+        updateEditorSurfaceSize();
+        applyViewportTransform();
+        return;
+    }
+    if (activePan) {
+        viewportState.panX = activePan.startPanX + (e.clientX - activePan.startX);
+        viewportState.panY = activePan.startPanY + (e.clientY - activePan.startY);
+        applyViewportTransform();
         return;
     }
     if (!draggingBlock) return;
@@ -423,6 +565,14 @@ document.addEventListener('pointerup', (e) => {
         document.body.style.cursor = "";
         return;
     }
+    if (activePan) {
+        editor.classList.remove("is-panning");
+        if (editor.hasPointerCapture(e.pointerId)) {
+            editor.releasePointerCapture(e.pointerId);
+        }
+        activePan = null;
+        return;
+    }
     if (!draggingBlock) return;
 
     const branchElement = getBranchUnderCursor(e.clientX, e.clientY);
@@ -434,6 +584,7 @@ document.addEventListener('pointerup', (e) => {
         e.clientY >= editorRect.top &&
         e.clientY <= editorRect.bottom;
     if (!isInsideEditor) {
+        console.log("BLOCK DELETED!!!");
         manager.removeNode(draggingBlock)
     } else if (branchElement && branchElement.parentElement !== draggingBlock.element) {
         const nodeBranchParent = manager.getNode(branchElement.parentElement.id);
@@ -441,19 +592,20 @@ document.addEventListener('pointerup', (e) => {
             manager.attach(draggingBlock, nodeBranchParent, branchElement);
         }
         else {
+            draggingBlock.element.classList.remove("is-dragging");
+            if (lastBranch) {
+                lastBranch.classList.remove('highlight');
+            }
+            lastBranch = null;
+            draggingBlock = null;
             return;
         }
     } else {
-        // пересчитываем координаты под editor
-        const x = e.clientX - editorRect.left - offsetX;
-        const y = e.clientY - editorRect.top  - offsetY;
-
-        editor.appendChild(draggingBlock.element);
-
-        draggingBlock.element.style.left = x + 'px';
-        draggingBlock.element.style.top  = y + 'px';
+        editorSurface.appendChild(draggingBlock.element);
+        positionDraggedBlockAtClient(draggingBlock, e.clientX, e.clientY);
     }
 
+    draggingBlock.element.classList.remove("is-dragging");
     if (lastBranch) { 
         lastBranch.classList.remove('highlight'); 
     }
@@ -498,6 +650,95 @@ export function getRootBlocks() {
     return [...manager.activeBlocks.values()].filter(uiNode => !uiNode.parent);
 }
 
+function createStateFilename() {
+    const now = new Date();
+    const date = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, "0"),
+        String(now.getDate()).padStart(2, "0"),
+    ].join("");
+    const time = [
+        String(now.getHours()).padStart(2, "0"),
+        String(now.getMinutes()).padStart(2, "0"),
+        String(now.getSeconds()).padStart(2, "0"),
+    ].join("");
+    return `editor-state-${date}-${time}.mjs`;
+}
+
+function downloadTextFile(filename, source, mimeType = "text/javascript") {
+    const blob = new Blob([source], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+async function importStateModuleFromFile(file) {
+    if (!file || typeof file.text !== "function") {
+        throw new Error("Please choose a JavaScript state file.");
+    }
+
+    const source = await file.text();
+    const moduleBlob = new Blob([source], { type: "text/javascript" });
+    const moduleUrl = URL.createObjectURL(moduleBlob);
+
+    try {
+        return await import(moduleUrl);
+    } finally {
+        setTimeout(() => URL.revokeObjectURL(moduleUrl), 0);
+    }
+}
+
+export function saveEditorStateToFile() {
+    const roots = getRootBlocks();
+    const state = createEditorStateSnapshot(roots, manager);
+    const filename = createStateFilename();
+    const moduleSource = serializeEditorStateModule(state);
+
+    downloadTextFile(filename, moduleSource);
+    editorConsole.log(
+        `<span class="console_msg--debug">Saved ${roots.length} root block(s) to ${filename}</span>`
+    );
+
+    return { filename, count: roots.length };
+}
+
+export function loadEditorStateModule(moduleNamespace) {
+    const state = normalizeEditorStateModule(moduleNamespace);
+    clearEditorBlocks();
+
+    for (const root of state.roots) {
+        converter.toUINodes(root.tree, {
+            allowPartial: true,
+            position: root.position,
+        });
+    }
+
+    editorConsole.log(
+        `<span class="console_msg--debug">Loaded ${state.roots.length} root block(s)</span>`
+    );
+
+    return state;
+}
+
+export async function loadEditorStateFromFile(file) {
+    const moduleNamespace = await importStateModuleFromFile(file);
+    return loadEditorStateModule(moduleNamespace);
+}
+
+export function promptLoadEditorStateFile() {
+    if (!loadFileInput) {
+        throw new Error("Load file input is not available.");
+    }
+
+    loadFileInput.value = "";
+    loadFileInput.click();
+}
+
 export async function runEditorBlocks() {
     clearErrorHighlights();
     const roots = [...manager.activeBlocks.values()]
@@ -521,8 +762,7 @@ export async function runEditorBlocks() {
 }
 
 export function clearEditorBlocks() {
-    const roots = [...manager.activeBlocks.values()]
-        .filter(uiNode => !uiNode.parent);
+    clearErrorHighlights();
     for (const uiNode of manager.activeBlocks.values()) {
         uiNode.remove();
     }
@@ -544,7 +784,7 @@ export async function runDebugMode(tree, waitForStep, callback) {
             console.log("Stack:", stack);
             for (const frame of stack.slice(1)) {
                 for (const [key, value] of Object.entries(frame)) {
-                    editorConsole.log(`<span class="console_msg--debug">Stack: ${key} ${JSON.stringify(value)}</span>`);
+                    editorConsole.log(`<span class="console_msg--debug">Stack: ${key} ${JSON.stringify(prune(value, 2))}</span>`);
                 }
             }
 
@@ -557,7 +797,7 @@ export async function runDebugMode(tree, waitForStep, callback) {
         const result = await interpreter.run();
         
         if (result) {
-            editorConsole.log(`<span class="console_msg--debug"><b>Debug Result:</b> ${result.type} ${JSON.stringify(result.value)}</span>`);
+            editorConsole.log(`<span class="console_msg--debug"><b>Debug Result:</b> ${result.type} ${JSON.stringify(prune(value, 2))}</span>`);
         }
     } catch (e) {
         if (e.path) {
@@ -580,6 +820,9 @@ const playButton = document.querySelector(".environment__run");
 const debugButton = document.querySelector(".environment__debug");
 const resetButton = document.querySelector(".environment__reset");
 const clearButton = document.querySelector(".environment__clear");
+const saveButton = document.querySelector(".environment__save");
+const loadButton = document.querySelector(".environment__load");
+const loadFileInput = document.querySelector(".environment__load-file");
 
 async function executeConsoleCommand(command) {
     editorConsole.input.value = command;
@@ -601,3 +844,39 @@ resetButton?.addEventListener("click", async () => {
 clearButton?.addEventListener("click", async () => {
     await executeConsoleCommand("clear");
 });
+
+saveButton?.addEventListener("click", async () => {
+    await executeConsoleCommand("save");
+});
+
+loadButton?.addEventListener("click", async () => {
+    await executeConsoleCommand("load");
+});
+
+loadFileInput?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+        return;
+    }
+
+    try {
+        await loadEditorStateFromFile(file);
+    } catch (error) {
+        console.error(error);
+        editorConsole.log(`<span class="console_msg--error">Load error: ${error.message}</span>`);
+    } finally {
+        event.target.value = "";
+    }
+});
+
+function prune(obj, depth) {
+    console.log(obj instanceof Var)
+    if (depth === 0 || typeof obj !== 'object' || obj === null) {
+    return typeof obj === 'object' && obj !== null && !(obj instanceof Var) ? "[Object]" : obj;
+    }
+    const result = Array.isArray(obj) ? [] : {};
+    for (const key in obj) {
+    result[key] = prune(obj[key], depth - 1);
+    }
+    return result;
+}

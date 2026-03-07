@@ -285,6 +285,10 @@
                 <div class="environment__operation">charAt</div>
                 <div class="environment__branch"></div>
             </div>
+            <div class="environment__from-char-code-block block">
+                <div class="environment__operation">fromCharCode</div>
+                <div class="environment__branch"></div>
+            </div>
             </div>
             <div class="palette-group palette-group--convert">
             <div class="category" id="convert">Convert</div>
@@ -429,23 +433,58 @@
                 <div class="environment__branch"></div>
             </div>
 
-            <div class="environment__param-block block">
-                <div class="environment__operation">param</div>
-                <input type="text" class = "environment__input-number">
-                <div class="centered">of type</div>
-                <!--TODO: Make this a multiple choice, instead of text--> 
-                <input type="text" class = "environment__input-number">
+            <div class="environment__param-block environment__param-number-block block" data-signature-node="param" data-signature-type="number">
+                <div class="environment__operation">number</div>
+                <input type="text" class="environment__input-number" placeholder="name">
             </div>
-            
-            <div class="environment__type-block block">
-                <div class="environment__operation">type</div>
-                <!--TODO: Make this a multiple choice, instead of text--> 
-                <input type="text" class = "environment__input-number">
+            <div class="environment__param-block environment__param-string-block block" data-signature-node="param" data-signature-type="string">
+                <div class="environment__operation">string</div>
+                <input type="text" class="environment__input-number" placeholder="name">
+            </div>
+            <div class="environment__param-block environment__param-bool-block block" data-signature-node="param" data-signature-type="bool">
+                <div class="environment__operation">bool</div>
+                <input type="text" class="environment__input-number" placeholder="name">
+            </div>
+            <div class="environment__param-block environment__param-array-block block" data-signature-node="param" data-signature-type="array">
+                <div class="environment__operation">array</div>
+                <input type="text" class="environment__input-number" placeholder="name">
+            </div>
+            <div class="environment__param-block environment__param-function-block block" data-signature-node="param" data-signature-type="function">
+                <div class="environment__operation">function</div>
+                <input type="text" class="environment__input-number" placeholder="name">
+            </div>
+            <div class="environment__param-block environment__param-any-block block" data-signature-node="param" data-signature-type="any">
+                <div class="environment__operation">any</div>
+                <input type="text" class="environment__input-number" placeholder="name">
+            </div>
+
+            <div class="environment__type-block environment__type-number-block block" data-signature-node="type" data-signature-type="number">
+                <div class="environment__operation">type number</div>
+            </div>
+            <div class="environment__type-block environment__type-string-block block" data-signature-node="type" data-signature-type="string">
+                <div class="environment__operation">type string</div>
+            </div>
+            <div class="environment__type-block environment__type-bool-block block" data-signature-node="type" data-signature-type="bool">
+                <div class="environment__operation">type bool</div>
+            </div>
+            <div class="environment__type-block environment__type-array-block block" data-signature-node="type" data-signature-type="array">
+                <div class="environment__operation">type array</div>
+            </div>
+            <div class="environment__type-block environment__type-function-block block" data-signature-node="type" data-signature-type="function">
+                <div class="environment__operation">type function</div>
+            </div>
+            <div class="environment__type-block environment__type-any-block block" data-signature-node="type" data-signature-type="any">
+                <div class="environment__operation">type any</div>
+            </div>
+            <div class="environment__type-block environment__type-void-block block" data-signature-node="type" data-signature-type="void">
+                <div class="environment__operation">type void</div>
             </div>
             </div>
         </section>
         <div class="environment__splitter environment__splitter--palette-editor" aria-hidden="true"></div>
-        <section class="environment__code-editor container"> </section>
+        <section class="environment__code-editor container">
+            <div class="environment__editor-surface" aria-label="Code editor workspace"></div>
+        </section>
         <div class="environment__splitter environment__splitter--editor-console" aria-hidden="true"></div>
         <section class = "environment__console container">
             <div class = "console_output"></div>
@@ -459,6 +498,9 @@
             <button class="environment__debug">debug</button>
             <button class="environment__reset">reset</button>
             <button class="environment__clear">clear</button>
+            <button class="environment__save">save</button>
+            <button class="environment__load">load</button>
+            <input class="environment__load-file" type="file" accept=".js,.mjs,text/javascript,application/javascript" hidden>
         </section>
     </section>
 </body>
