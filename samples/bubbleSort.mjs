@@ -1,4 +1,4 @@
-import { ASTNode, Interpreter } from "./interpreter.mjs";
+import { ASTNode, Interpreter } from "../interpreter.mjs";
 
 const V = (name) => new ASTNode("variable", name);
 const N = (n) => new ASTNode("number", n);

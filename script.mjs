@@ -1,4 +1,4 @@
-import { ASTNode, Interpreter } from "./interpreter.mjs";
+import { ASTNode, Interpreter, Var } from "./interpreter.mjs";
 import { UINodeManager } from "./UINodeManager.mjs";
 import { Debugger } from "./debugger.mjs";
 import { Console } from "./console.mjs";
@@ -114,8 +114,8 @@ const arrayToBoolBlock = palette.querySelector(".environment__array-to-bool-bloc
 const arrayToStringBlock = palette.querySelector(".environment__array-to-string-block")
 const typeofBlock = palette.querySelector(".environment__typeof-block")
 const functionBlock = palette.querySelector(".environment__function-block")
-const paramBlock = palette.querySelector(".environment__param-block")
-const typeBlock = palette.querySelector(".environment__type-block")
+const paramBlocks = palette.querySelectorAll('[data-signature-node="param"]')
+const typeBlocks = palette.querySelectorAll('[data-signature-node="type"]')
 
 function bindCallBlock(blockElement, operation, label = operation) {
     if (!blockElement) return;
@@ -242,14 +242,20 @@ functionBlock.addEventListener('pointerdown', (e) => {
     const uiNode = manager.spawnNode("function", "function");
     startDragging(uiNode, e, e.target);
 });
-paramBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("param", "param");
-    startDragging(uiNode, e, e.target);
-});
-typeBlock.addEventListener('pointerdown', (e) => {
-    const uiNode = manager.spawnNode("type", "type");
-    startDragging(uiNode, e, e.target);
-});
+for (const blockElement of paramBlocks) {
+    blockElement.addEventListener('pointerdown', (e) => {
+        const signatureType = blockElement.dataset.signatureType;
+        const uiNode = manager.spawnNode("param", signatureType, { signatureType });
+        startDragging(uiNode, e, e.target);
+    });
+}
+for (const blockElement of typeBlocks) {
+    blockElement.addEventListener('pointerdown', (e) => {
+        const signatureType = blockElement.dataset.signatureType;
+        const uiNode = manager.spawnNode("type", `type ${signatureType}`, { signatureType });
+        startDragging(uiNode, e, e.target);
+    });
+}
 
 function setPaneWidth(pane, widthPx) {
     pane.style.flex = `0 0 ${widthPx}px`;
@@ -548,7 +554,7 @@ export async function runDebugMode(tree, waitForStep, callback) {
             console.log("Stack:", stack);
             for (const frame of stack.slice(1)) {
                 for (const [key, value] of Object.entries(frame)) {
-                    editorConsole.log(`<span class="console_msg--debug">Stack: ${key} ${JSON.stringify(value)}</span>`);
+                    editorConsole.log(`<span class="console_msg--debug">Stack: ${key} ${JSON.stringify(prune(value, 2))}</span>`);
                 }
             }
 
@@ -561,7 +567,7 @@ export async function runDebugMode(tree, waitForStep, callback) {
         const result = await interpreter.run();
         
         if (result) {
-            editorConsole.log(`<span class="console_msg--debug"><b>Debug Result:</b> ${result.type} ${JSON.stringify(result.value)}</span>`);
+            editorConsole.log(`<span class="console_msg--debug"><b>Debug Result:</b> ${result.type} ${JSON.stringify(prune(value, 2))}</span>`);
         }
     } catch (e) {
         if (e.path) {
@@ -605,3 +611,16 @@ resetButton?.addEventListener("click", async () => {
 clearButton?.addEventListener("click", async () => {
     await executeConsoleCommand("clear");
 });
+
+
+function prune(obj, depth) {
+    console.log(obj instanceof Var)
+    if (depth === 0 || typeof obj !== 'object' || obj === null) {
+    return typeof obj === 'object' && obj !== null && !(obj instanceof Var) ? "[Object]" : obj;
+    }
+    const result = Array.isArray(obj) ? [] : {};
+    for (const key in obj) {
+    result[key] = prune(obj[key], depth - 1);
+    }
+    return result;
+}
