@@ -9,7 +9,6 @@ import {
     normalizeEditorStateModule,
     serializeEditorStateModule,
 } from "./editorState.mjs";
-import { brainfuck } from "./samples/brainfuckInterpreter.mjs";
 const manager = new UINodeManager();
 
 const palette = document.querySelector(".environment__block-palette");
@@ -21,7 +20,6 @@ const toolbarPane = document.querySelector(".environment__toolbar");
 const paletteEditorSplitter = document.querySelector(".environment__splitter--palette-editor");
 const editorConsoleSplitter = document.querySelector(".environment__splitter--editor-console");
 const converter = new Converter(editorSurface, manager);
-converter.toUINodes(brainfuck)
 const editorConsole = new Console();
 for (const group of palette.querySelectorAll(".palette-group")) {
     const title = group.querySelector(".category");
@@ -52,9 +50,9 @@ const viewportState = {
     surfaceHeight: 0,
 };
 const MIN_WIDTH_FALLBACK = {
-    palette: 220,
-    editor: 320,
-    console: 220,
+    palette: 100,
+    editor: 100,
+    console: 100,
 };
 let activeResize = null;
 let activePan = null;
