@@ -52,7 +52,7 @@ img {
 
 .environment__code-editor {
     flex: 1 1 auto;
-    min-width: 20em;
+    min-width: 100px;
     position: relative;
     overflow: hidden;
     cursor: grab;
@@ -82,8 +82,8 @@ img {
 }
 
 .environment__block-palette {
-    flex: 0 0 18em;
-    min-width: 18em;
+    flex: 0 0 0;
+    min-width: 224px;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-gutter: stable;
@@ -92,16 +92,15 @@ img {
 }
 
 .environment__console {
-    flex: 0 0 20em;
-    min-width: 16em;
+    flex: 0 0 0;
+    min-width: 100px;
     display: flex;
     flex-direction: column;
     min-height: 0;
 }
 
 .environment__toolbar {
-    flex: 0 0 7.5em;
-    min-width: 7.5em;
+    flex: 0 0 0;
     display: flex;
     flex-direction: column;
     gap: 0.375em;

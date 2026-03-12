@@ -2353,540 +2353,625 @@ export default {
                         ]
                     },
                     {
-                        "id": "6410543b-113c-4413-8a7e-fd30b2308533",
-                        "token": "assign",
+                        "id": "a19851c1-da8e-4141-8bac-57b22edfacec",
+                        "token": "if",
                         "value": null,
                         "children": [
                             {
-                                "id": "8fad4394-c6e5-4489-bad6-45b223c5305d",
-                                "token": "variable",
-                                "value": "input",
-                                "children": []
-                            },
-                            {
-                                "id": "8d95cf10-bce4-4ada-b3b3-7f06f38d0fe4",
-                                "token": "array",
-                                "value": null,
-                                "children": [
-                                    {
-                                        "id": "5987ec15-f574-4590-b61f-52e2f6957fc6",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "efd2150d-187c-4c3f-b8fc-673743a90242",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "d3a402c6-8bc5-4931-b184-1cc3d1a12ad4",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "0e8368e0-1d0c-450f-9685-57ad37d809c7",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "01d3f2ec-c259-4728-9f46-ecf28a5306d9",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "80ad4f9b-9e83-4969-985d-3025baff7606",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "f2d67d3d-77b7-4756-87f6-1df744f66fc5",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "cc87cb76-cc88-47fb-9382-7f8a12c6a485",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "0d6f3c18-b670-4b2b-8686-b53b82188f86",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "88656673-5bee-40a3-9a65-b7ec8a5abe6c",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "7cccb0cd-b217-4c2d-8caf-5bd1e8d3882a",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "0ee22b90-e36f-4d47-a08e-53fc72ecbb88",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "c1e240a0-a20c-407f-8948-3c7730c83578",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "37ac90c6-d202-4753-9f1a-b9420d1cb50e",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "7619cc91-2121-4e1f-a41f-d61d1d10c675",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "ecb5a37e-de5f-4996-aa62-e2699843cbe3",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "8abd599d-e914-4798-8d1f-c41734718a4a",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "e153c1e4-24bd-45f0-97d9-7b77f12da6be",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "594face7-fa85-45b5-b3c8-7228b61f8493",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "af73b0af-9694-444a-bdde-7224b7472e55",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "3f2423bf-130f-4e61-a765-b7f7a2e90792",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "81ee5db8-e025-4e44-8ce4-9e10aea66a43",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "d8ed18e6-86c4-4f2e-aa47-fd71c501abe2",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "6bf30c95-ef54-4989-a278-eca22393e600",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "be3ab525-b825-4c5a-b7d8-0540660ce71a",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "0b497d12-6b9b-4469-8ec7-3938a3e42691",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "af36c7de-e16d-4758-970c-eaa63471f674",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "468131f5-2473-4c75-b5ee-762603c5c2d1",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "f9272b42-f301-4b42-bd44-75081e288672",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "2ad20d80-2a2f-4573-aa82-cac92895eae8",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "6586bbb5-e75a-4bb4-980b-d29e71e07424",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "6f572bb1-00c9-44b1-91e7-c1604e3ee080",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "836a8067-9ab1-4fd7-bf75-b94655550391",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "cc522608-fe58-4774-9a87-4653eadfbe82",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "0d655f68-c3f0-43e6-ab5f-9559eedfdba0",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "9768bf03-93b4-4fca-998b-3e3109aa30c8",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "b226077d-5c17-48f7-9255-8a43435067e7",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "f060f69a-769e-4462-8638-c27ae8b2b92b",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "68f25bd6-7b02-4553-afa9-f3568418eb43",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "55045f81-1b5f-40cd-8ac5-0b1aa228d13b",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "66665c0e-8869-4dad-9e45-f4d10295c55e",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "b8c58511-6125-45f2-bf32-75f0ace5a02b",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "1ec391f8-90b3-47ab-a344-7ea40f0d4266",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "561216d4-f76e-45ba-8889-4d879296116d",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "63d39431-21ec-4220-84d1-ef972094dc73",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "ecee74e0-8142-43c2-a5a3-dad7ab48fffb",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "8190e193-7727-4047-910f-45b9fde566b8",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "64d14625-d93b-46fd-bf7d-6670b786c52f",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "99cc8ea0-22b7-4f50-9d5f-7608fd6414b4",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "5b3d4ac1-e7ad-4a43-9455-01c46ce8ef79",
-                                        "token": "number",
-                                        "value": 0,
-                                        "children": []
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "1091ab93-a61a-4448-88a9-6c90fbd14e7f",
-                        "token": "assign",
-                        "value": null,
-                        "children": [
-                            {
-                                "id": "882e2ada-be12-4148-918e-2b0ae2036504",
-                                "token": "variable",
-                                "value": "res",
-                                "children": []
-                            },
-                            {
-                                "id": "da0354b0-a264-4f03-9876-d9eb26535a8c",
+                                "id": "31a83878-6341-4829-b911-7933d01a9317",
                                 "token": "call",
                                 "value": null,
                                 "children": [
                                     {
-                                        "id": "7964db78-b173-4250-86e8-da91e1b2e3ca",
+                                        "id": "b0ebe15f-f444-4f96-9a79-b3e313d589c3",
                                         "token": "variable",
-                                        "value": "run_bf",
+                                        "value": "==",
                                         "children": []
                                     },
                                     {
-                                        "id": "85fa5c97-c504-4605-9292-6950333d406d",
+                                        "id": "8f215159-ebf0-4747-8177-c19dedef6bd7",
+                                        "token": "call",
+                                        "value": null,
+                                        "children": [
+                                            {
+                                                "id": "e3af4446-1469-4a75-817e-b1b5c7ce3e58",
+                                                "token": "variable",
+                                                "value": "strlen",
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "a4e91f4f-8c8e-4bef-bd85-aa8080450b7a",
+                                                "token": "variable",
+                                                "value": "program",
+                                                "children": []
+                                            }
+                                        ],
+                                        "ui": {
+                                            "callMode": "fixed",
+                                            "callOperation": "strlen"
+                                        }
+                                    },
+                                    {
+                                        "id": "2ef18054-ff93-4cae-9092-7ce2a6621f27",
+                                        "token": "number",
+                                        "value": 0,
+                                        "children": []
+                                    }
+                                ],
+                                "ui": {
+                                    "callMode": "fixed",
+                                    "callOperation": "=="
+                                }
+                            },
+                            {
+                                "id": "0cd5d061-6e72-4103-8847-faabb5ee901d",
+                                "token": "assign",
+                                "value": null,
+                                "children": [
+                                    {
+                                        "id": "a6751e4c-8f3a-485f-b08c-450942d26e23",
                                         "token": "variable",
                                         "value": "program",
                                         "children": []
                                     },
                                     {
-                                        "id": "cc6595ac-93b1-461f-a44d-92201c9ce73b",
-                                        "token": "variable",
-                                        "value": "input",
-                                        "children": []
-                                    }
-                                ],
-                                "ui": {
-                                    "callMode": "generic"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "id": "de7315ae-286b-4281-a8ef-f44152bc5fc8",
-                        "token": "for",
-                        "value": null,
-                        "children": [
-                            {
-                                "id": "4be991a7-b343-40f1-9897-f3e081200426",
-                                "token": "assign",
-                                "value": null,
-                                "children": [
-                                    {
-                                        "id": "38743cc4-3f0f-4425-ae01-caab2b625dcd",
-                                        "token": "variable",
-                                        "value": "i",
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "4cddbac0-cb71-4bb6-a5e7-e511b628a861",
-                                        "token": "number",
-                                        "value": 0,
+                                        "id": "8967dc02-b00b-4106-9caf-fb0e2fd48a6e",
+                                        "token": "string",
+                                        "value": "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.",
                                         "children": []
                                     }
                                 ]
                             },
                             {
-                                "id": "8d67264a-c4ee-4ba8-9e61-434655dc8aff",
-                                "token": "call",
+                                "id": "05fcf321-6f4a-46b9-8665-45bfcb5ce9a2",
+                                "token": "block",
                                 "value": null,
-                                "children": [
-                                    {
-                                        "id": "73adf6b8-d88f-422c-89ec-ce02960d0dee",
-                                        "token": "variable",
-                                        "value": "<",
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "cd36063b-ce18-4651-b1a9-626db8ac0f7e",
-                                        "token": "variable",
-                                        "value": "i",
-                                        "children": []
-                                    },
-                                    {
-                                        "id": "aac95559-c06e-4c86-9fcd-eabb0feb0692",
-                                        "token": "call",
-                                        "value": null,
-                                        "children": [
-                                            {
-                                                "id": "ea385fa3-0a89-43be-a75d-48de61269bcd",
-                                                "token": "variable",
-                                                "value": "len",
-                                                "children": []
-                                            },
-                                            {
-                                                "id": "dd401834-d14a-411d-9615-be19858ec22f",
-                                                "token": "variable",
-                                                "value": "res",
-                                                "children": []
-                                            }
-                                        ],
-                                        "ui": {
-                                            "callMode": "fixed",
-                                            "callOperation": "len"
-                                        }
-                                    }
-                                ],
-                                "ui": {
-                                    "callMode": "fixed",
-                                    "callOperation": "<"
-                                }
-                            },
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "id": "a86e88d6-6703-4657-811c-5b827a904a0a",
+                        "token": "block",
+                        "value": null,
+                        "children": [
                             {
-                                "id": "79c299ef-1801-4746-a2f9-b681396c526c",
+                                "id": "6410543b-113c-4413-8a7e-fd30b2308533",
                                 "token": "assign",
                                 "value": null,
                                 "children": [
                                     {
-                                        "id": "284de3ee-cdb1-432d-9cd5-6f2b5076bc01",
+                                        "id": "8fad4394-c6e5-4489-bad6-45b223c5305d",
                                         "token": "variable",
-                                        "value": "i",
+                                        "value": "input",
                                         "children": []
                                     },
                                     {
-                                        "id": "57fd9097-6107-48a6-bc14-e239a716ebec",
+                                        "id": "8d95cf10-bce4-4ada-b3b3-7f06f38d0fe4",
+                                        "token": "array",
+                                        "value": null,
+                                        "children": [
+                                            {
+                                                "id": "5987ec15-f574-4590-b61f-52e2f6957fc6",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "efd2150d-187c-4c3f-b8fc-673743a90242",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "d3a402c6-8bc5-4931-b184-1cc3d1a12ad4",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "0e8368e0-1d0c-450f-9685-57ad37d809c7",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "01d3f2ec-c259-4728-9f46-ecf28a5306d9",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "80ad4f9b-9e83-4969-985d-3025baff7606",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "f2d67d3d-77b7-4756-87f6-1df744f66fc5",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "cc87cb76-cc88-47fb-9382-7f8a12c6a485",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "0d6f3c18-b670-4b2b-8686-b53b82188f86",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "88656673-5bee-40a3-9a65-b7ec8a5abe6c",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "7cccb0cd-b217-4c2d-8caf-5bd1e8d3882a",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "0ee22b90-e36f-4d47-a08e-53fc72ecbb88",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "c1e240a0-a20c-407f-8948-3c7730c83578",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "37ac90c6-d202-4753-9f1a-b9420d1cb50e",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "7619cc91-2121-4e1f-a41f-d61d1d10c675",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "ecb5a37e-de5f-4996-aa62-e2699843cbe3",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "8abd599d-e914-4798-8d1f-c41734718a4a",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "e153c1e4-24bd-45f0-97d9-7b77f12da6be",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "594face7-fa85-45b5-b3c8-7228b61f8493",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "af73b0af-9694-444a-bdde-7224b7472e55",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "3f2423bf-130f-4e61-a765-b7f7a2e90792",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "81ee5db8-e025-4e44-8ce4-9e10aea66a43",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "d8ed18e6-86c4-4f2e-aa47-fd71c501abe2",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "6bf30c95-ef54-4989-a278-eca22393e600",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "be3ab525-b825-4c5a-b7d8-0540660ce71a",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "0b497d12-6b9b-4469-8ec7-3938a3e42691",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "af36c7de-e16d-4758-970c-eaa63471f674",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "468131f5-2473-4c75-b5ee-762603c5c2d1",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "f9272b42-f301-4b42-bd44-75081e288672",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "2ad20d80-2a2f-4573-aa82-cac92895eae8",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "6586bbb5-e75a-4bb4-980b-d29e71e07424",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "6f572bb1-00c9-44b1-91e7-c1604e3ee080",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "836a8067-9ab1-4fd7-bf75-b94655550391",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "cc522608-fe58-4774-9a87-4653eadfbe82",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "0d655f68-c3f0-43e6-ab5f-9559eedfdba0",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "9768bf03-93b4-4fca-998b-3e3109aa30c8",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "b226077d-5c17-48f7-9255-8a43435067e7",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "f060f69a-769e-4462-8638-c27ae8b2b92b",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "68f25bd6-7b02-4553-afa9-f3568418eb43",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "55045f81-1b5f-40cd-8ac5-0b1aa228d13b",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "66665c0e-8869-4dad-9e45-f4d10295c55e",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "b8c58511-6125-45f2-bf32-75f0ace5a02b",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "1ec391f8-90b3-47ab-a344-7ea40f0d4266",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "561216d4-f76e-45ba-8889-4d879296116d",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "63d39431-21ec-4220-84d1-ef972094dc73",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "ecee74e0-8142-43c2-a5a3-dad7ab48fffb",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "8190e193-7727-4047-910f-45b9fde566b8",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "64d14625-d93b-46fd-bf7d-6670b786c52f",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "99cc8ea0-22b7-4f50-9d5f-7608fd6414b4",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "5b3d4ac1-e7ad-4a43-9455-01c46ce8ef79",
+                                                "token": "number",
+                                                "value": 0,
+                                                "children": []
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "1091ab93-a61a-4448-88a9-6c90fbd14e7f",
+                                "token": "assign",
+                                "value": null,
+                                "children": [
+                                    {
+                                        "id": "882e2ada-be12-4148-918e-2b0ae2036504",
+                                        "token": "variable",
+                                        "value": "res",
+                                        "children": []
+                                    },
+                                    {
+                                        "id": "da0354b0-a264-4f03-9876-d9eb26535a8c",
                                         "token": "call",
                                         "value": null,
                                         "children": [
                                             {
-                                                "id": "11fd1c17-051c-4233-be00-eeb66d478eae",
+                                                "id": "7964db78-b173-4250-86e8-da91e1b2e3ca",
                                                 "token": "variable",
-                                                "value": "+",
+                                                "value": "run_bf",
                                                 "children": []
                                             },
                                             {
-                                                "id": "7264f40e-c148-45ec-88c4-397fb2a39a29",
+                                                "id": "85fa5c97-c504-4605-9292-6950333d406d",
+                                                "token": "variable",
+                                                "value": "program",
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "cc6595ac-93b1-461f-a44d-92201c9ce73b",
+                                                "token": "variable",
+                                                "value": "input",
+                                                "children": []
+                                            }
+                                        ],
+                                        "ui": {
+                                            "callMode": "generic"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "de7315ae-286b-4281-a8ef-f44152bc5fc8",
+                                "token": "for",
+                                "value": null,
+                                "children": [
+                                    {
+                                        "id": "4be991a7-b343-40f1-9897-f3e081200426",
+                                        "token": "assign",
+                                        "value": null,
+                                        "children": [
+                                            {
+                                                "id": "38743cc4-3f0f-4425-ae01-caab2b625dcd",
                                                 "token": "variable",
                                                 "value": "i",
                                                 "children": []
                                             },
                                             {
-                                                "id": "7cf3637f-a71c-4f43-b7ce-8f7b35c0b7d0",
+                                                "id": "4cddbac0-cb71-4bb6-a5e7-e511b628a861",
                                                 "token": "number",
-                                                "value": 1,
+                                                "value": 0,
                                                 "children": []
                                             }
-                                        ],
-                                        "ui": {
-                                            "callMode": "fixed",
-                                            "callOperation": "+"
-                                        }
-                                    }
-                                ]
-                            },
-                            {
-                                "id": "6d8a4ff7-6387-4dd0-8582-3df31ae0ba04",
-                                "token": "call",
-                                "value": null,
-                                "children": [
-                                    {
-                                        "id": "adb4d61b-40bc-4511-adb9-52bdc6d7322d",
-                                        "token": "variable",
-                                        "value": "print",
-                                        "children": []
+                                        ]
                                     },
                                     {
-                                        "id": "e01e8539-8364-4678-8784-d5befcd5756d",
+                                        "id": "8d67264a-c4ee-4ba8-9e61-434655dc8aff",
                                         "token": "call",
                                         "value": null,
                                         "children": [
                                             {
-                                                "id": "575997ca-3a79-4179-9d6c-b8f4eab8913a",
+                                                "id": "73adf6b8-d88f-422c-89ec-ce02960d0dee",
                                                 "token": "variable",
-                                                "value": "fromCharCode",
+                                                "value": "<",
                                                 "children": []
                                             },
                                             {
-                                                "id": "1afab448-de83-44e1-9376-267875455a34",
+                                                "id": "cd36063b-ce18-4651-b1a9-626db8ac0f7e",
+                                                "token": "variable",
+                                                "value": "i",
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "aac95559-c06e-4c86-9fcd-eabb0feb0692",
                                                 "token": "call",
                                                 "value": null,
                                                 "children": [
                                                     {
-                                                        "id": "b171c16b-d42a-4e12-a843-9484a18d786e",
+                                                        "id": "ea385fa3-0a89-43be-a75d-48de61269bcd",
                                                         "token": "variable",
-                                                        "value": "at",
+                                                        "value": "len",
                                                         "children": []
                                                     },
                                                     {
-                                                        "id": "35f8d00a-c5e4-4c6a-96bd-b34c9db189b8",
+                                                        "id": "dd401834-d14a-411d-9615-be19858ec22f",
                                                         "token": "variable",
                                                         "value": "res",
-                                                        "children": []
-                                                    },
-                                                    {
-                                                        "id": "93287a63-f1e6-4366-bfd5-253c02f08495",
-                                                        "token": "variable",
-                                                        "value": "i",
                                                         "children": []
                                                     }
                                                 ],
                                                 "ui": {
                                                     "callMode": "fixed",
-                                                    "callOperation": "at"
+                                                    "callOperation": "len"
                                                 }
                                             }
                                         ],
                                         "ui": {
                                             "callMode": "fixed",
-                                            "callOperation": "fromCharCode"
+                                            "callOperation": "<"
+                                        }
+                                    },
+                                    {
+                                        "id": "79c299ef-1801-4746-a2f9-b681396c526c",
+                                        "token": "assign",
+                                        "value": null,
+                                        "children": [
+                                            {
+                                                "id": "284de3ee-cdb1-432d-9cd5-6f2b5076bc01",
+                                                "token": "variable",
+                                                "value": "i",
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "57fd9097-6107-48a6-bc14-e239a716ebec",
+                                                "token": "call",
+                                                "value": null,
+                                                "children": [
+                                                    {
+                                                        "id": "11fd1c17-051c-4233-be00-eeb66d478eae",
+                                                        "token": "variable",
+                                                        "value": "+",
+                                                        "children": []
+                                                    },
+                                                    {
+                                                        "id": "7264f40e-c148-45ec-88c4-397fb2a39a29",
+                                                        "token": "variable",
+                                                        "value": "i",
+                                                        "children": []
+                                                    },
+                                                    {
+                                                        "id": "7cf3637f-a71c-4f43-b7ce-8f7b35c0b7d0",
+                                                        "token": "number",
+                                                        "value": 1,
+                                                        "children": []
+                                                    }
+                                                ],
+                                                "ui": {
+                                                    "callMode": "fixed",
+                                                    "callOperation": "+"
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": "6d8a4ff7-6387-4dd0-8582-3df31ae0ba04",
+                                        "token": "call",
+                                        "value": null,
+                                        "children": [
+                                            {
+                                                "id": "adb4d61b-40bc-4511-adb9-52bdc6d7322d",
+                                                "token": "variable",
+                                                "value": "print",
+                                                "children": []
+                                            },
+                                            {
+                                                "id": "e01e8539-8364-4678-8784-d5befcd5756d",
+                                                "token": "call",
+                                                "value": null,
+                                                "children": [
+                                                    {
+                                                        "id": "575997ca-3a79-4179-9d6c-b8f4eab8913a",
+                                                        "token": "variable",
+                                                        "value": "fromCharCode",
+                                                        "children": []
+                                                    },
+                                                    {
+                                                        "id": "1afab448-de83-44e1-9376-267875455a34",
+                                                        "token": "call",
+                                                        "value": null,
+                                                        "children": [
+                                                            {
+                                                                "id": "b171c16b-d42a-4e12-a843-9484a18d786e",
+                                                                "token": "variable",
+                                                                "value": "at",
+                                                                "children": []
+                                                            },
+                                                            {
+                                                                "id": "35f8d00a-c5e4-4c6a-96bd-b34c9db189b8",
+                                                                "token": "variable",
+                                                                "value": "res",
+                                                                "children": []
+                                                            },
+                                                            {
+                                                                "id": "93287a63-f1e6-4366-bfd5-253c02f08495",
+                                                                "token": "variable",
+                                                                "value": "i",
+                                                                "children": []
+                                                            }
+                                                        ],
+                                                        "ui": {
+                                                            "callMode": "fixed",
+                                                            "callOperation": "at"
+                                                        }
+                                                    }
+                                                ],
+                                                "ui": {
+                                                    "callMode": "fixed",
+                                                    "callOperation": "fromCharCode"
+                                                }
+                                            }
+                                        ],
+                                        "ui": {
+                                            "callMode": "fixed",
+                                            "callOperation": "print"
                                         }
                                     }
-                                ],
-                                "ui": {
-                                    "callMode": "fixed",
-                                    "callOperation": "print"
-                                }
+                                ]
                             }
                         ]
                     }
