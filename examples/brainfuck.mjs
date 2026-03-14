@@ -916,55 +916,124 @@ export default {
                                                                                                 "children": []
                                                                                             },
                                                                                             {
-                                                                                                "id": "9156e9e7-090d-4135-8239-d2f2aaea4342",
+                                                                                                "id": "0d35de6b-26ee-4f35-bb8e-4fad538c3f73",
                                                                                                 "token": "call",
                                                                                                 "value": null,
                                                                                                 "children": [
                                                                                                     {
-                                                                                                        "id": "79fcc0ce-9bb6-40e4-8e5f-4c6e91396b26",
+                                                                                                        "id": "7a00b15e-d7fe-4bfd-a9da-f4ac58ee9f69",
                                                                                                         "token": "variable",
-                                                                                                        "value": "+",
+                                                                                                        "value": "%",
                                                                                                         "children": []
                                                                                                     },
                                                                                                     {
-                                                                                                        "id": "812af6de-1d76-4f1f-91f9-817b57a1712c",
+                                                                                                        "id": "7c2eac30-6b61-4109-a541-9cb925b0d428",
                                                                                                         "token": "call",
                                                                                                         "value": null,
                                                                                                         "children": [
                                                                                                             {
-                                                                                                                "id": "a387a45b-c38b-41b1-8a93-ac4ba626edc1",
+                                                                                                                "id": "6f997cf3-e61d-469c-be89-3a31daa6a111",
                                                                                                                 "token": "variable",
-                                                                                                                "value": "at",
+                                                                                                                "value": "+",
                                                                                                                 "children": []
                                                                                                             },
                                                                                                             {
-                                                                                                                "id": "cf67c0d0-7267-47fa-b775-839827efc7b9",
-                                                                                                                "token": "variable",
-                                                                                                                "value": "tape",
-                                                                                                                "children": []
+                                                                                                                "id": "54179bea-c2ff-48d6-80ac-4c689c9be8a2",
+                                                                                                                "token": "call",
+                                                                                                                "value": null,
+                                                                                                                "children": [
+                                                                                                                    {
+                                                                                                                        "id": "c6c8f908-fc3d-4e39-b69d-8bfcc442bf35",
+                                                                                                                        "token": "variable",
+                                                                                                                        "value": "%",
+                                                                                                                        "children": []
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "id": "9156e9e7-090d-4135-8239-d2f2aaea4342",
+                                                                                                                        "token": "call",
+                                                                                                                        "value": null,
+                                                                                                                        "children": [
+                                                                                                                            {
+                                                                                                                                "id": "79fcc0ce-9bb6-40e4-8e5f-4c6e91396b26",
+                                                                                                                                "token": "variable",
+                                                                                                                                "value": "+",
+                                                                                                                                "children": []
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "id": "812af6de-1d76-4f1f-91f9-817b57a1712c",
+                                                                                                                                "token": "call",
+                                                                                                                                "value": null,
+                                                                                                                                "children": [
+                                                                                                                                    {
+                                                                                                                                        "id": "a387a45b-c38b-41b1-8a93-ac4ba626edc1",
+                                                                                                                                        "token": "variable",
+                                                                                                                                        "value": "at",
+                                                                                                                                        "children": []
+                                                                                                                                    },
+                                                                                                                                    {
+                                                                                                                                        "id": "cf67c0d0-7267-47fa-b775-839827efc7b9",
+                                                                                                                                        "token": "variable",
+                                                                                                                                        "value": "tape",
+                                                                                                                                        "children": []
+                                                                                                                                    },
+                                                                                                                                    {
+                                                                                                                                        "id": "5d9d2418-1305-4bba-b966-5a351e396165",
+                                                                                                                                        "token": "variable",
+                                                                                                                                        "value": "ptr",
+                                                                                                                                        "children": []
+                                                                                                                                    }
+                                                                                                                                ],
+                                                                                                                                "ui": {
+                                                                                                                                    "callMode": "fixed",
+                                                                                                                                    "callOperation": "at"
+                                                                                                                                }
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "id": "a4d792ee-6e5d-44e4-bad3-4e4b832c43b6",
+                                                                                                                                "token": "number",
+                                                                                                                                "value": 1,
+                                                                                                                                "children": []
+                                                                                                                            }
+                                                                                                                        ],
+                                                                                                                        "ui": {
+                                                                                                                            "callMode": "fixed",
+                                                                                                                            "callOperation": "+"
+                                                                                                                        }
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "id": "76811490-caf1-4a20-b6e2-49de02cdce79",
+                                                                                                                        "token": "number",
+                                                                                                                        "value": 256,
+                                                                                                                        "children": []
+                                                                                                                    }
+                                                                                                                ],
+                                                                                                                "ui": {
+                                                                                                                    "callMode": "fixed",
+                                                                                                                    "callOperation": "%"
+                                                                                                                }
                                                                                                             },
                                                                                                             {
-                                                                                                                "id": "5d9d2418-1305-4bba-b966-5a351e396165",
-                                                                                                                "token": "variable",
-                                                                                                                "value": "ptr",
+                                                                                                                "id": "1a1f91ca-13e1-4a86-b952-d25e36d71fcd",
+                                                                                                                "token": "number",
+                                                                                                                "value": 256,
                                                                                                                 "children": []
                                                                                                             }
                                                                                                         ],
                                                                                                         "ui": {
                                                                                                             "callMode": "fixed",
-                                                                                                            "callOperation": "at"
+                                                                                                            "callOperation": "+"
                                                                                                         }
                                                                                                     },
                                                                                                     {
-                                                                                                        "id": "a4d792ee-6e5d-44e4-bad3-4e4b832c43b6",
+                                                                                                        "id": "365eaa00-d134-40f6-a35c-46bb2855647c",
                                                                                                         "token": "number",
-                                                                                                        "value": 1,
+                                                                                                        "value": 256,
                                                                                                         "children": []
                                                                                                     }
                                                                                                 ],
                                                                                                 "ui": {
                                                                                                     "callMode": "fixed",
-                                                                                                    "callOperation": "+"
+                                                                                                    "callOperation": "%"
                                                                                                 }
                                                                                             },
                                                                                             {
@@ -1030,55 +1099,124 @@ export default {
                                                                                                         "children": []
                                                                                                     },
                                                                                                     {
-                                                                                                        "id": "e8aa7c7a-e448-4c5d-8c71-bfcd04b6efe9",
+                                                                                                        "id": "7b6fefbc-17ed-4e7c-881b-e4347fd80aa9",
                                                                                                         "token": "call",
                                                                                                         "value": null,
                                                                                                         "children": [
                                                                                                             {
-                                                                                                                "id": "54c56b11-2397-4493-9ec5-4898d1636e77",
+                                                                                                                "id": "d0b7e2a1-6508-4eee-a17a-1484f8d153f2",
                                                                                                                 "token": "variable",
-                                                                                                                "value": "-",
+                                                                                                                "value": "%",
                                                                                                                 "children": []
                                                                                                             },
                                                                                                             {
-                                                                                                                "id": "27fe159b-111f-4aa2-8c91-2f3b853a1030",
+                                                                                                                "id": "4c03f6db-201f-45ee-94eb-74c5f59b27cc",
                                                                                                                 "token": "call",
                                                                                                                 "value": null,
                                                                                                                 "children": [
                                                                                                                     {
-                                                                                                                        "id": "6a5c28e7-9d7f-4a9a-8e79-5b72ba04c755",
+                                                                                                                        "id": "9cfd10b0-1cc4-45e6-ac1a-a9e3f155e441",
                                                                                                                         "token": "variable",
-                                                                                                                        "value": "at",
+                                                                                                                        "value": "+",
                                                                                                                         "children": []
                                                                                                                     },
                                                                                                                     {
-                                                                                                                        "id": "14411750-8f43-47ea-bbef-f6831349be28",
-                                                                                                                        "token": "variable",
-                                                                                                                        "value": "tape",
-                                                                                                                        "children": []
+                                                                                                                        "id": "b11a20cd-7199-4f62-be7c-8bba4103a3c0",
+                                                                                                                        "token": "call",
+                                                                                                                        "value": null,
+                                                                                                                        "children": [
+                                                                                                                            {
+                                                                                                                                "id": "c5fc89b8-86da-4edf-ad72-7496d1c2d1d1",
+                                                                                                                                "token": "variable",
+                                                                                                                                "value": "%",
+                                                                                                                                "children": []
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "id": "e8aa7c7a-e448-4c5d-8c71-bfcd04b6efe9",
+                                                                                                                                "token": "call",
+                                                                                                                                "value": null,
+                                                                                                                                "children": [
+                                                                                                                                    {
+                                                                                                                                        "id": "54c56b11-2397-4493-9ec5-4898d1636e77",
+                                                                                                                                        "token": "variable",
+                                                                                                                                        "value": "-",
+                                                                                                                                        "children": []
+                                                                                                                                    },
+                                                                                                                                    {
+                                                                                                                                        "id": "27fe159b-111f-4aa2-8c91-2f3b853a1030",
+                                                                                                                                        "token": "call",
+                                                                                                                                        "value": null,
+                                                                                                                                        "children": [
+                                                                                                                                            {
+                                                                                                                                                "id": "6a5c28e7-9d7f-4a9a-8e79-5b72ba04c755",
+                                                                                                                                                "token": "variable",
+                                                                                                                                                "value": "at",
+                                                                                                                                                "children": []
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "id": "14411750-8f43-47ea-bbef-f6831349be28",
+                                                                                                                                                "token": "variable",
+                                                                                                                                                "value": "tape",
+                                                                                                                                                "children": []
+                                                                                                                                            },
+                                                                                                                                            {
+                                                                                                                                                "id": "5d137ad5-917a-4e28-a043-650670a2c09b",
+                                                                                                                                                "token": "variable",
+                                                                                                                                                "value": "ptr",
+                                                                                                                                                "children": []
+                                                                                                                                            }
+                                                                                                                                        ],
+                                                                                                                                        "ui": {
+                                                                                                                                            "callMode": "fixed",
+                                                                                                                                            "callOperation": "at"
+                                                                                                                                        }
+                                                                                                                                    },
+                                                                                                                                    {
+                                                                                                                                        "id": "5787ba75-145d-4ad6-8604-a5d7c3f8c5df",
+                                                                                                                                        "token": "number",
+                                                                                                                                        "value": 1,
+                                                                                                                                        "children": []
+                                                                                                                                    }
+                                                                                                                                ],
+                                                                                                                                "ui": {
+                                                                                                                                    "callMode": "fixed",
+                                                                                                                                    "callOperation": "-"
+                                                                                                                                }
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "id": "8d78dca3-6f46-4bc9-acd8-94035b8f5f02",
+                                                                                                                                "token": "number",
+                                                                                                                                "value": 256,
+                                                                                                                                "children": []
+                                                                                                                            }
+                                                                                                                        ],
+                                                                                                                        "ui": {
+                                                                                                                            "callMode": "fixed",
+                                                                                                                            "callOperation": "%"
+                                                                                                                        }
                                                                                                                     },
                                                                                                                     {
-                                                                                                                        "id": "5d137ad5-917a-4e28-a043-650670a2c09b",
-                                                                                                                        "token": "variable",
-                                                                                                                        "value": "ptr",
+                                                                                                                        "id": "777b66e1-1183-43f8-a258-b3d4c5c75eba",
+                                                                                                                        "token": "number",
+                                                                                                                        "value": 256,
                                                                                                                         "children": []
                                                                                                                     }
                                                                                                                 ],
                                                                                                                 "ui": {
                                                                                                                     "callMode": "fixed",
-                                                                                                                    "callOperation": "at"
+                                                                                                                    "callOperation": "+"
                                                                                                                 }
                                                                                                             },
                                                                                                             {
-                                                                                                                "id": "5787ba75-145d-4ad6-8604-a5d7c3f8c5df",
+                                                                                                                "id": "c338a0d9-023a-4bc6-bad2-f6377b922a7c",
                                                                                                                 "token": "number",
-                                                                                                                "value": 1,
+                                                                                                                "value": 256,
                                                                                                                 "children": []
                                                                                                             }
                                                                                                         ],
                                                                                                         "ui": {
                                                                                                             "callMode": "fixed",
-                                                                                                            "callOperation": "-"
+                                                                                                            "callOperation": "%"
                                                                                                         }
                                                                                                     },
                                                                                                     {
